@@ -101,9 +101,17 @@ def test_ci_runs_every_gate() -> None:
         "scripts.regression_gate security",
         "opspilot.benchmark run --split dev",
         "scripts.security_suite",
+        "./scripts/verify.sh",
+        "gitleaks git",
+        "pip-audit",
+        "trivy image",
+        "terraform validate",
     ):
         assert command in workflow, command
     assert "--split heldout" not in workflow  # the consumed held-out set is never re-run
+    # Paid / real-side-effect smokes are opt-in scripts, never CI steps; CI holds no such secret.
+    for forbidden in ("live_openai_smoke", "live_gitlab_smoke", "secrets.", "terraform apply"):
+        assert forbidden not in workflow, forbidden
 
 
 @pytest.mark.integration

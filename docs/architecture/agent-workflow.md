@@ -262,19 +262,24 @@ proposes a legitimate issue. The results:
 The offline heuristic planner shows the same behaviour, and via HTTP the request body cannot
 carry `tenant_id` or `approved` (422).
 
-## 10. Observability (prepared, not Phase 3)
+## 10. Observability (Phase 3, extended in Phase 4)
 
-Spans are emitted as key-value log lines that include both `request_id` and `run_id`:
-- `request` → `agent.run` → `agent.llm` / `agent.tool` → `retrieval` / `gitlab.request`;
-- `agent.approval`.
+Manual OpenTelemetry spans cover `http.request`, `agent.run`, planning/LLM calls, knowledge
+search, authorization, approval, execution, GitLab requests and reconciliation. JSON stdout
+logs and PostgreSQL audit events correlate request, run and trace IDs. AI spans record configured
+and served model IDs, usage and configured price estimates; missing usage/cost is unknown.
+See [observability](../observability.md) and [ADR 005](../adr/005-otlp-http-collector-jaeger.md).
 
-Replacing `observability.span` with an OpenTelemetry tracer is the Phase 3 extension point.
-Logs contain no tokens, `PRIVATE-TOKEN`, request text or documents (checked in tests and in
-container logs). Audit events (`agent_events`, append-only) record:
-- who started the run, the request size, each validated decision (tool and arguments; long
-  descriptions as a length only);
-- denials with reasons, the stored proposal hash, and who approved or rejected which hash;
-- each claim and attempt, and the outcome with the issue IID and URL.
+Attribute/metric-label allowlists exclude credentials and document/request content. Export is
+background, bounded and fail-open. FastAPI's automatic telemetry is disabled to prevent a
+second uncontrolled pipeline. The optional local Collector/Jaeger profile is separate from
+API availability. In AWS, the optional ADOT sidecar sends traces to X-Ray and EMF metrics to
+CloudWatch; that deployment path has not been executed.
+
+Append-only audit events record actor/action hashes, denials, claims, attempts and safe
+outcomes. Long descriptions are recorded as lengths. Telemetry is diagnostic; persisted
+state and authorization remain the authority. Historical Phase 3 exporter-failure tests are
+not substitutes for the pending final tests/runtime checks.
 
 ## 11. Evaluation and mutation results
 
@@ -320,33 +325,36 @@ arbitrary project, double side effect, step bound). **17 / 17 were caught.**
   - nothing resumes stuck or ambiguous runs on startup or on a schedule; an operator or client
     calls `POST /resume`;
   - grace and attempts are configuration, not adaptive.
-- **Partial observability:** the request log line still reports `outcome=ok` for handled 4xx/5xx
-  (a Phase 1 limitation, unchanged).
+- **HTTP outcome interpretation:** request logs include `status` and spans include the HTTP
+  response code. A handled response may still have span-wrapper `outcome=ok`; use the status
+  rather than interpreting that wrapper field as HTTP success.
 - **retrieval-v2 freeze:** Phase 2 changed `persistence/postgres.py` (readiness only; retrieval SQL
   is unchanged), so the retrieval-v2 freeze manifest correctly refuses a held-out re-run at this
   commit. The published held-out result belongs to commit `7ba3378`.
 
-## 13. Optional real GitLab smoke (documented, not executed)
+## 13. Optional real GitLab smoke (not executed)
 
-Automated tests never touch a real GitLab. To try the adapter against one, use a **sandbox
-project**; the approved issue is created for real.
+Use `scripts/live_gitlab_smoke.py` only with a disposable sandbox project, a project access
+token with Reporter role / `api` scope / short expiry, HTTPS base URL, numeric project ID,
+a migrated runtime-role `DATABASE_URL`, and `OPSPILOT_ALLOW_REAL_GITLAB_SMOKE=true`.
+Missing configuration exits 2 without network work. Never run this script in CI.
 
-1. Create a throwaway project. Create a *project* access token with the `api` scope and a short
-   expiry. Note the numeric project ID.
-2. In `.env` (never committed):
-   - `GITLAB_BASE_URL=https://gitlab.example.com` (https only; no path or credentials);
-   - `GITLAB_TOKEN=<token>`;
-   - `AGENT_POLICY` mapping your tenant to `{"projects":{"sandbox":{"gitlab_project_id":<id>}}}`.
-3. Start with `docker compose --env-file .env up --build -d --wait`, **without**
-   `compose.smoke.yaml`.
-4. `POST /v1/agent/runs` with a requester token and a request asking for an issue in "sandbox".
-   Inspect `proposal`, then `POST /v1/agent/runs/{id}/approve` with an approver token and the
-   returned `action_hash`.
-5. In GitLab, confirm exactly one issue whose description ends with the
-   `<!-- opspilot-action: … -->` marker. Optionally exercise reconciliation: set `status`
-   to `ambiguous` with an admin SQL session, call `/resume`, and confirm that no second issue
-   appears.
-6. Revoke the token and delete the project.
+It drives the in-process HTTP API with an offline planner, approves the exact proposal with
+a distinct subject, creates a real issue, confirms it via GET, expects 409 on second approval,
+resumes without a second create, and closes the issue. Partial failures trigger best-effort
+cleanup, including marker lookup when a create response is lost. If GitLab cannot be reached
+or its search does not expose the issue, an operator must check the sandbox for leftovers.
+Evidence contains safe IDs, statuses and attempted-request counts; a lost response has an
+unknown HTTP status. No token, URL, path or request/document content is written to evidence.
 
-This would also verify the assumption that project issue search (`search=…&in=description`)
-finds the marker immediately on that GitLab edition.
+The fake-server rehearsal tests this logic, not real GitLab's role permissions, search
+visibility or version-specific behavior. Latest status:
+
+GITLAB LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
+
+OPENAI LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
+
+The real OpenAI smoke separately probes models, 256-dimensional embedding, actual strict
+answer/planner schemas, usage/cost/served models, trace IDs, secret exclusion and a tight
+classified timeout, with optional small PostgreSQL RAG. It reserves at most nine requests.
+Real acceptance of minLength/maxLength remains unmeasured; no mock result is live evidence.

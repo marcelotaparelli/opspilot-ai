@@ -1,4 +1,6 @@
-name: phase-1
+name: ci
+# Release gates. Deliberately NOT run here: the paid OpenAI live smoke, the real GitLab
+# smoke (both opt-in scripts that need credentials) and the consumed retrieval-v2 held-out.
 on:
   push:
   pull_request:
@@ -20,11 +22,13 @@ jobs:
       AGENT_POLICY: '{"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa":{"projects":{"payments-ops":{"gitlab_project_id":101,"labels":["ops","incident"],"assignees":{"approver":7}}}}}'
       PROVIDER: fake
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          version: "0.7.3"
-          python-version: "3.12.10"
+          fetch-depth: 0 # the secret scan covers the full history
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          version: "0.12.23"
+          python-version: "3.12.15"
       - name: Require resolved lockfile
         run: |
           uv lock --check
@@ -33,8 +37,32 @@ jobs:
         run: |
           docker compose up --detach --wait db
           uv run --locked python -m opspilot.persistence.migrate
-      - name: Quality gates
+      - name: Quality gates (lock, format, lint, types, unit, integration, image build)
         run: ./scripts/verify.sh
+      - name: Install pinned release scanners (checksum-verified)
+        run: |
+          mkdir -p "$RUNNER_TEMP/bin"
+          cd "$RUNNER_TEMP"
+          curl -sSfLO https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  gitleaks_8.30.1_linux_x64.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks_8.30.1_linux_x64.tar.gz -C bin gitleaks
+          curl -sSfLO https://github.com/aquasecurity/trivy/releases/download/v0.75.0/trivy_0.75.0_Linux-64bit.tar.gz
+          echo "c6e65abddb348e25f10549df887045629cf28cc72453cd1c63acb717316b3f3f  trivy_0.75.0_Linux-64bit.tar.gz" | sha256sum -c -
+          tar -xzf trivy_0.75.0_Linux-64bit.tar.gz -C bin trivy
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+      - name: Secret scan (working tree and full git history)
+        run: |
+          gitleaks dir . --config .gitleaks.toml --redact --no-banner
+          gitleaks git . --config .gitleaks.toml --redact --no-banner
+      - name: Python dependency audit (whole lock, dev included)
+        run: |
+          uv export --locked --all-groups --no-emit-project --format requirements-txt -o "$RUNNER_TEMP/requirements.txt"
+          uvx pip-audit==2.9.0 -r "$RUNNER_TEMP/requirements.txt" --disable-pip --require-hashes --strict --format json --output dependency-audit-ci.json
+      - name: Image vulnerability scan (fail on fixable HIGH/CRITICAL) and SBOM
+        run: |
+          trivy image --scanners vuln --format json --output image-vulnerabilities-ci.json opspilot-ai:release
+          trivy image --format cyclonedx --output sbom-image-ci.cdx.json opspilot-ai:release
+          trivy image --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 opspilot-ai:release
       - name: Measure retrieval against real PostgreSQL
         run: uv run --locked python -m opspilot.evaluation --seed --output eval-results-ci.json
       - name: RAG regression gate (retrieval-v2 DEV split; held-out is never re-run)
@@ -62,8 +90,8 @@ jobs:
           uv run --locked python scripts/smoke.py --output smoke-results-ci.json
           OPSPILOT_APPROVER_TOKEN=ci-approver-token-with-at-least-32-characters \
             uv run --locked python scripts/agent_smoke.py --output agent-smoke-ci.json
-      - uses: actions/upload-artifact@v4
-        if: success()
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always()
         with:
           name: measured-retrieval
           path: |
@@ -73,6 +101,28 @@ jobs:
             security-ci.json
             smoke-results-ci.json
             agent-smoke-ci.json
+            sbom-image-ci.cdx.json
+            dependency-audit-ci.json
+            image-vulnerabilities-ci.json
       - name: Stop PostgreSQL
         if: always()
         run: docker compose -f compose.yaml -f compose.smoke.yaml down
+  terraform:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: infra/terraform
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        with:
+          terraform_version: "1.16.5"
+          terraform_wrapper: false
+      - name: Format, init (no backend) and validate; never plan with real credentials or apply
+        run: |
+          terraform fmt -check -recursive
+          terraform init -backend=false -input=false -lockfile=readonly
+          terraform validate

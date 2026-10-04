@@ -1,0 +1,6 @@
+2026-10-04T21:48:59Z	INFO	[misconfig] Misconfiguration scanning is enabled
+2026-10-04T21:48:59Z	INFO	[checks-client] Need to update the checks bundle
+2026-10-04T21:48:59Z	INFO	[checks-client] Downloading the checks bundle...
+223.25 KiB / 234.65 KiB [-------------------------------------------------------->__] 95.14% ? p/s ?234.65 KiB / 234.65 KiB [--------------------------------------------------------->] 100.00% ? p/s ?234.65 KiB / 234.65 KiB [--------------------------------------------------------->] 100.00% ? p/s ?234.65 KiB / 234.65 KiB [---------------------------------------------] 100.00% 427.49 KiB p/s 700ms2026-10-04T21:49:04Z	INFO	[terraform scanner] Scanning root module	file_path="."
+2026-10-04T21:49:04Z	WARN	[terraform parser] Variable values were not found in the environment or variable files. Evaluating may not work correctly.	module="root" variables="aws_account_id, certificate_arn"
+2026-10-04T21:49:04Z	INFO	Detected config files	num=4

@@ -1,0 +1,24 @@
+{
+  "image_tag": "opspilot-ai:release",
+  "image_id": "sha256:a09a2ab0988232a3b8b6d82be22bf667352755e83b7c770b37a68079371a27ab",
+  "repo_digests": [
+    "opspilot-ai@sha256:a09a2ab0988232a3b8b6d82be22bf667352755e83b7c770b37a68079371a27ab"
+  ],
+  "size_bytes": 362790524,
+  "created": "2026-10-04T21:48:58.56406816Z",
+  "image_user": "10001:10001",
+  "architecture": "amd64",
+  "runtime": {
+    "uid": 10001,
+    "gid": 10001,
+    "root_read_only": true,
+    "tmp_writable": true,
+    "cap_effective": 0,
+    "no_new_privileges": true
+  },
+  "api_health": "healthy",
+  "migration_exit_code": 0,
+  "postgres_vector_schema": "17.6 (Debian 17.6-1.pgdg12+1)|0.8.0|2",
+  "build": "docker build --no-cache",
+  "registry_push": false
+}

@@ -71,7 +71,7 @@ class OpenAIProvider:
                     if getattr(response, "usage", None) is not None
                     else Usage()
                 )
-                call.report_usage(usage, self.cost(model, usage))
+                call.report_usage(usage, self.cost(model, usage), served_model(response))
                 ordered = sorted(response.data, key=lambda item: item.index)
                 if [item.index for item in ordered] != list(range(len(texts))):
                     call.fail("invalid_output")
@@ -102,7 +102,7 @@ class OpenAIProvider:
                         store=False,
                     )
                 usage = response_usage(response)
-                call.report_usage(usage, self.cost(model, usage))
+                call.report_usage(usage, self.cost(model, usage), served_model(response))
                 if response.output_parsed is None:
                     call.fail("refusal" if refused(response) else "invalid_output")
                     raise ProviderError
@@ -144,6 +144,11 @@ def response_usage(response: object) -> Usage:
         getattr(usage, "output_tokens", None),
         getattr(usage, "total_tokens", None),
     )
+
+
+def served_model(response: object) -> str | None:
+    model = getattr(response, "model", None)
+    return model if isinstance(model, str) else None
 
 
 def refused(response: object) -> bool:

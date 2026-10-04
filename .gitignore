@@ -7,3 +7,9 @@ __pycache__/
 .env
 eval-results*.json
 dist/
+# Terraform: provider binaries, state and plans never enter the repository.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log

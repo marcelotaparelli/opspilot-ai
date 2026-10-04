@@ -1,0 +1,39 @@
+{
+  "provider": "fake",
+  "transport": "HTTP socket",
+  "checks": [
+    {
+      "endpoint": "/health",
+      "status": 200,
+      "request_id": "c94da099-e2e4-4213-b140-706fb1932460"
+    },
+    {
+      "endpoint": "/ready",
+      "status": 200,
+      "request_id": "d92b9546-0ed7-434b-85c2-aacf6cbd0bbf"
+    },
+    {
+      "endpoint": "/v1/documents",
+      "status": 201,
+      "request_id": "4b97b022-46bd-47eb-bf09-ec5822889bc1"
+    },
+    {
+      "endpoint": "/v1/query",
+      "status": 200,
+      "request_id": "256f7e1e-191c-4dfc-bd13-c4ff2d003cb4",
+      "citation_count": 1,
+      "retrieved_count": 1,
+      "cited_document_id": "abf4568d-cd32-45c1-bda9-e0ecdaef8679"
+    },
+    {
+      "endpoint": "/v1/query",
+      "status": 200,
+      "request_id": "8627f142-ab10-4125-881a-d6a4f257fa86",
+      "check": "second tenant sees only its own document",
+      "visible_document_ids": [
+        "6e75b9d4-088c-45da-8b37-a8fa5628bc65"
+      ],
+      "first_tenant_document_visible": false
+    }
+  ]
+}

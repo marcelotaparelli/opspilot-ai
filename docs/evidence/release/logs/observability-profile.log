@@ -1,0 +1,127 @@
+ Image otel/opentelemetry-collector-contrib:0.161.0 Pulling
+ Image jaegertracing/jaeger:2.21.0 Pulling
+ 55afa1ecc21d Pulling fs layer 0B
+ 28ede702a59e Pulling fs layer 0B
+ 157d41acf62c Pulling fs layer 0B
+ d9b64a1d4fc6 Pulling fs layer 0B
+ 9926de6285be Pulling fs layer 0B
+ 84e0d013005a Pulling fs layer 0B
+ ea339a46f8c1 Pulling fs layer 0B
+ 3c661e367453 Pulling fs layer 0B
+ 55afa1ecc21d Download complete 0B
+ 55afa1ecc21d Extracting 1B
+ 28ede702a59e Downloading 4.194MB
+ 9926de6285be Download complete 0B
+ 55afa1ecc21d Extracting 1B
+ 157d41acf62c Download complete 0B
+ 28ede702a59e Downloading 8.389MB
+ 55afa1ecc21d Extracting 1B
+ d9b64a1d4fc6 Download complete 0B
+ 28ede702a59e Downloading 13.63MB
+ 55afa1ecc21d Extracting 1B
+ 28ede702a59e Downloading 19.92MB
+ ea339a46f8c1 Download complete 0B
+ ea339a46f8c1 Pull complete 0B
+ 55afa1ecc21d Extracting 1B
+ 28ede702a59e Downloading 26.21MB
+ 84e0d013005a Downloading 831B
+ 55afa1ecc21d Extracting 1B
+ 28ede702a59e Downloading 31.46MB
+ 55afa1ecc21d Extracting 1B
+ 84e0d013005a Download complete 0B
+ 28ede702a59e Downloading 36.7MB
+ 55afa1ecc21d Extracting 1B
+ 44136fa355b3 Already exists 0B
+ 28ede702a59e Downloading 42.99MB
+ 55afa1ecc21d Extracting 1B
+ 28ede702a59e Downloading 49.28MB
+ 55afa1ecc21d Pull complete 0B
+ 9926de6285be Pull complete 0B
+ d9b64a1d4fc6 Pull complete 0B
+ 3c661e367453 Downloading 1.049MB
+ 28ede702a59e Download complete 0B
+ c683c4cac931 Download complete 0B
+ 28ede702a59e Extracting 1B
+ 3c661e367453 Downloading 3.146MB
+ 28ede702a59e Extracting 1B
+ 3c661e367453 Downloading 5.243MB
+ 28ede702a59e Extracting 1B
+ 3c661e367453 Downloading 9.437MB
+ 28ede702a59e Extracting 1B
+ 3c661e367453 Downloading 13.63MB
+ 28ede702a59e Extracting 1B
+ 3c661e367453 Downloading 18.87MB
+ 28ede702a59e Extracting 1B
+ 157d41acf62c Pull complete 0B
+ 28ede702a59e Pull complete 0B
+ Image jaegertracing/jaeger:2.21.0 Pulled
+ 3c661e367453 Downloading 23.07MB
+ 3c661e367453 Downloading 28.31MB
+ 3c661e367453 Downloading 34.6MB
+ 3c661e367453 Downloading 40.89MB
+ 3c661e367453 Downloading 47.19MB
+ 3c661e367453 Downloading 53.48MB
+ 3c661e367453 Downloading 58.72MB
+ 3c661e367453 Downloading 62.91MB
+ 3c661e367453 Downloading 68.16MB
+ 3c661e367453 Downloading 73.4MB
+ 3c661e367453 Downloading 79.69MB
+ 3c661e367453 Downloading 85.98MB
+ 3c661e367453 Downloading 91.23MB
+ 3c661e367453 Downloading 97.52MB
+ 3c661e367453 Downloading 103.8MB
+ 3c661e367453 Downloading 109.1MB
+ 3c661e367453 Download complete 0B
+ 3c661e367453 Extracting 1B
+ 3c661e367453 Extracting 1B
+ 3c661e367453 Extracting 1B
+ 3c661e367453 Extracting 1B
+ 3c661e367453 Extracting 1B
+ 3c661e367453 Extracting 1B
+ 3c661e367453 Extracting 1B
+ 3c661e367453 Extracting 1B
+ 3c661e367453 Extracting 1B
+ 3c661e367453 Extracting 1B
+ 3c661e367453 Extracting 2B
+ 3c661e367453 Extracting 2B
+ 3c661e367453 Extracting 2B
+ 3c661e367453 Extracting 2B
+ 3c661e367453 Extracting 2B
+ 3c661e367453 Extracting 2B
+ 3c661e367453 Extracting 2B
+ 3c661e367453 Extracting 2B
+ 3c661e367453 Extracting 2B
+ 84e0d013005a Pull complete 0B
+ 3c661e367453 Pull complete 0B
+ Image otel/opentelemetry-collector-contrib:0.161.0 Pulled
+ Container opspilot-phase4-release-fake-gitlab-1 Running
+ Container opspilot-phase4-release-db-1 Running
+ Container opspilot-phase4-release-api-1 Running
+ Container opspilot-phase4-release-jaeger-1 Creating
+ Container opspilot-phase4-release-jaeger-1 Created
+ Container opspilot-phase4-release-otel-collector-1 Creating
+ Container opspilot-phase4-release-otel-collector-1 Created
+ Container opspilot-phase4-release-jaeger-1 Starting
+ Container opspilot-phase4-release-db-1 Waiting
+ Container opspilot-phase4-release-jaeger-1 Started
+ Container opspilot-phase4-release-otel-collector-1 Starting
+ Container opspilot-phase4-release-otel-collector-1 Started
+ Container opspilot-phase4-release-db-1 Healthy
+ Container opspilot-phase4-release-migrate-1 Starting
+ Container opspilot-phase4-release-migrate-1 Started
+ Container opspilot-phase4-release-migrate-1 Waiting
+ Container opspilot-phase4-release-fake-gitlab-1 Waiting
+ Container opspilot-phase4-release-fake-gitlab-1 Healthy
+ Container opspilot-phase4-release-migrate-1 Exited
+ Container opspilot-phase4-release-migrate-1 Waiting
+ Container opspilot-phase4-release-api-1 Waiting
+ Container opspilot-phase4-release-otel-collector-1 Waiting
+ Container opspilot-phase4-release-fake-gitlab-1 Waiting
+ Container opspilot-phase4-release-jaeger-1 Waiting
+ Container opspilot-phase4-release-db-1 Waiting
+ Container opspilot-phase4-release-db-1 Healthy
+ Container opspilot-phase4-release-fake-gitlab-1 Healthy
+ Container opspilot-phase4-release-migrate-1 Exited
+ Container opspilot-phase4-release-otel-collector-1 Healthy
+ Container opspilot-phase4-release-api-1 Healthy
+ Container opspilot-phase4-release-jaeger-1 Healthy

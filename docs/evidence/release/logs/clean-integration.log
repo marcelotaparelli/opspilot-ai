@@ -1,0 +1,23 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.15, pytest-9.1.1, pluggy-1.6.0
+rootdir: /workspace/.opspilot-runtime/phase4/clean-room/snapshot
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.15.1, asyncio-1.4.0, langsmith-0.14.4
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 313 items / 241 deselected / 72 selected
+
+tests/test_agent_api.py .                                                [  1%]
+tests/test_agent_eval.py ..                                              [  4%]
+tests/test_agent_recovery.py ..                                          [  6%]
+tests/test_agent_workflow.py ...................................         [ 55%]
+tests/test_benchmark.py .                                                [ 56%]
+tests/test_evaluation.py ..                                              [ 59%]
+tests/test_integration.py .............                                  [ 77%]
+tests/test_live_smokes.py ...                                            [ 81%]
+tests/test_migrations.py .....                                           [ 88%]
+tests/test_observability_integration.py ......                           [ 97%]
+tests/test_regression_gates.py .                                         [ 98%]
+tests/test_telemetry_failure.py .                                        [100%]
+
+================ 72 passed, 241 deselected in 62.46s (0:01:02) =================

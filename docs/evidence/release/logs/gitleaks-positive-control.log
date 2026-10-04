@@ -1,0 +1,2 @@
+{"exit": 1, "rules": ["aws-access-token"]}
+{"synthetic_control": "detected", "exit_code": 1, "raw_secret_retained": false}

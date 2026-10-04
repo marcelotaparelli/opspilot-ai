@@ -1,0 +1,425 @@
+{
+  "algorithm": "sha256",
+  "files": [
+    {
+      "path": ".dockerignore",
+      "sha256": "65cb2cb8a6cc653468c4ab848859d552ea15524f1cfeac42f2dd60deeca49272"
+    },
+    {
+      "path": ".env.example",
+      "sha256": "f32da84d71d6125c7c8ab0572938a064760bee9751abb60963d6f5a58ed1912f"
+    },
+    {
+      "path": ".github/workflows/ci.yaml",
+      "sha256": "f21f12dda1ad82fbdb8291d0fc6b087c2605d52e882a3a6f74b7f4ba246132ed"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "b6473f507eca2a4a8b004ac32f24b9e5d441c7b99f66a78560a863097fc256a5"
+    },
+    {
+      "path": ".gitleaks.toml",
+      "sha256": "068854d1ee1c4fe61ced217ce3691b0e625713a7e6c678a6861e1eb0c8fc0cea"
+    },
+    {
+      "path": ".python-version",
+      "sha256": "845c494b4a7e1a741db19fd42eda239d3ee03b65f08276008943349a3055c9cc"
+    },
+    {
+      "path": "Dockerfile",
+      "sha256": "713f94a740612b9b0f92f714327ce4b3b5156192fbbd20813398d2fb60949fc7"
+    },
+    {
+      "path": "compose.smoke.yaml",
+      "sha256": "2c33f7da73d00d5d4542a3591c525d6abbbf2784772aafcc381327a4e16e9051"
+    },
+    {
+      "path": "compose.yaml",
+      "sha256": "efd756325daae9836eeb907f243df01e93c6140c990ae191a293fa21daeccef0"
+    },
+    {
+      "path": "evals/agent-v1/cases.json",
+      "sha256": "98e0af96c734420d79c0decaa631fba18de15fb1dfbe95fdd1a4baf9e34a3f36"
+    },
+    {
+      "path": "evals/regression/agent-gate.json",
+      "sha256": "fd44ecc0cffcf324b0d43bc61be9999fd67b6133c30716d3c09b2dead0ee1beb"
+    },
+    {
+      "path": "evals/regression/rag-dev-baseline.json",
+      "sha256": "7ffafe026d24250cd54f491a78f61ac2b8150545492b76111e934e1fef11cf7d"
+    },
+    {
+      "path": "evals/retrieval-v1.json",
+      "sha256": "ce6844d3b85116c28f877ae74a17f9c62db82536045ed7162129d08a9fbb6076"
+    },
+    {
+      "path": "evals/retrieval-v2/README.md",
+      "sha256": "0597bf9ae3b04ec99062d9e33116204440e1af02053ae77e5df6e48c8df323d6"
+    },
+    {
+      "path": "evals/retrieval-v2/authoring-log.json",
+      "sha256": "1b30fe0972d60917b66748e84f49766dbe755ae5cdfb47213686af7904de73e6"
+    },
+    {
+      "path": "evals/retrieval-v2/corpus.json",
+      "sha256": "eea076115b6928905f11a940d2108197dc4ac02960e01cecb35ab5c0e722d845"
+    },
+    {
+      "path": "evals/retrieval-v2/dev.json",
+      "sha256": "e0e409d26b18068b316106c7024d0657be28c973f1694f8b03932e8d72793c77"
+    },
+    {
+      "path": "evals/retrieval-v2/freeze.json",
+      "sha256": "53d1042a30a047b1458da355685cd3416fd70ebb6c5458169b2c1b2fad2b1809"
+    },
+    {
+      "path": "evals/retrieval-v2/heldout.json",
+      "sha256": "b21714eb234648a65b77e270be35eb8fddc123180b437b59ca0093b6f35b9915"
+    },
+    {
+      "path": "evals/security-v1/cases.json",
+      "sha256": "016732e317568236c3b481186a26c67cd0dc03486bf6f4d032666f9252c51aa4"
+    },
+    {
+      "path": "infra/terraform/.terraform.lock.hcl",
+      "sha256": "19c2192904b6bae4e2143e2ab5105c74b86b6aa8d566f710cc9373cc67a0b0ee"
+    },
+    {
+      "path": "infra/terraform/alb.tf",
+      "sha256": "0cfe336853e3eb3399cdcab76b35f3452e23b15e2ff054ceb103456fd47d6b8d"
+    },
+    {
+      "path": "infra/terraform/ecr.tf",
+      "sha256": "f3145f3812a9295b5df89084fe8fc2942ea371c2e1dd2fc79a8f59f924f99450"
+    },
+    {
+      "path": "infra/terraform/ecs.tf",
+      "sha256": "6cde2f12fe94d829d1f7c12ed9e64cd271c4fcc38df89454351777e8c7730a86"
+    },
+    {
+      "path": "infra/terraform/iam.tf",
+      "sha256": "a86d64e5a8a955a30620293aa3e46eeab61e928aff77879cd1edc0eb7e981f4c"
+    },
+    {
+      "path": "infra/terraform/logs.tf",
+      "sha256": "b13e08b7ac364ae2daa9738ac0a0838a7e824d34a376adef8ac5a62c908ba1a0"
+    },
+    {
+      "path": "infra/terraform/main.tf",
+      "sha256": "5022a5f8e4788b5c0a1427225983f7c5d6e5b36aae3a35038d5c53e43e42c2c5"
+    },
+    {
+      "path": "infra/terraform/network.tf",
+      "sha256": "e115c98dae736f13a5b7423480af5988813d9a7a0d0ce92b3186151aec5bf1a0"
+    },
+    {
+      "path": "infra/terraform/offline.tfvars",
+      "sha256": "5d832469dfeedacf0854b52a2d6593fa9cc9350f50b62d1773c0b0dbb8d94c69"
+    },
+    {
+      "path": "infra/terraform/outputs.tf",
+      "sha256": "d6e19765e7095d9b4a442eb646f3dafab39bb211becec8992906966d4c9d60fd"
+    },
+    {
+      "path": "infra/terraform/rds.tf",
+      "sha256": "0895d47f25974cb4bf2e3a547b4f0dfb25558864d7f9b83bcac3e16c602df151"
+    },
+    {
+      "path": "infra/terraform/secrets.tf",
+      "sha256": "40dd2f650fabba6c3fd8cffeb467f2fe6351d584e0dc2e4404888620c5a764aa"
+    },
+    {
+      "path": "infra/terraform/variables.tf",
+      "sha256": "3d031e540248e6fe05fdb2606bcff15e065e35ba5ebea695dd94626fa3d0157e"
+    },
+    {
+      "path": "infra/terraform/versions.tf",
+      "sha256": "e9f6c5b74f28041cade70f674b667b68ba03e4c97e9bef2829dbf383caa2e46e"
+    },
+    {
+      "path": "observability/otel-collector.yaml",
+      "sha256": "d821250daedb7120be5adde72311d9f2a27a3f288ba65524aac029215355a1be"
+    },
+    {
+      "path": "pyproject.toml",
+      "sha256": "33f4da042637e36a9715d7a41276006f60dd9394013fc36a701b75ae4c5b663b"
+    },
+    {
+      "path": "scripts/__init__.py",
+      "sha256": "f43f209382500e4dd4b25a727b230d83c0f544ec0fd5b66d6d921820751c0b23"
+    },
+    {
+      "path": "scripts/agent_eval.py",
+      "sha256": "61fd778f0d81b5affee9808e1ed44351c1e2e1e22a22af8cd6ee2e2c1acf0032"
+    },
+    {
+      "path": "scripts/agent_smoke.py",
+      "sha256": "388594e93e5867c7c12ece90ca3bf036c90d3a6f7e1f700e603100553ea01d6a"
+    },
+    {
+      "path": "scripts/analyze_benchmark.py",
+      "sha256": "7b5105a06488ba1f1fac5c145f3ebbd08165fcf62c1e365e8488ce49292d7c4f"
+    },
+    {
+      "path": "scripts/fake_gitlab.py",
+      "sha256": "857fe539a7c1f87c8b8e22c91e780c171cc68b13c1f20e83daa79a8b133182e8"
+    },
+    {
+      "path": "scripts/init-db.sh",
+      "sha256": "ce334bc8574a4fa8ecb3ad0e63096c14eb2fb021430567cd3d29aea66dbfd8de"
+    },
+    {
+      "path": "scripts/live_gitlab_smoke.py",
+      "sha256": "bc33af29f7daa645d66d4da6d5b59bca80070e200f39874199567ce2ddd35452"
+    },
+    {
+      "path": "scripts/live_openai_smoke.py",
+      "sha256": "08befc53a9fa5b55a53c2966b5fc501cb7c542462722de08aed6ec1cbab68dd5"
+    },
+    {
+      "path": "scripts/load_test.py",
+      "sha256": "9528d90e735dd1b2f103795c4a0a10cb7623fcb9f0952643296d9f0c116250e4"
+    },
+    {
+      "path": "scripts/regression_gate.py",
+      "sha256": "376e120eb84c3f383811e9c68c14a32aa217e1e02179c120acd632c98f3127fd"
+    },
+    {
+      "path": "scripts/security_suite.py",
+      "sha256": "dee0d0018567ec7318cf24a26773b56de23c458dd06fc67dc7ef500af01577fc"
+    },
+    {
+      "path": "scripts/smoke.py",
+      "sha256": "595a551f183f3e4cee9e6128ea42ddde1929d56f1c41c97fbef530b2e442fbec"
+    },
+    {
+      "path": "scripts/verify.sh",
+      "sha256": "7ef9f104a04acae6dc5f33327903606f6dc9f90e015aef7ebc1e8f1c06168c32"
+    },
+    {
+      "path": "src/opspilot/__init__.py",
+      "sha256": "b29d6db7b584371670122b13d3ff64852a7a152909b7b60ec78f2291785bd2f0"
+    },
+    {
+      "path": "src/opspilot/agent/__init__.py",
+      "sha256": "df7ac22b8e6d8e6e50ba823d655aca07396d08f90419adb3ac32d8b5bd87c5a0"
+    },
+    {
+      "path": "src/opspilot/agent/gitlab.py",
+      "sha256": "809f832ad132c6b1c70e144cb44c07cd2efd804064783f1433efb2f3ce1d4321"
+    },
+    {
+      "path": "src/opspilot/agent/graph.py",
+      "sha256": "6f95de3dd371c493d64a2eb2dc1b6890bdd68ccbbe2d9fd7a530d47bdec7a786"
+    },
+    {
+      "path": "src/opspilot/agent/models.py",
+      "sha256": "74512b3b800ecb314421b17d76995b0ef3884cbafcf53de36f105b5728a7de04"
+    },
+    {
+      "path": "src/opspilot/agent/planners.py",
+      "sha256": "ce7e1da35019aee922f8a089d1b1bc27f7c1cb4659838c51ca7a567bdc07373b"
+    },
+    {
+      "path": "src/opspilot/agent/policy.py",
+      "sha256": "22f356d14cf6cec343405931207682ca6f6db89b45b0d9fa96f7b36617ae3c73"
+    },
+    {
+      "path": "src/opspilot/agent/ports.py",
+      "sha256": "b0b4b34506fe604400a1b1616324adc37e7ad3062438129624e16c618656e512"
+    },
+    {
+      "path": "src/opspilot/agent/store.py",
+      "sha256": "6b590fc3d87725b9348bc785ed9031f91e0eb243530cf19534ca5059c1560577"
+    },
+    {
+      "path": "src/opspilot/api/__init__.py",
+      "sha256": "80106562202e8cc64171639d0cd12b66cb3b944e188ea358ff68e13f4108c6af"
+    },
+    {
+      "path": "src/opspilot/api/app.py",
+      "sha256": "caa6ac7e14358d61eef85ea738701596fe272cb902e8014c2ae42782006d1d90"
+    },
+    {
+      "path": "src/opspilot/api/contracts.py",
+      "sha256": "7080ac2714b8517185fc19f365a290041dcbf60837343ffcf5a9233cee1c64ae"
+    },
+    {
+      "path": "src/opspilot/api/middleware.py",
+      "sha256": "e69b030bea929768b0e5d311f107905bd2afb2f1bded1afbbac2d05f7f6f2a0b"
+    },
+    {
+      "path": "src/opspilot/application.py",
+      "sha256": "09d14058b497248ae9d63e83308d865f8fb0a88f473f56b3bfa15a72286cbee2"
+    },
+    {
+      "path": "src/opspilot/benchmark.py",
+      "sha256": "f722f446fc2667c8332b5294f9bef4b2a9f44238e1cc2c8fd31dbba04d1b1cce"
+    },
+    {
+      "path": "src/opspilot/chunking.py",
+      "sha256": "9bf414290ffa409e0aae0825afe7dc346353d99d609c8c3621ded2a54e13dfbe"
+    },
+    {
+      "path": "src/opspilot/config.py",
+      "sha256": "a51b956eb0429c86addb9ba0c5961646b000dbf482902290fa2564f4298c4405"
+    },
+    {
+      "path": "src/opspilot/domain.py",
+      "sha256": "607fc2d85de71e958f7cfb6aa69993e19bdeefeb3dc09e9828b29cdba723b881"
+    },
+    {
+      "path": "src/opspilot/evaluation.py",
+      "sha256": "a78bcdc6a40eede0eacf604574915e6be1ff6c995c6c09e5fbdd80855e544e2f"
+    },
+    {
+      "path": "src/opspilot/observability.py",
+      "sha256": "91264f5cfa27bfb2734723ccb9aa3975152c98632a7965903cbf726c60af7a4b"
+    },
+    {
+      "path": "src/opspilot/persistence/__init__.py",
+      "sha256": "cb20996173b2fce824eda42fcf38e8f93710161ace34232e0026ee5655ea36da"
+    },
+    {
+      "path": "src/opspilot/persistence/migrate.py",
+      "sha256": "75b8b7aa5c17107117899fb5f7c34e9eb664f9a5d13ef19ed44400d5c36f448c"
+    },
+    {
+      "path": "src/opspilot/persistence/postgres.py",
+      "sha256": "300c21ae8a5203dae272d372ed9dd551f6786c93e945153b65cf1f02ee744098"
+    },
+    {
+      "path": "src/opspilot/persistence/schema.sql",
+      "sha256": "35b22ec1e31d4d683464ea8eaf809eaef5598fe9b1379e76a3cac6788ba30e5f"
+    },
+    {
+      "path": "src/opspilot/persistence/schema_v2.sql",
+      "sha256": "6e05e97c304ce657a885557ec5ff057d5a4293894251d587ade7263902dca3b7"
+    },
+    {
+      "path": "src/opspilot/pricing.py",
+      "sha256": "365814a5a173a6e5882e2a97d5915171f27e8bbb9446abc77f555a02719043d5"
+    },
+    {
+      "path": "src/opspilot/providers/__init__.py",
+      "sha256": "7d3c49b8c1390e80ddbd40f0d32453be1615fc23327edf49b2e8a3086bffc3d1"
+    },
+    {
+      "path": "src/opspilot/providers/fake.py",
+      "sha256": "8ddfdea95d405fba0b848bf79c7f9db969dc3ebe4343688ff32bed6a969c3a1f"
+    },
+    {
+      "path": "src/opspilot/providers/openai.py",
+      "sha256": "49278133757b9a00a7c7215293715ee58882d6e5e83b90c1f38c7f8290787fbd"
+    },
+    {
+      "path": "src/opspilot/retrieval.py",
+      "sha256": "6f288a9917a89a4459f848d3d20cdffd465b90fa861f8eb98d38c1806b689a93"
+    },
+    {
+      "path": "tests/__init__.py",
+      "sha256": "7cd676954b426cd522a385766977be2f32668a6fd3a67da9eba30c6a000d1b7a"
+    },
+    {
+      "path": "tests/agent_support.py",
+      "sha256": "2f03846a828397c5dcf700e599e194f5d2e5a49dcd2e3178937bd82c9f25bb9e"
+    },
+    {
+      "path": "tests/conftest.py",
+      "sha256": "4e62efb711f41d3e748792e5ca6e7ec41f50c319e2809aa287b09fdade5c94bb"
+    },
+    {
+      "path": "tests/helpers.py",
+      "sha256": "96db7263c25085d77024440b7f2bfb718fdd70c62ec1009275ddffab0efae972"
+    },
+    {
+      "path": "tests/telemetry_support.py",
+      "sha256": "df5e13ad2a63d07bfa75c62349a22704571a83d0bffda2b7a877ba15bc246d74"
+    },
+    {
+      "path": "tests/test_agent_api.py",
+      "sha256": "6a767dbf136f135c20495a14679f61b13321bdc45755372a6e0d8e4ad264b443"
+    },
+    {
+      "path": "tests/test_agent_eval.py",
+      "sha256": "ada5a3895bd8faee6eddda8bb27573747726ff23dea45dcf37131679db76965a"
+    },
+    {
+      "path": "tests/test_agent_gitlab.py",
+      "sha256": "4111a8c920692477ae3af463d4e2851c40723f483aa9d1ee2a8134b4b813da99"
+    },
+    {
+      "path": "tests/test_agent_recovery.py",
+      "sha256": "e80d708da07d65ee6ebf4978a75ebe146aaddec301f933e30a32f33b6bc54df0"
+    },
+    {
+      "path": "tests/test_agent_unit.py",
+      "sha256": "8a0ee44bbb884ce839287ff4f80c0ab0fed761fe8a5c36451a5824057f2d2ae0"
+    },
+    {
+      "path": "tests/test_agent_workflow.py",
+      "sha256": "c39ac517124cd1f8e8e02c921dd4e785ab426bf175947942753706954a11b229"
+    },
+    {
+      "path": "tests/test_api.py",
+      "sha256": "0764ce8cba206033ba2a1792bfc4e9a6f15068a10607c4a3a3774f1f8c98b5fc"
+    },
+    {
+      "path": "tests/test_benchmark.py",
+      "sha256": "bfb2b04aec3da3d90163647dd4e67322f95bb3448a7b1e06a34cbfbebb010d0c"
+    },
+    {
+      "path": "tests/test_config.py",
+      "sha256": "34fd81beea5418af78cbc82acc28638fc7c238e7ceebae48544e1030398284a5"
+    },
+    {
+      "path": "tests/test_evaluation.py",
+      "sha256": "9ac052bff24f5f1fe0e766f40ec8f70644ca7cb11abbdaf927b342b91b881dfc"
+    },
+    {
+      "path": "tests/test_integration.py",
+      "sha256": "793fe4ada322bfe16d753044874f3635e71b7d33f55f59bdf344e8e68419775c"
+    },
+    {
+      "path": "tests/test_live_smokes.py",
+      "sha256": "7862491cfef31ad9874c5d95ad0b04d8b993e97369a25f1e8188a494e03bff54"
+    },
+    {
+      "path": "tests/test_migrations.py",
+      "sha256": "b3dc42e2b7e8a1b4ab11e73fe2add495b981c33c5b0f4f51b8ba65ba814e3a68"
+    },
+    {
+      "path": "tests/test_observability.py",
+      "sha256": "601d0609be0369cf0907abb99c4f07711d4480ae34780dc3f44f3f02ec0ede1e"
+    },
+    {
+      "path": "tests/test_observability_integration.py",
+      "sha256": "b59f6750f84fb24d8f6b05006c4ae514324eaea3c6ebc18a0e1742cfb609d37d"
+    },
+    {
+      "path": "tests/test_provider.py",
+      "sha256": "099a5fd7ae13b84ca0c0ae060944108a0193f29e9c362d61ef24c15f6a77f4be"
+    },
+    {
+      "path": "tests/test_regression_gates.py",
+      "sha256": "47e4e2e933df462f4eec91225aa7862ae0b8b99ee334bba85ebdfa28cd04feff"
+    },
+    {
+      "path": "tests/test_release_config.py",
+      "sha256": "18167f2be414471ab44d3fb653c0cc05577af808c592c33b7c94b38ee3821768"
+    },
+    {
+      "path": "tests/test_telemetry_failure.py",
+      "sha256": "f1a53ebc0de1510997a9eed627a2fde21214692b4793cb5d4486b13e7f2843d6"
+    },
+    {
+      "path": "tests/test_unit.py",
+      "sha256": "23138d9c693a54d2bee629c32920063b2d9cd6a63450f4179e86cc340a768f73"
+    },
+    {
+      "path": "uv.lock",
+      "sha256": "b34b706da412c22e5e9ed98394d4d09c3a93016c4bef903fb50d3b13656a1181"
+    }
+  ]
+}

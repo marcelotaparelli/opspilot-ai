@@ -1,0 +1,36 @@
+{
+  "transport": "HTTP socket",
+  "provider": "fake",
+  "gitlab": "fake server via real adapter",
+  "checks": [
+    {
+      "step": "create_run",
+      "status": 201,
+      "run_status": "awaiting_approval",
+      "request_id": "b03530c8-291b-4efb-8056-77397a5a5b44"
+    },
+    {
+      "step": "self_approval",
+      "status": 403,
+      "error": "approver_role_required"
+    },
+    {
+      "step": "wrong_hash",
+      "status": 409,
+      "error": "action_hash_mismatch"
+    },
+    {
+      "step": "approve",
+      "status": 200,
+      "run_status": "succeeded",
+      "approved_hash_matches": true,
+      "issue_iid": 1,
+      "gitlab_creates_received": 1
+    },
+    {
+      "step": "question_run",
+      "status": 201,
+      "run_status": "answered"
+    }
+  ]
+}

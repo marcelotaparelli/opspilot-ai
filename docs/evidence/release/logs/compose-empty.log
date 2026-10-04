@@ -1,0 +1,72 @@
+ Image python:3.12.10-slim-bookworm Pulling
+ 7a1cb8b88221 Pulling fs layer 0B
+ be1274d3cce0 Pulling fs layer 0B
+ 61320b01ae5e Pulling fs layer 0B
+ 8991c9200d62 Pulling fs layer 0B
+ 7a1cb8b88221 Download complete 0B
+ be1274d3cce0 Download complete 0B
+ 8991c9200d62 Downloading 4.194MB
+ 8991c9200d62 Downloading 9.437MB
+ 8991c9200d62 Download complete 0B
+ 61320b01ae5e Downloading 6.291MB
+ f0d7729722a7 Download complete 0B
+ 61320b01ae5e Downloading 10.49MB
+ dd7bcf489f65 Download complete 0B
+ 61320b01ae5e Downloading 16.78MB
+ 61320b01ae5e Downloading 22.02MB
+ 61320b01ae5e Download complete 0B
+ 61320b01ae5e Extracting 1B
+ 61320b01ae5e Extracting 1B
+ 61320b01ae5e Extracting 1B
+ 61320b01ae5e Extracting 1B
+ 61320b01ae5e Extracting 1B
+ 61320b01ae5e Extracting 1B
+ 61320b01ae5e Extracting 1B
+ be1274d3cce0 Extracting 1B
+ 61320b01ae5e Pull complete 0B
+ be1274d3cce0 Pull complete 0B
+ 8991c9200d62 Extracting 1B
+ 8991c9200d62 Extracting 1B
+ 8991c9200d62 Extracting 1B
+ 8991c9200d62 Extracting 1B
+ 7a1cb8b88221 Pull complete 0B
+ 8991c9200d62 Pull complete 0B
+ Image python:3.12.10-slim-bookworm Pulled
+ Network opspilot-phase4-release_default Creating
+ Network opspilot-phase4-release_default Creating
+ Volume opspilot-phase4-release_postgres_data Creating
+ Volume opspilot-phase4-release_postgres_data Creating
+ Volume opspilot-phase4-release_postgres_data Created
+ Volume opspilot-phase4-release_postgres_data Created
+ Network opspilot-phase4-release_default Created
+ Network opspilot-phase4-release_default Created
+ Container opspilot-phase4-release-fake-gitlab-1 Creating
+ Container opspilot-phase4-release-db-1 Creating
+ Container opspilot-phase4-release-fake-gitlab-1 Created
+ Container opspilot-phase4-release-db-1 Created
+ Container opspilot-phase4-release-migrate-1 Creating
+ Container opspilot-phase4-release-migrate-1 Created
+ Container opspilot-phase4-release-api-1 Creating
+ Container opspilot-phase4-release-api-1 Created
+ Container opspilot-phase4-release-db-1 Starting
+ Container opspilot-phase4-release-fake-gitlab-1 Starting
+ Container opspilot-phase4-release-db-1 Started
+ Container opspilot-phase4-release-db-1 Waiting
+ Container opspilot-phase4-release-fake-gitlab-1 Started
+ Container opspilot-phase4-release-db-1 Healthy
+ Container opspilot-phase4-release-migrate-1 Starting
+ Container opspilot-phase4-release-migrate-1 Started
+ Container opspilot-phase4-release-migrate-1 Waiting
+ Container opspilot-phase4-release-fake-gitlab-1 Waiting
+ Container opspilot-phase4-release-fake-gitlab-1 Healthy
+ Container opspilot-phase4-release-migrate-1 Exited
+ Container opspilot-phase4-release-api-1 Starting
+ Container opspilot-phase4-release-api-1 Started
+ Container opspilot-phase4-release-db-1 Waiting
+ Container opspilot-phase4-release-migrate-1 Waiting
+ Container opspilot-phase4-release-api-1 Waiting
+ Container opspilot-phase4-release-fake-gitlab-1 Waiting
+ Container opspilot-phase4-release-fake-gitlab-1 Healthy
+ Container opspilot-phase4-release-db-1 Healthy
+ Container opspilot-phase4-release-migrate-1 Exited
+ Container opspilot-phase4-release-api-1 Healthy

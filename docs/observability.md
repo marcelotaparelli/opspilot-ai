@@ -13,7 +13,7 @@ decision: [ADR 005](adr/005-otlp-http-collector-jaeger.md).
 | Which request/run failed? | `http.request` span status + `x-request-id`/`x-trace-id` response headers; `agent_failure_total{reason}`; run `status`/`error` and audit events by `run_id` |
 | Why was this request slow? | Trace breakdown: `http.request` → `rag.query` → `retrieval` → `embedding` / `vector_retrieval` / `lexical_retrieval` / `rank_fusion` → `context_build` → `llm.request` |
 | Where does agent time go? | `agent.run` → `agent.plan` (`llm.request`) / `knowledge_search` / `authorization` / `approval` / `tool.execute` → `gitlab.request` / `reconciliation`; `agent_duration_seconds{entry}`, `tool_duration_seconds{tool}` |
-| Which model/provider was called? | `llm.request` / `embedding` spans: `ai.provider`, `ai.model`, `ai.operation`; `llm_requests_total{provider,model,operation}` |
+| Which model/provider was called? | `llm.request` / `embedding` spans: `ai.provider`, configured `ai.model`, served `ai.response.model`, `ai.operation`; `llm_requests_total{provider,model,operation}` |
 | How many tokens? | `ai.usage.*` span attributes; `llm_input_tokens_total`, `llm_output_tokens_total`; `llm_usage_unknown_total` when the provider did not say |
 | What would it cost? | `ai.cost.estimated_usd`, `llm_estimated_cost_usd_total` (configured prices only), `llm_cost_unknown_total`; per-decision cost persisted in `llm.decision` audit events |
 | Which retrieval strategy, how many chunks? | `retrieval` span: `ai.retrieval.strategy`, `top_k`, `candidates_requested`, `chunks_returned`; branch spans: `candidates_returned`; `retrieval_chunks_returned{strategy}`, `retrieval_empty_total{strategy}` |
@@ -97,7 +97,7 @@ approval `decided_at`).
 ## 5. Logs
 
 One JSON object per line on stdout:
-`ts, level, request_id, run_id, trace_id, span_id, operation, outcome, duration_ms[, error_type]`.
+`ts, level, request_id, run_id, trace_id, span_id, operation, outcome, duration_ms[, status, error_type]`.
 
 Logs never contain request text, documents, prompts, answers, tokens, connection strings or
 exception messages. OpenTelemetry SDK export failures appear as
@@ -256,3 +256,12 @@ Observations:
   `error.type=Denied`, and the reason is in `ai.policy.reason`.
 - **Narrow benchmark:** one VM, one worker, fake providers, and the client on the same host. Not
   capacity planning.
+
+## Phase 4 release boundary
+
+FastAPI-native automatic tracing/metrics/logging and auto-configuration are disabled in the
+composition root. Manual instrumentation and its allowlists remain the export boundary.
+`ai.response.model` is span-only; served-version IDs are not new metric labels. HTTP request
+log lines include response status, so handled errors can be identified independently of the
+span wrapper's outcome. The final release tests and AWS sidecar runtime remain pending;
+see [release gates](evidence/release/README.md).

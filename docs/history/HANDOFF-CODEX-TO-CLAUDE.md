@@ -244,7 +244,7 @@ embeddings, unchanged K=5/RRF=60, actual results were:
 | Vector | 1.0 | 1.0 |
 | Hybrid | 1.0 | 1.0 |
 
-Evidence: [real per-case report](evidence/retrieval-v1-fake.json) and
+Evidence: [real per-case report](../evidence/retrieval-v1-fake.json) and
 `/tmp/opspilot-validation/live/evaluation-final.{json,stdout.log,stderr.log}`.
 This is a tiny synthetic regression, not held-out or a quality benchmark. Only four
 corpus documents belong to the queried tenant, fewer than K=5; Recall@5 is therefore

@@ -1,0 +1,626 @@
+{
+  "base_head": "55ddc102bef685d103f4868afea782cd1c5dbb88",
+  "inventory_scope": "Tracked edits and newly added non-ignored Phase 4 files before the single release commit",
+  "files": [
+    {
+      "status": "M",
+      "path": ".env.example"
+    },
+    {
+      "status": "M",
+      "path": ".github/workflows/ci.yaml"
+    },
+    {
+      "status": "M",
+      "path": ".gitignore"
+    },
+    {
+      "status": "A",
+      "path": ".gitleaks.toml"
+    },
+    {
+      "status": "M",
+      "path": ".python-version"
+    },
+    {
+      "status": "M",
+      "path": "Dockerfile"
+    },
+    {
+      "status": "M",
+      "path": "README.md"
+    },
+    {
+      "status": "M",
+      "path": "compose.yaml"
+    },
+    {
+      "status": "M",
+      "path": "docs/CURRENT-STATE.md"
+    },
+    {
+      "status": "M",
+      "path": "docs/DEPENDENCIES.md"
+    },
+    {
+      "status": "M",
+      "path": "docs/VALIDATION.md"
+    },
+    {
+      "status": "M",
+      "path": "docs/adr/003-retrieval-and-provider.md"
+    },
+    {
+      "status": "M",
+      "path": "docs/architecture/agent-workflow.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/deployment/aws.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/README.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/agent-eval.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/artifact-provenance.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/ci-audit.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/clean-agent-eval.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/clean-http-agent.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/clean-http-rag.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/clean-rag-dev.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/clean-retrieval-v1.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/clean-room-container.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/clean-room-validation.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/clean-security.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/container-metadata.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/execution-records.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/files-changed.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/final-gates.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/final-validation.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/handoff.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/http-agent.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/http-rag.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/iac-findings.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/iac-scan.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/image-vulnerabilities.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/live-provider-status.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/agent-eval.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/agent-gate.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/ci-audit.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-agent-gate.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-agent.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-build.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-compose-db.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-compose-empty.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-format.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-http-agent.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-http-rag.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-image-gate.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-integration.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-lint.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-lock.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-migrate.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-migrations.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-mypy.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-python.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-rag-dev.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-rag-gate.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-read-only-runtime.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-reset-db.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-retrieval-v1.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-secret-tree.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-security-gate.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-security.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-sync.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/clean-unit.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/compose-db.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/compose-empty.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/dependency-audit.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/dependency-export.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/docker-build.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/final-review.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/final-secret-history.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/final-secret-tree.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/gitleaks-positive-control.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/http-agent.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/http-rag.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/iac-scan.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/image-scan.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/image-vulnerability-gate.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/integration.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/migrate.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/migrations.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/mypy.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/observability-api.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/observability-profile.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/observability-runtime.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/production-runtime.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/rag-dev.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/rag-gate.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/read-only-runtime.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/retrieval-v1.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/ruff-format.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/ruff-lint.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/sbom.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/secret-history.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/secret-tree.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/security-gate.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/security.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/stop-release-stack.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/stop-test-db.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/terraform.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/trivy-db.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/logs/unit.log"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/observability-runtime.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/pip-audit.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/production-config-audit.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/production-runtime.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/rag-dev.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/retrieval-v1.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/revalidation.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/sbom-image.cdx.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/secret-scan.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/security.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/terraform-plan-summary.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/terraform-plans.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/terraform-validation.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/test-quality-review.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/validated-source-manifest.json"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/vm-revalidation.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/evidence/release/vulnerability-summary.md"
+    },
+    {
+      "status": "M",
+      "path": "docs/history/HANDOFF-CODEX-TO-CLAUDE.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/interview-notes.md"
+    },
+    {
+      "status": "M",
+      "path": "docs/observability.md"
+    },
+    {
+      "status": "A",
+      "path": "docs/portfolio-summary.md"
+    },
+    {
+      "status": "A",
+      "path": "infra/terraform/.terraform.lock.hcl"
+    },
+    {
+      "status": "A",
+      "path": "infra/terraform/alb.tf"
+    },
+    {
+      "status": "A",
+      "path": "infra/terraform/ecr.tf"
+    },
+    {
+      "status": "A",
+      "path": "infra/terraform/ecs.tf"
+    },
+    {
+      "status": "A",
+      "path": "infra/terraform/iam.tf"
+    },
+    {
+      "status": "A",
+      "path": "infra/terraform/logs.tf"
+    },
+    {
+      "status": "A",
+      "path": "infra/terraform/main.tf"
+    },
+    {
+      "status": "A",
+      "path": "infra/terraform/network.tf"
+    },
+    {
+      "status": "A",
+      "path": "infra/terraform/offline.tfvars"
+    },
+    {
+      "status": "A",
+      "path": "infra/terraform/outputs.tf"
+    },
+    {
+      "status": "A",
+      "path": "infra/terraform/rds.tf"
+    },
+    {
+      "status": "A",
+      "path": "infra/terraform/secrets.tf"
+    },
+    {
+      "status": "A",
+      "path": "infra/terraform/variables.tf"
+    },
+    {
+      "status": "A",
+      "path": "infra/terraform/versions.tf"
+    },
+    {
+      "status": "M",
+      "path": "pyproject.toml"
+    },
+    {
+      "status": "M",
+      "path": "scripts/fake_gitlab.py"
+    },
+    {
+      "status": "A",
+      "path": "scripts/live_gitlab_smoke.py"
+    },
+    {
+      "status": "A",
+      "path": "scripts/live_openai_smoke.py"
+    },
+    {
+      "status": "M",
+      "path": "scripts/verify.sh"
+    },
+    {
+      "status": "M",
+      "path": "src/opspilot/agent/planners.py"
+    },
+    {
+      "status": "M",
+      "path": "src/opspilot/api/app.py"
+    },
+    {
+      "status": "M",
+      "path": "src/opspilot/config.py"
+    },
+    {
+      "status": "M",
+      "path": "src/opspilot/observability.py"
+    },
+    {
+      "status": "M",
+      "path": "src/opspilot/providers/openai.py"
+    },
+    {
+      "status": "A",
+      "path": "tests/test_live_smokes.py"
+    },
+    {
+      "status": "A",
+      "path": "tests/test_migrations.py"
+    },
+    {
+      "status": "M",
+      "path": "tests/test_regression_gates.py"
+    },
+    {
+      "status": "A",
+      "path": "tests/test_release_config.py"
+    },
+    {
+      "status": "M",
+      "path": "uv.lock"
+    }
+  ]
+}

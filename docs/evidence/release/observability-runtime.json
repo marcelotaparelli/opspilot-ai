@@ -1,0 +1,28 @@
+{
+  "profile_startup": "PASS",
+  "collector_up_http_rag": "PASS",
+  "collector_down_http_rag": "PASS",
+  "collector_recovery_http_rag": "PASS",
+  "jaeger_resource_span_groups": 20,
+  "metric_names": [
+    "http_server_duration_seconds_bucket",
+    "http_server_duration_seconds_count",
+    "http_server_duration_seconds_sum",
+    "http_server_requests_total",
+    "llm_cost_unknown_total",
+    "llm_duration_seconds_bucket",
+    "llm_duration_seconds_count",
+    "llm_duration_seconds_sum",
+    "llm_requests_total",
+    "llm_usage_unknown_total",
+    "retrieval_chunks_returned_bucket",
+    "retrieval_chunks_returned_count",
+    "retrieval_chunks_returned_sum",
+    "retrieval_duration_seconds_bucket",
+    "retrieval_duration_seconds_count",
+    "retrieval_duration_seconds_sum",
+    "retrieval_requests_total",
+    "target_info"
+  ],
+  "scope": "real local Collector/Jaeger; integration test independently checks fail-open latency, error redaction, export recovery and bounded shutdown"
+}

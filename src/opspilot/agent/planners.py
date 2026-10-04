@@ -14,7 +14,7 @@ from opspilot.agent.ports import PlannerView
 from opspilot.config import Settings
 from opspilot.domain import ProviderError
 from opspilot.observability import llm_call
-from opspilot.providers.openai import classify_error, refused, response_usage
+from opspilot.providers.openai import classify_error, refused, response_usage, served_model
 
 ISSUE_REQUEST = re.compile(r"\b(issue|ticket)\b", re.IGNORECASE)
 
@@ -151,7 +151,8 @@ class OpenAIPlanner:
                 raise ProviderError from None
             usage = response_usage(response)
             pricing = self.settings.model_pricing
-            call.report_usage(usage, pricing.cost("openai", model, usage, datetime.now(UTC)))
+            cost = pricing.cost("openai", model, usage, datetime.now(UTC))
+            call.report_usage(usage, cost, served_model(response))
             if response.output_parsed is None:
                 call.fail("refusal" if refused(response) else "invalid_output")
                 raise ProviderError

@@ -1,6 +1,7 @@
 """Minimal fake of the GitLab REST v4 issues API, for tests and the local smoke stack only.
 
-Implements POST/GET /api/v4/projects/:id/issues with PRIVATE-TOKEN auth plus a test-only
+Implements POST/GET /api/v4/projects/:id/issues, GET/PUT .../issues/:iid (read, close) with
+PRIVATE-TOKEN auth plus a test-only
 /_control API for fault injection. Faults model what matters for idempotency:
   status:<code>          answer <code> without creating anything
   drop_after_create      create the issue, then close the socket without a response
@@ -20,6 +21,7 @@ from typing import Any
 from urllib.parse import parse_qs, urlsplit
 
 ISSUES = re.compile(r"^/api/v4/projects/(\d+)/issues$")
+ISSUE = re.compile(r"^/api/v4/projects/(\d+)/issues/(\d+)$")
 
 
 class State:
@@ -71,6 +73,12 @@ class Handler(BaseHTTPRequestHandler):
                     200, {"issues": state.issues, "creates_received": state.creates_received}
                 )
             return
+        single = ISSUE.match(url.path)
+        if single:
+            if self.authorised():
+                issue = self.find(int(single.group(1)), int(single.group(2)))
+                self.reply(200, issue) if issue else self.reply(404, {"message": "404 Not found"})
+            return
         match = ISSUES.match(url.path)
         if not match or not self.authorised():
             if not match:
@@ -85,6 +93,34 @@ class Handler(BaseHTTPRequestHandler):
                 if issue["project_id"] == project and search in issue["description"].casefold()
             ]
         self.reply(200, found)
+
+    def find(self, project: int, iid: int) -> dict[str, Any] | None:
+        with self.server.state.lock:
+            return next(
+                (
+                    i
+                    for i in self.server.state.issues
+                    if (i["project_id"], i["iid"]) == (project, iid)
+                ),
+                None,
+            )
+
+    def do_PUT(self) -> None:  # noqa: N802 - stdlib name
+        single = ISSUE.match(urlsplit(self.path).path)
+        if not single:
+            self.reply(404, {"message": "404 Not Found"})
+            return
+        if not self.authorised():
+            return
+        payload = self.body()
+        issue = self.find(int(single.group(1)), int(single.group(2)))
+        if issue is None:
+            self.reply(404, {"message": "404 Not found"})
+            return
+        with self.server.state.lock:
+            if payload.get("state_event") == "close":
+                issue["state"] = "closed"
+            self.reply(200, issue)
 
     def do_POST(self) -> None:  # noqa: N802 - stdlib name
         state = self.server.state
@@ -129,6 +165,7 @@ class Handler(BaseHTTPRequestHandler):
                 "description": payload.get("description") or "",
                 "labels": [label for label in (payload.get("labels") or "").split(",") if label],
                 "assignee_ids": payload.get("assignee_ids") or [],
+                "state": "opened",
                 "web_url": f"http://gitlab.invalid/project/{project}/-/issues/{iid}",
             }
             state.issues.append(issue)

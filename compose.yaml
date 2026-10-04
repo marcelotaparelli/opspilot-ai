@@ -27,9 +27,16 @@ services:
       db:
         condition: service_healthy
     restart: "no"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
   api:
     build: .
     environment:
+      APP_ENV: ${APP_ENV:-development}
+      EXPOSE_API_DOCS: ${EXPOSE_API_DOCS:-false}
       DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL}
       TENANT_TOKENS: ${TENANT_TOKENS:?Set TENANT_TOKENS}
       PROVIDER: ${PROVIDER:-fake}
@@ -59,6 +66,8 @@ services:
     read_only: true
     tmpfs:
       - /tmp
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
   # Optional: docker compose --profile observability up. The API never depends on these.
   otel-collector:
     image: otel/opentelemetry-collector-contrib:0.161.0

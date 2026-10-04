@@ -31,6 +31,9 @@ class Settings(BaseModel):
     # Token -> principal. A bare tenant UUID (Phase 1 format) maps to a principal with the
     # "agent" role and a subject derived from the token hash; approvers must be explicit.
     tenant_tokens: dict[str, Principal] = Field(min_length=1, max_length=100, repr=False)
+    # "production" turns known development defaults into startup errors (fail-fast).
+    app_env: Literal["development", "production"] = "development"
+    expose_api_docs: bool = False
     provider: Literal["fake", "openai"] = "fake"
     openai_api_key: SecretStr | None = None
     embedding_model: str = Field(default="text-embedding-3-small", min_length=1, max_length=100)
@@ -100,7 +103,28 @@ class Settings(BaseModel):
             raise ValueError("execution lease must outlast one GitLab request")
         if (self.gitlab_base_url is None) != (self.gitlab_token is None):
             raise ValueError("GitLab requires both base URL and token")
+        if self.app_env == "production":
+            self.production_checks()
         return self
+
+    def production_checks(self) -> None:
+        """Refuse to start production with development shortcuts or published examples."""
+        if self.gitlab_allow_http:
+            raise ValueError("GITLAB_ALLOW_HTTP is not allowed in production")
+        if self.expose_api_docs:
+            raise ValueError("API docs must not be exposed in production")
+        published = (
+            "replace-with",
+            "random-token-at-least",
+            "development-",
+            "ci-token",
+            "change-me",
+        )
+        values = [*self.tenant_tokens, self.database_url.get_secret_value()]
+        if self.gitlab_token is not None:
+            values.append(self.gitlab_token.get_secret_value())
+        if any(marker in value for value in values for marker in published):
+            raise ValueError("example credentials are not allowed in production")
 
     @field_validator("otel_exporter_otlp_endpoint")
     @classmethod
@@ -150,6 +174,8 @@ class Settings(BaseModel):
             {
                 "database_url": SecretStr(os.environ["DATABASE_URL"]),
                 "tenant_tokens": tokens,
+                "app_env": os.environ.get("APP_ENV", "development"),
+                "expose_api_docs": os.environ.get("EXPOSE_API_DOCS", "false") == "true",
                 "provider": os.environ.get("PROVIDER", "fake"),
                 "openai_api_key": SecretStr(os.environ.get("OPENAI_API_KEY", "")),
                 "embedding_model": os.environ.get("EMBEDDING_MODEL", "text-embedding-3-small"),

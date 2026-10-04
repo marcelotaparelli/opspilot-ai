@@ -1,0 +1,24 @@
+# Secret scanning policy (Gitleaks 8.30). Default rules apply; allowlists are narrow and
+# justified. Anything not matched below fails the scan (CI and docs/evidence/release).
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Test fixtures: credentials that contain the TEST_SECRET sentinel are fake by construction"
+regexes = ['''TEST_SECRET''']
+
+[[allowlists]]
+description = "retrieval-v2 benchmark: a document slug that the generic-api-key rule misreads as a key"
+condition = "AND"
+paths = ['''^evals/retrieval-v2/corpus\.json$''']
+regexes = ['''^k8s-crashloop-missing-secret$''']
+
+[[allowlists]]
+description = "Generated, git-ignored local artefacts (virtualenv, bytecode, tool caches, Terraform plugins)"
+paths = ['''(^|/)(\.venv|__pycache__|\.terraform|\.mypy_cache|\.ruff_cache|\.pytest_cache)/''']
+
+[[allowlists]]
+description = "Pinned Python base image: public GPG signing-key fingerprint in the full Trivy report"
+condition = "AND"
+paths = ['''^docs/evidence/release/image-vulnerabilities\.json$''']
+regexes = ['''^7169605F62C751356D054A26A821E680E5FA6305$''']

@@ -1,0 +1,29 @@
+{
+  "default": {
+    "resources": 56,
+    "creates": 56,
+    "plan_invariants": "PASS",
+    "assign_public_ip": true,
+    "nat_gateways": 0,
+    "collector_enabled": true,
+    "container_json": "unknown until ECR URL; runtime controls checked by source tests and local Docker, not resolved plan"
+  },
+  "nat": {
+    "resources": 58,
+    "creates": 58,
+    "plan_invariants": "PASS",
+    "assign_public_ip": false,
+    "nat_gateways": 1,
+    "collector_enabled": true,
+    "container_json": "unknown until ECR URL; runtime controls checked by source tests and local Docker, not resolved plan"
+  },
+  "no-collector": {
+    "resources": 53,
+    "creates": 53,
+    "plan_invariants": "PASS",
+    "assign_public_ip": true,
+    "nat_gateways": 0,
+    "collector_enabled": false,
+    "container_json": "unknown until ECR URL; runtime controls checked by source tests and local Docker, not resolved plan"
+  }
+}

@@ -50,6 +50,37 @@ if not logger.handlers:
 tracer = trace.get_tracer("opspilot")
 meter = metrics.get_meter("opspilot")
 
+
+@contextmanager
+def logs_to_stderr() -> Iterator[None]:
+    """Temporarily route console logs away from a CLI's JSON stdout.
+
+    Streams belong to the caller and may already be closed after a previous capture.
+    Replacing handlers avoids setStream's flush of that borrowed stream, and restoring
+    the original handlers keeps repeated CLI invocations from retaining stderr captures.
+    """
+    replaced: list[tuple[logging.Handler, logging.Handler]] = []
+    for original in list(logger.handlers):
+        if isinstance(original, logging.StreamHandler) and not isinstance(
+            original, logging.FileHandler
+        ):
+            temporary = logging.StreamHandler(sys.stderr)
+            temporary.setLevel(original.level)
+            temporary.setFormatter(original.formatter)
+            for log_filter in original.filters:
+                temporary.addFilter(log_filter)
+            logger.removeHandler(original)
+            logger.addHandler(temporary)
+            replaced.append((original, temporary))
+    try:
+        yield
+    finally:
+        for restored, replacement in replaced:
+            logger.removeHandler(replacement)
+            replacement.close()  # Handler.close does not close the caller's stream.
+            logger.addHandler(restored)
+
+
 # --------------------------------------------------------------------- redaction model
 SAFE_STRING = re.compile(r"^[A-Za-z0-9_.:/{}-]{1,128}$")
 SPAN_ATTRIBUTES: dict[str, type] = {
@@ -61,6 +92,7 @@ SPAN_ATTRIBUTES: dict[str, type] = {
     "error.type": str,
     "ai.provider": str,
     "ai.model": str,
+    "ai.response.model": str,
     "ai.operation": str,
     "ai.error.type": str,
     "ai.usage.known": bool,
@@ -289,6 +321,9 @@ def span(
                 "outcome": outcome,
                 "duration_ms": round((time.monotonic() - started) * 1000, 2),
             }
+            status = (getattr(current, "attributes", None) or {}).get("http.response.status_code")
+            if isinstance(status, int):
+                fields["status"] = status
             if error_type:
                 fields["error_type"] = error_type
             log_event(fields)
@@ -338,9 +373,13 @@ class LLMCall:
     usage: Usage = field(default_factory=Usage)
     cost: Decimal | None = None
     error_type: str | None = None
+    response_model: str | None = None
 
-    def report_usage(self, usage: Usage, cost: Decimal | None) -> None:
-        self.usage, self.cost = usage, cost
+    def report_usage(
+        self, usage: Usage, cost: Decimal | None, response_model: str | None = None
+    ) -> None:
+        """response_model: the identifier the provider says it served (span only, not a label)."""
+        self.usage, self.cost, self.response_model = usage, cost, response_model
 
     def fail(self, error_type: str) -> None:
         self.error_type = error_type
@@ -397,6 +436,7 @@ def _finish_llm_call(call: LLMCall, seconds: float) -> None:
         ai__usage__total_tokens=usage.total_tokens,
         ai__cost__known=call.cost is not None,
         ai__cost__estimated_usd=call.cost,
+        ai__response__model=call.response_model,
     )
     # Unknown usage is counted as unknown, never added as zero tokens.
     if usage.input_tokens is not None:

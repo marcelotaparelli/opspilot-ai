@@ -1,0 +1,368 @@
+{
+  "date": "2026-10-04",
+  "phase": 4,
+  "validated_base_head": "55ddc102bef685d103f4868afea782cd1c5dbb88",
+  "engineering_release": "PASS",
+  "openai_live_evidence": "NOT EXECUTED",
+  "gitlab_live_evidence": "NOT EXECUTED",
+  "push_performed": false,
+  "critical_gates_satisfied": true,
+  "clean_room_satisfied": true,
+  "release_commit_policy": "One commit only after all gates PASS: chore: prepare opspilot release candidate",
+  "unit": {
+    "collected": 313,
+    "selected": 241,
+    "passed": 241,
+    "failed": 0,
+    "skipped": 0,
+    "deselected": 72
+  },
+  "integration": {
+    "collected": 313,
+    "selected": 72,
+    "passed": 72,
+    "failed": 0,
+    "skipped": 0,
+    "deselected": 241
+  },
+  "image_vulnerabilities": {
+    "total": 166,
+    "by_severity": {
+      "LOW": 60,
+      "HIGH": 44,
+      "MEDIUM": 60,
+      "UNKNOWN": 2
+    },
+    "fixable_by_severity": {},
+    "fixable_high_critical_gate": "PASS"
+  },
+  "iac": {
+    "checks_passed": 90,
+    "findings": 4,
+    "classification": "Accepted blueprint risks; no suppression"
+  },
+  "gates": [
+    {
+      "gate": "ruff-format",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "ruff-lint",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "mypy",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "migrations",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "integration",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "rag-gate",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "agent-gate",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "security-gate",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "docker-build",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "image-scan",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "sbom",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "image-vulnerability-gate",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "dependency-audit",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "iac-scan",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "terraform",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "compose-empty",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "http-rag",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "http-agent",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "observability-runtime",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "production-runtime",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "read-only-runtime",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "ci-audit",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "secret-history",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "secret-tree",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "gitleaks-positive-control",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-lock",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-sync",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-format",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-lint",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-mypy",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-unit",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-migrations",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-integration",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-rag-gate",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-agent-gate",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-security-gate",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-build",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-compose-empty",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-http-rag",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-http-agent",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-read-only-runtime",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-image-gate",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "clean-secret-tree",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "final-review",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "final-secret-tree",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    },
+    {
+      "gate": "final-secret-history",
+      "status": "PASS",
+      "evidence_class": "FINAL",
+      "exit_code": 0,
+      "record": "execution-records.json"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.15, pytest-9.1.1, pluggy-1.6.0
+rootdir: /workspace/opspilot-ai
+configfile: pyproject.toml
+testpaths: tests
+plugins: anyio-4.15.1, asyncio-1.4.0, langsmith-0.14.4
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 312 items / 71 deselected / 241 selected
+
+tests/test_agent_gitlab.py ..............................                [ 12%]
+tests/test_agent_unit.py ....................................            [ 27%]
+tests/test_api.py ...........                                            [ 31%]
+tests/test_benchmark.py ........                                         [ 35%]
+tests/test_config.py ......                                              [ 37%]
+tests/test_evaluation.py ...                                             [ 39%]
+tests/test_live_smokes.py ............................                   [ 50%]
+tests/test_observability.py .................                            [ 57%]
+tests/test_provider.py ................................                  [ 70%]
+tests/test_regression_gates.py ............                              [ 75%]
+tests/test_release_config.py ............                                [ 80%]
+tests/test_unit.py ..............................................        [100%]
+
+====================== 241 passed, 71 deselected in 6.54s ======================

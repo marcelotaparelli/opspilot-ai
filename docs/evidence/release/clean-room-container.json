@@ -1,0 +1,24 @@
+{
+  "image_tag": "opspilot-ai:clean-room",
+  "image_id": "sha256:3d948dbddaaed3204ce99a6db7c464e9aa98fc8544c56152ce3cd8989a90f315",
+  "repo_digests": [
+    "opspilot-ai@sha256:3d948dbddaaed3204ce99a6db7c464e9aa98fc8544c56152ce3cd8989a90f315"
+  ],
+  "size_bytes": 362790320,
+  "created": "2026-10-04T21:59:47.71071597Z",
+  "image_user": "10001:10001",
+  "architecture": "amd64",
+  "runtime": {
+    "uid": 10001,
+    "gid": 10001,
+    "root_read_only": true,
+    "tmp_writable": true,
+    "cap_effective": 0,
+    "no_new_privileges": true
+  },
+  "api_health": "healthy",
+  "migration_exit_code": 0,
+  "postgres_vector_schema": "17.6 (Debian 17.6-1.pgdg12+1)|0.8.0|2",
+  "build": "docker build --no-cache",
+  "registry_push": false
+}

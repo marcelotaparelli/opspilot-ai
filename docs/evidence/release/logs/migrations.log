@@ -1,0 +1,16 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.15, pytest-9.1.1, pluggy-1.6.0 -- /workspace/opspilot-ai/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /workspace/opspilot-ai
+configfile: pyproject.toml
+plugins: anyio-4.15.1, asyncio-1.4.0, langsmith-0.14.4
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collecting ... collected 5 items
+
+tests/test_migrations.py::test_empty_database_to_latest_is_idempotent_and_ready PASSED [ 20%]
+tests/test_migrations.py::test_v1_database_upgrades_to_latest_and_keeps_data PASSED [ 40%]
+tests/test_migrations.py::test_unknown_future_version_fails_fast PASSED  [ 60%]
+tests/test_migrations.py::test_concurrent_migrators_serialise_on_the_advisory_lock PASSED [ 80%]
+tests/test_migrations.py::test_failed_ddl_rolls_back_all_migrations_and_can_retry PASSED [100%]
+
+============================== 5 passed in 1.48s ===============================

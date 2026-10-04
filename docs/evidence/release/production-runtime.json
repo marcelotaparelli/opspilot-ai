@@ -1,0 +1,13 @@
+{
+  "app_env": "production",
+  "provider": "fake",
+  "readiness": 200,
+  "docs_and_errors": {
+    "/docs": 404,
+    "/openapi.json": 404,
+    "/redoc": 404,
+    "/unknown": 404
+  },
+  "real_credentials": false,
+  "aws_deployment": false
+}

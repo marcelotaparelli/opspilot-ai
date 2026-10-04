@@ -1,7 +1,9 @@
 # ADR 003: Exact vectors, simple full-text search and deterministic RRF
 
-Status: accepted for Phase 1; synthetic retrieval regression measured on 2026-10-04
-(see [validation record](../VALIDATION.md)). Real model quality and load latency remain unmeasured.
+Status: accepted; retrieval-v2 measured lexical, fake-vector and hybrid on dev and the
+once-consumed held-out split. Phase 3 measured local fake-provider load latency. Real semantic
+embedding/answer quality and AWS performance remain unmeasured. Current gates and provenance
+are in the [validation record](../VALIDATION.md).
 
 Use exact cosine retrieval on 256-dimensional pgvector values and GIN-indexed PostgreSQL
 `simple` full-text search, then RRF with constant 60. Fixed UUID tie breaks make a fixed
@@ -26,5 +28,12 @@ across spaces. Reembedding/model lifecycle is deferred. The SDK is official and 
 schema-constrained Responses output, explicit per-call deadlines, request deadlines and
 zero retries; this bounds failure latency at the cost of transient-error availability.
 
-Only safe correlation/timing is installed. `observability.span` is the exact Phase 3
-tracing extension; installing a tracer/exporter now would add scope without measured value.
+Phase 3 installed manual OpenTelemetry traces/metrics and background OTLP/HTTP export;
+Phase 4 separates configured and served model identifiers. Allowlists exclude content and
+credentials; telemetry errors do not fail product requests. Unknown usage/cost stay unknown.
+Framework-native telemetry is disabled to keep one controlled export boundary.
+
+The answer/planner schemas contain constrained strings, including minLength/maxLength.
+Mocked SDK acceptance does not establish the real API's support. The opt-in smoke tests the
+actual schemas with at most nine reserved requests; acceptance/rejection remains
+NOT EXECUTED — CREDENTIALS NOT PROVIDED. See [live status](../evidence/release/live-provider-status.md).

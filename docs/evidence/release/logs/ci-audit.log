@@ -1,0 +1,23 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.15, pytest-9.1.1, pluggy-1.6.0 -- /workspace/opspilot-ai/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /workspace/opspilot-ai
+configfile: pyproject.toml
+plugins: anyio-4.15.1, asyncio-1.4.0, langsmith-0.14.4
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collecting ... collected 13 items / 1 deselected / 12 selected
+
+tests/test_regression_gates.py::test_rag_gate_passes_on_the_baseline_report PASSED [  8%]
+tests/test_regression_gates.py::test_rag_gate_detects_material_regressions[<lambda>-lexical mrr@5 dropped] PASSED [ 16%]
+tests/test_regression_gates.py::test_rag_gate_detects_material_regressions[<lambda>-hybrid recall@5 dropped] PASSED [ 25%]
+tests/test_regression_gates.py::test_rag_gate_detects_material_regressions[<lambda>-dev split] PASSED [ 33%]
+tests/test_regression_gates.py::test_rag_gate_detects_material_regressions[<lambda>-embedding_space] PASSED [ 41%]
+tests/test_regression_gates.py::test_rag_gate_detects_material_regressions[<lambda>-RRF] PASSED [ 50%]
+tests/test_regression_gates.py::test_rag_gate_detects_material_regressions[<lambda>-degenerating] PASSED [ 58%]
+tests/test_regression_gates.py::test_rag_gate_detects_material_regressions[<lambda>-vector: missing] PASSED [ 66%]
+tests/test_regression_gates.py::test_rag_gate_tolerates_less_than_one_query_of_change PASSED [ 75%]
+tests/test_regression_gates.py::test_agent_gate_treats_safety_metrics_as_invariants PASSED [ 83%]
+tests/test_regression_gates.py::test_security_gate_fails_on_any_failed_or_missing_case PASSED [ 91%]
+tests/test_regression_gates.py::test_ci_runs_every_gate PASSED           [100%]
+
+======================= 12 passed, 1 deselected in 0.07s =======================

@@ -11,6 +11,7 @@ from uuid import UUID
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from opspilot import observability
 from opspilot.agent.gitlab import GitLabTracker
@@ -38,6 +39,14 @@ from opspilot.observability import request_id
 from opspilot.persistence.postgres import PostgresRepository
 from opspilot.providers.fake import FakeProvider
 from opspilot.providers.openai import OpenAIProvider
+
+HTTP_ERROR_CODES = {
+    401: "unauthorized",
+    403: "forbidden",
+    404: "not_found",
+    405: "method_not_allowed",
+    413: "request_too_large",
+}
 
 
 def citation(chunk: Chunk) -> Citation:
@@ -111,7 +120,27 @@ def create_app(
                 if telemetry_owned:
                     observability.shutdown()
 
-    app = FastAPI(title="opspilot-ai", version="0.1.0", lifespan=lifespan, debug=False)
+    # Interactive docs and the OpenAPI document are opt-in, never public by default.
+    docs = config.expose_api_docs
+    app = FastAPI(
+        title="opspilot-ai",
+        version="0.1.0",
+        lifespan=lifespan,
+        debug=False,
+        docs_url="/docs" if docs else None,
+        redoc_url=None,
+        openapi_url="/openapi.json" if docs else None,
+        # FastAPI >= 0.13x ships native OpenTelemetry (spans, metrics, log records and OTLP
+        # auto-configuration from OTEL_* env) that bypasses our attribute allowlist. One
+        # redaction-controlled pipeline only: ours (observability.py + RequestMiddleware).
+        telemetry={
+            "tracing": False,
+            "metrics": False,
+            "logs": False,
+            "operation_spans": False,
+            "auto_configure": False,
+        },
+    )
     # Test injection does not require an ASGI lifespan manager dependency.
     if service is not None:
         app.state.service = service
@@ -160,11 +189,15 @@ def create_app(
             content={"error": "invalid_input", "request_id": request_id.get()},
         )
 
-    @app.exception_handler(HTTPException)
-    async def http_error(request: Request, error: HTTPException) -> JSONResponse:
+    @app.exception_handler(StarletteHTTPException)
+    async def http_error(request: Request, error: StarletteHTTPException) -> JSONResponse:
+        # One envelope for every status, including routing 404/405; never echo details.
         return JSONResponse(
             status_code=error.status_code,
-            content={"error": "unauthorized", "request_id": request_id.get()},
+            content={
+                "error": HTTP_ERROR_CODES.get(error.status_code, "http_error"),
+                "request_id": request_id.get(),
+            },
         )
 
     @app.post("/v1/documents", response_model=DocumentOutput, status_code=201)

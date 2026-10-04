@@ -1,0 +1,158 @@
+{"ts":"2026-10-04T21:49:14.593+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"embedding","outcome":"ok","duration_ms":0.16}
+{"ts":"2026-10-04T21:49:14.600+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"rag.ingest","outcome":"ok","duration_ms":7.77}
+{"ts":"2026-10-04T21:49:14.603+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"embedding","outcome":"ok","duration_ms":0.09}
+{"ts":"2026-10-04T21:49:14.606+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"rag.ingest","outcome":"ok","duration_ms":2.74}
+{"ts":"2026-10-04T21:49:14.607+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"embedding","outcome":"ok","duration_ms":0.08}
+{"ts":"2026-10-04T21:49:14.609+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"rag.ingest","outcome":"ok","duration_ms":2.31}
+{"ts":"2026-10-04T21:49:14.611+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"embedding","outcome":"ok","duration_ms":0.07}
+{"ts":"2026-10-04T21:49:14.613+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"rag.ingest","outcome":"ok","duration_ms":2.09}
+{"ts":"2026-10-04T21:49:14.615+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"embedding","outcome":"ok","duration_ms":0.06}
+{"ts":"2026-10-04T21:49:14.617+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"rag.ingest","outcome":"ok","duration_ms":2.06}
+{"ts":"2026-10-04T21:49:14.619+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"lexical_retrieval","outcome":"ok","duration_ms":2.65}
+{"ts":"2026-10-04T21:49:14.620+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"retrieval","outcome":"ok","duration_ms":2.84}
+{"ts":"2026-10-04T21:49:14.622+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"lexical_retrieval","outcome":"ok","duration_ms":1.9}
+{"ts":"2026-10-04T21:49:14.622+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"retrieval","outcome":"ok","duration_ms":2.05}
+{"ts":"2026-10-04T21:49:14.623+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"lexical_retrieval","outcome":"ok","duration_ms":1.61}
+{"ts":"2026-10-04T21:49:14.624+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"retrieval","outcome":"ok","duration_ms":1.74}
+{"ts":"2026-10-04T21:49:14.624+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"embedding","outcome":"ok","duration_ms":0.07}
+{"ts":"2026-10-04T21:49:14.626+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"vector_retrieval","outcome":"ok","duration_ms":2.39}
+{"ts":"2026-10-04T21:49:14.626+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"retrieval","outcome":"ok","duration_ms":2.76}
+{"ts":"2026-10-04T21:49:14.627+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"embedding","outcome":"ok","duration_ms":0.06}
+{"ts":"2026-10-04T21:49:14.629+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"vector_retrieval","outcome":"ok","duration_ms":1.78}
+{"ts":"2026-10-04T21:49:14.629+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"retrieval","outcome":"ok","duration_ms":2.11}
+{"ts":"2026-10-04T21:49:14.629+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"embedding","outcome":"ok","duration_ms":0.06}
+{"ts":"2026-10-04T21:49:14.631+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"vector_retrieval","outcome":"ok","duration_ms":1.77}
+{"ts":"2026-10-04T21:49:14.631+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"retrieval","outcome":"ok","duration_ms":2.14}
+{"ts":"2026-10-04T21:49:14.631+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"embedding","outcome":"ok","duration_ms":0.05}
+{"ts":"2026-10-04T21:49:14.633+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"vector_retrieval","outcome":"ok","duration_ms":1.7}
+{"ts":"2026-10-04T21:49:14.635+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"lexical_retrieval","outcome":"ok","duration_ms":1.57}
+{"ts":"2026-10-04T21:49:14.636+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"rank_fusion","outcome":"ok","duration_ms":0.05}
+{"ts":"2026-10-04T21:49:14.636+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"retrieval","outcome":"ok","duration_ms":4.68}
+{"ts":"2026-10-04T21:49:14.636+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"embedding","outcome":"ok","duration_ms":0.09}
+{"ts":"2026-10-04T21:49:14.639+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"vector_retrieval","outcome":"ok","duration_ms":2.34}
+{"ts":"2026-10-04T21:49:14.641+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"lexical_retrieval","outcome":"ok","duration_ms":2.02}
+{"ts":"2026-10-04T21:49:14.641+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"rank_fusion","outcome":"ok","duration_ms":0.03}
+{"ts":"2026-10-04T21:49:14.641+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"retrieval","outcome":"ok","duration_ms":5.06}
+{"ts":"2026-10-04T21:49:14.641+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"embedding","outcome":"ok","duration_ms":0.06}
+{"ts":"2026-10-04T21:49:14.643+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"vector_retrieval","outcome":"ok","duration_ms":1.74}
+{"ts":"2026-10-04T21:49:14.645+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"lexical_retrieval","outcome":"ok","duration_ms":1.84}
+{"ts":"2026-10-04T21:49:14.645+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"rank_fusion","outcome":"ok","duration_ms":0.03}
+{"ts":"2026-10-04T21:49:14.645+00:00","level":"INFO","request_id":"background","run_id":"-","trace_id":"-","span_id":"-","operation":"retrieval","outcome":"ok","duration_ms":4.15}
+{
+  "dataset_version": 1,
+  "embedding_space": "fake:sha256-bow-v1:256",
+  "k": 5,
+  "case_count": 3,
+  "modes": {
+    "lexical": {
+      "recall_at_k": 1.0,
+      "mrr_at_k": 1.0,
+      "cases": [
+        {
+          "id": "certificate-document",
+          "recall_at_k": 1.0,
+          "mrr_at_k": 1.0,
+          "retrieved_ids": [
+            "11111111-1111-4111-8111-111111111111"
+          ]
+        },
+        {
+          "id": "restart-chunk",
+          "recall_at_k": 1.0,
+          "mrr_at_k": 1.0,
+          "retrieved_ids": [
+            "b01c22e2-ad7a-5ca5-a4dc-5b045234fa15",
+            "7e33a39e-89ce-594e-82db-76f9424047ef"
+          ]
+        },
+        {
+          "id": "backup-document",
+          "recall_at_k": 1.0,
+          "mrr_at_k": 1.0,
+          "retrieved_ids": [
+            "33333333-3333-4333-8333-333333333333",
+            "22222222-2222-4222-8222-222222222222"
+          ]
+        }
+      ]
+    },
+    "vector": {
+      "recall_at_k": 1.0,
+      "mrr_at_k": 1.0,
+      "cases": [
+        {
+          "id": "certificate-document",
+          "recall_at_k": 1.0,
+          "mrr_at_k": 1.0,
+          "retrieved_ids": [
+            "11111111-1111-4111-8111-111111111111",
+            "44444444-4444-4444-8444-444444444444",
+            "33333333-3333-4333-8333-333333333333",
+            "22222222-2222-4222-8222-222222222222"
+          ]
+        },
+        {
+          "id": "restart-chunk",
+          "recall_at_k": 1.0,
+          "mrr_at_k": 1.0,
+          "retrieved_ids": [
+            "b01c22e2-ad7a-5ca5-a4dc-5b045234fa15",
+            "7e33a39e-89ce-594e-82db-76f9424047ef",
+            "8704ab9f-7c54-57a2-befd-420292425e4e",
+            "088d8ffd-d9c3-579f-a392-8894d0c66bb2"
+          ]
+        },
+        {
+          "id": "backup-document",
+          "recall_at_k": 1.0,
+          "mrr_at_k": 1.0,
+          "retrieved_ids": [
+            "33333333-3333-4333-8333-333333333333",
+            "22222222-2222-4222-8222-222222222222",
+            "44444444-4444-4444-8444-444444444444",
+            "11111111-1111-4111-8111-111111111111"
+          ]
+        }
+      ]
+    },
+    "hybrid": {
+      "recall_at_k": 1.0,
+      "mrr_at_k": 1.0,
+      "cases": [
+        {
+          "id": "certificate-document",
+          "recall_at_k": 1.0,
+          "mrr_at_k": 1.0,
+          "retrieved_ids": [
+            "11111111-1111-4111-8111-111111111111",
+            "44444444-4444-4444-8444-444444444444",
+            "33333333-3333-4333-8333-333333333333",
+            "22222222-2222-4222-8222-222222222222"
+          ]
+        },
+        {
+          "id": "restart-chunk",
+          "recall_at_k": 1.0,
+          "mrr_at_k": 1.0,
+          "retrieved_ids": [
+            "b01c22e2-ad7a-5ca5-a4dc-5b045234fa15",
+            "7e33a39e-89ce-594e-82db-76f9424047ef",
+            "8704ab9f-7c54-57a2-befd-420292425e4e",
+            "088d8ffd-d9c3-579f-a392-8894d0c66bb2"
+          ]
+        },
+        {
+          "id": "backup-document",
+          "recall_at_k": 1.0,
+          "mrr_at_k": 1.0,
+          "retrieved_ids": [
+            "33333333-3333-4333-8333-333333333333",
+            "22222222-2222-4222-8222-222222222222",
+            "44444444-4444-4444-8444-444444444444",
+            "11111111-1111-4111-8111-111111111111"
+          ]
+        }
+      ]
+    }
+  }
+}
