@@ -193,3 +193,47 @@ async def test_embedding_space_does_not_mix_vector_models() -> None:
     chunk, vector, _ = repository.chunks[0]
     repository.chunks[0] = (replace(chunk, title="old"), vector, "other-model")
     assert not await service.retriever.search(TENANT_A, "evidence", 5, "vector")
+
+
+@pytest.mark.parametrize(
+    ("question", "expected"),
+    [
+        ("How do I restart the service?", "'How' | 'do' | 'I' | 'restart' | 'the' | 'service'"),
+        ("restart restart", "'restart'"),
+        ("'; DROP TABLE chunks; --", "'DROP' | 'TABLE' | 'chunks'"),
+        ("a & !b <-> c:* \\ ''", "'a' | 'b' | 'c'"),
+        ("??? !!!", ""),
+    ],
+)
+def test_lexical_query_is_any_term_and_operator_free(question: str, expected: str) -> None:
+    from opspilot.persistence.postgres import PostgresRepository
+
+    assert PostgresRepository.any_term_query(question) == expected
+
+
+async def test_unreachable_database_readiness_is_bounded_and_controlled() -> None:
+    import time
+
+    from pydantic import SecretStr
+
+    from opspilot.config import Settings
+    from opspilot.domain import DependencyError
+    from opspilot.persistence.postgres import PostgresRepository
+    from tests.helpers import TOKEN_A
+
+    # Real asyncpg driver against a closed local port; no server is required.
+    repository = PostgresRepository(
+        Settings(
+            database_url=SecretStr("postgresql+asyncpg://opspilot_app:secret@127.0.0.1:9/x"),
+            tenant_tokens={TOKEN_A: TENANT_A},
+            database_timeout_seconds=1,
+        )
+    )
+    started = time.monotonic()
+    try:
+        with pytest.raises(DependencyError) as error:
+            await repository.ready()
+        assert "secret" not in repr(error.value) and error.value.__cause__ is None
+        assert time.monotonic() - started < 3
+    finally:
+        await repository.close()

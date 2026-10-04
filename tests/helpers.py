@@ -28,9 +28,7 @@ class MemoryRepository:
             (chunk, vector, space) for chunk, vector in zip(chunks, vectors, strict=True)
         )
 
-    async def vector(
-        self, tenant: UUID, vector: list[float], space: str, limit: int
-    ) -> list[Hit]:
+    async def vector(self, tenant: UUID, vector: list[float], space: str, limit: int) -> list[Hit]:
         hits = [
             Hit(chunk, sum(a * b for a, b in zip(vector, embedded, strict=True)))
             for chunk, embedded, saved_space in self.chunks

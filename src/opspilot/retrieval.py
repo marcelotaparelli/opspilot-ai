@@ -10,6 +10,8 @@ RetrievalMode = Literal["lexical", "vector", "hybrid"]
 
 
 def rrf(rankings: list[list[Hit]], k: int, constant: int = 60) -> list[Hit]:
+    # score = sum(1 / (constant + rank)). 60 is the value proposed with RRF (Cormack,
+    # Clarke & Buettcher, SIGIR 2009); it is a literature default, not tuned here.
     scores: dict[UUID, float] = {}
     chunks = {hit.chunk.id: hit.chunk for ranking in rankings for hit in ranking}
     for ranking in rankings:

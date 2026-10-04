@@ -1,0 +1,50 @@
+opspilot-ai v0.1.0
+├── asyncpg v0.30.0
+├── fastapi v0.115.12
+│   ├── pydantic v2.11.4
+│   │   ├── annotated-types v0.8.0
+│   │   ├── pydantic-core v2.33.2
+│   │   │   └── typing-extensions v4.16.0
+│   │   ├── typing-extensions v4.16.0
+│   │   └── typing-inspection v0.4.4
+│   │       └── typing-extensions v4.16.0
+│   ├── starlette v0.46.2
+│   │   └── anyio v4.15.1
+│   │       ├── idna v3.20
+│   │       └── typing-extensions v4.16.0
+│   └── typing-extensions v4.16.0
+├── openai v1.78.1
+│   ├── anyio v4.15.1 (*)
+│   ├── distro v1.9.0
+│   ├── httpx v0.28.1
+│   │   ├── anyio v4.15.1 (*)
+│   │   ├── certifi v2026.7.22
+│   │   ├── httpcore v1.0.9
+│   │   │   ├── certifi v2026.7.22
+│   │   │   └── h11 v0.16.0
+│   │   └── idna v3.20
+│   ├── jiter v0.17.0
+│   ├── pydantic v2.11.4 (*)
+│   ├── sniffio v1.3.1
+│   ├── tqdm v4.70.1
+│   └── typing-extensions v4.16.0
+├── pydantic v2.11.4 (*)
+├── sqlalchemy[asyncio] v2.0.41
+│   ├── greenlet v3.5.6
+│   ├── typing-extensions v4.16.0
+│   └── greenlet v3.5.6 (extra: asyncio)
+├── uvicorn v0.34.2
+│   ├── click v8.5.0
+│   └── h11 v0.16.0
+├── httpx v0.28.1 (group: dev) (*)
+├── mypy v1.15.0 (group: dev)
+│   ├── mypy-extensions v1.1.0
+│   └── typing-extensions v4.16.0
+├── pytest v8.3.5 (group: dev)
+│   ├── iniconfig v2.3.0
+│   ├── packaging v26.3
+│   └── pluggy v1.6.0
+├── pytest-asyncio v0.26.0 (group: dev)
+│   └── pytest v8.3.5 (*)
+└── ruff v0.11.9 (group: dev)
+(*) Package tree already displayed

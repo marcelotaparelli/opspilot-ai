@@ -5,7 +5,7 @@ WORKDIR /app
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 COPY pyproject.toml uv.lock .python-version ./
 COPY src ./src
-# Missing uv.lock is an explicit acceptance blocker (see docs/CHECKS.md).
+# Install the committed dependency graph; fail on manifest/lock inconsistencies.
 RUN uv sync --locked --no-dev --no-editable
 
 FROM python:3.12.10-slim-bookworm

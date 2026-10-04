@@ -16,17 +16,17 @@ jobs:
       MIGRATION_DATABASE_URL: postgresql+asyncpg://postgres:ci-admin-ephemeral@localhost:5432/opspilot
       TEST_DATABASE_URL: postgresql+asyncpg://opspilot_app:ci-app-ephemeral@localhost:5432/opspilot
       TEST_ADMIN_DATABASE_URL: postgresql+asyncpg://postgres:ci-admin-ephemeral@localhost:5432/opspilot
-      TENANT_TOKENS: '{"ci-token-with-at-least-32-characters-long":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"}'
+      TENANT_TOKENS: '{"ci-token-with-at-least-32-characters-long":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa","ci-other-token-with-at-least-32-characters":"bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"}'
       PROVIDER: fake
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
         with:
           version: "0.7.3"
-          python-version: "3.12"
+          python-version: "3.12.10"
       - name: Require resolved lockfile
         run: |
-          test -f uv.lock || { echo 'BLOCKED: generate and commit uv.lock in a network-enabled environment'; exit 1; }
+          uv lock --check
           uv sync --locked
       - name: Start real PostgreSQL and apply schema
         run: |
@@ -36,11 +36,22 @@ jobs:
         run: ./scripts/verify.sh
       - name: Measure retrieval against real PostgreSQL
         run: uv run --locked python -m opspilot.evaluation --seed --output eval-results-ci.json
+      - name: Start built API and smoke test real HTTP
+        env:
+          DATABASE_URL: postgresql+asyncpg://opspilot_app:ci-app-ephemeral@db:5432/opspilot
+          MIGRATION_DATABASE_URL: postgresql+asyncpg://postgres:ci-admin-ephemeral@db:5432/opspilot
+          OPSPILOT_TOKEN: ci-token-with-at-least-32-characters-long
+          OPSPILOT_OTHER_TOKEN: ci-other-token-with-at-least-32-characters
+        run: |
+          docker compose --env-file .env.example up --build --detach --wait --wait-timeout 90
+          uv run --locked python scripts/smoke.py --output smoke-results-ci.json
       - uses: actions/upload-artifact@v4
         if: success()
         with:
           name: measured-retrieval
-          path: eval-results-ci.json
+          path: |
+            eval-results-ci.json
+            smoke-results-ci.json
       - name: Stop PostgreSQL
         if: always()
         run: docker compose down

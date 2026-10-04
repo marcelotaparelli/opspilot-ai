@@ -1,6 +1,7 @@
 # ADR 001: Ports with SQLAlchemy async and transactional SQL migration
 
-Status: accepted for Phase 1; runtime verification pending.
+Status: accepted for Phase 1; runtime regression checks executed on 2026-10-04
+(see [validation record](../VALIDATION.md)).
 
 Use plain dataclasses/Protocols for application boundaries, Pydantic at input/output
 adapters, and SQLAlchemy 2 async with asyncpg for pooling and transactions. Parameterized

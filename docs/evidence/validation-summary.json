@@ -1,0 +1,151 @@
+{
+  "recorded_at": "2026-10-04",
+  "scope": "Phase 1 RAG vertical slice; fake provider; no paid provider calls; no push",
+  "environment": {
+    "os": "Debian GNU/Linux 12 (bookworm), Linux 6.12.98 x86_64",
+    "python": "3.12.10",
+    "uv": "0.7.3",
+    "git": "2.39.5",
+    "docker_engine": "29.8.2",
+    "docker_compose": "5.6.0",
+    "postgresql": "17.6",
+    "pgvector": "0.8.0",
+    "ruff": "0.11.9",
+    "mypy": "1.15.0",
+    "pytest": "8.3.5"
+  },
+  "gates": [
+    {
+      "gate": "git fsck --full",
+      "exit_code": 0
+    },
+    {
+      "gate": "uv lock / uv lock --check",
+      "exit_code": 0,
+      "packages": 33,
+      "lock_changed": false
+    },
+    {
+      "gate": "uv sync --all-extras --dev",
+      "exit_code": 0
+    },
+    {
+      "gate": "ruff format --check",
+      "exit_code": 0,
+      "files": 28
+    },
+    {
+      "gate": "ruff check",
+      "exit_code": 0
+    },
+    {
+      "gate": "mypy (strict)",
+      "exit_code": 0,
+      "files": 28
+    },
+    {
+      "gate": "pytest -m 'not integration'",
+      "exit_code": 0,
+      "collected": 113,
+      "selected": 98,
+      "passed": 98,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 15,
+      "junit": "junit-unit.xml"
+    },
+    {
+      "gate": "pytest -m integration (real PostgreSQL/pgvector)",
+      "exit_code": 0,
+      "collected": 113,
+      "selected": 15,
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 98,
+      "junit": "junit-integration.xml"
+    },
+    {
+      "gate": "mutation checks",
+      "injected": 24,
+      "caught": 24,
+      "survived_inherited_suite": 4,
+      "details": "mutation-results.txt"
+    },
+    {
+      "gate": "scripts/verify.sh",
+      "exit_code": 0
+    },
+    {
+      "gate": "docker build -t opspilot-ai:phase1 .",
+      "exit_code": 0,
+      "user": "10001:10001"
+    },
+    {
+      "gate": "docker compose down -v && up --build -d --wait",
+      "exit_code": 0,
+      "services": {
+        "db": "healthy",
+        "migrate": "exited 0",
+        "api": "healthy"
+      }
+    },
+    {
+      "gate": "scripts/smoke.py (HTTP socket, fake provider, two tenants)",
+      "exit_code": 0,
+      "details": "http-smoke.json"
+    },
+    {
+      "gate": "readiness outage/recovery",
+      "health_during_outage": 200,
+      "ready_during_outage": 503,
+      "query_during_outage": 503,
+      "ready_after_restart": 200
+    },
+    {
+      "gate": "graceful shutdown (docker compose stop api)",
+      "exit_code": 0,
+      "seconds": 0.6
+    },
+    {
+      "gate": "CI workflow steps replayed locally with workflow env",
+      "exit_code": 0,
+      "github_hosted_run": false
+    }
+  ],
+  "evaluation": {
+    "command": "uv run python -m opspilot.evaluation --seed --k 5",
+    "dataset": "evals/retrieval-v1.json",
+    "dataset_version": 1,
+    "embedding_space": "fake:sha256-bow-v1:256",
+    "k": 5,
+    "case_count": 3,
+    "metrics": {
+      "lexical": {
+        "recall_at_5": 1.0,
+        "mrr_at_5": 1.0
+      },
+      "vector": {
+        "recall_at_5": 1.0,
+        "mrr_at_5": 1.0
+      },
+      "hybrid": {
+        "recall_at_5": 1.0,
+        "mrr_at_5": 1.0
+      }
+    },
+    "report": "retrieval-v1-fake.json",
+    "pre_lexical_fix_report": "retrieval-v1-fake-pre-lexical-fix.json",
+    "caveats": [
+      "synthetic, 3 cases, not held-out, no dev/test split",
+      "queried tenant has 4 documents < K=5, so vector Recall@5 is trivially 1.0",
+      "questions are keyword bags copied from target documents; fake embedder is bag-of-words",
+      "does not measure real embedding or answer quality"
+    ]
+  },
+  "bugs_fixed": [
+    "lexical retrieval AND-ed every question word (incl. stopwords): natural-language questions matched nothing",
+    "OpenAIError subclasses outside APIError escaped as HTTP 500",
+    "compose db healthcheck could pass against the socket-only init server"
+  ]
+}

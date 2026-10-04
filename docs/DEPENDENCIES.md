@@ -1,9 +1,14 @@
 # Dependency decisions
 
-Only direct necessities are added. `pyproject.toml` pins direct versions; this workspace
-could not execute uv or resolve transitive dependencies. The transitive names below
-describe expected package relationships, not a resolved SBOM. Produce a real `uv.lock`
-and review `uv tree` before accepting the reproducibility/supply-chain gate.
+Only direct necessities are added. No Python dependency was added or changed during
+runtime validation (re-checked 2026-10-04: `uv lock --check` passes and `uv.lock` is unchanged;
+PyYAML was used once via an ephemeral `uv run --no-project --with` to parse the CI workflow
+and is not a project dependency). `pyproject.toml` pins direct versions; the real `uv lock` resolved 33 packages
+including the project, and `uv sync --all-extras --dev` installed/audited 32 packages.
+The committed `uv.lock` records versions, artifacts and hashes for runtime/development
+dependencies. The actual [`uv tree --locked` output](evidence/dependency-tree.txt) was
+reviewed. The isolated hatchling build dependency and its own transitives require separate
+review; they are not part of that runtime/development lock. This is not a vulnerability audit.
 
 | Dependency | Need / why stdlib is insufficient | Relevant transitives / maintenance impact |
 | --- | --- | --- |

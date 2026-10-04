@@ -1,0 +1,43 @@
+# Mutation checks, 2026-10-04 (PostgreSQL 17.6 / pgvector 0.8.0, Python 3.12.10)
+#
+# Each line: one deliberate single-site defect injected into src/, full suite
+# (unit + integration against real PostgreSQL) run, file restored. Schema mutants
+# drop and re-migrate the schema. Bytecode caches purged before every run
+# (PYTHONDONTWRITEBYTECODE=1) because same-size edits within one second otherwise
+# reuse stale .pyc files. CAUGHT = at least one test failed; the first failing test is shown.
+#
+# Survivors against the INHERITED suite (before this validation added tests):
+#   vector ORDER BY reversed, lexical ORDER BY reversed, vector LIMIT ignored,
+#   OpenAI client max_retries=2  -> all 85 inherited tests still passed.
+#
+# Results: M01-M21 ran against 112 tests; M22-M24 ran after the 113th test (readiness vs
+# BYPASSRLS) was added. First attempts at M22/M24 were invalid mutants (NameError /
+# commit placed before both inserts) and were redone; M23 initially survived, which
+# motivated the BYPASSRLS readiness test.
+M01 tenant GUC session-scoped instead of transaction-local: CAUGHT (test_rls_without_application_filters_and_pool_reset)
+M02 vector SQL tenant predicate removed: CAUGHT (test_explicit_filters_when_database_role_bypasses_rls)
+M03 lexical SQL tenant predicate removed: CAUGHT (test_explicit_filters_when_database_role_bypasses_rls)
+M04 chunks RLS USING true: CAUGHT (test_rls_without_application_filters_and_pool_reset)
+M05 documents RLS USING true: CAUGHT (test_concurrent_pool_reuse_never_leaks_tenant_context)
+M06 chunks RLS WITH CHECK true: CAUGHT (test_rls_alone_protects_pipeline_when_application_filters_are_removed)
+M07 chunks RLS not forced: CAUGHT (readiness refuses schema; test_full_harness_seed_and_repeatability errors)
+M08 vector ORDER BY reversed: CAUGHT (test_real_vector_ranking_matches_independent_cosine_and_top_k)
+M09 lexical ORDER BY reversed: CAUGHT (test_real_lexical_natural_language_question_and_ranking)
+M10 vector LIMIT ignored: CAUGHT (test_real_vector_ranking_matches_independent_cosine_and_top_k)
+M11 vector score = distance: CAUGHT (test_real_embedding_space_filter)
+M12 embedding-space filter removed: CAUGHT (test_real_embedding_space_filter)
+M13 lexical AND semantics (original bug): CAUGHT (test_real_lexical_natural_language_question_and_ranking)
+M14 retriever isolation guard removed: CAUGHT (test_defensive_isolation_guard_before_generation)
+M15 hybrid drops lexical branch: CAUGHT (test_full_harness_seed_and_repeatability)
+M16 RRF constant 60 -> 0: CAUGHT (test_lexical_index_and_repeatable_ranking)
+M17 citation membership unchecked: CAUGHT (test_prompt_injection_cannot_reach_other_tenant_through_real_llm_adapter)
+M18 uncited answer not abstained: CAUGHT (test_generated_answer_validation[uncited])
+M19 OpenAI client max_retries=2: CAUGHT (test_production_client_has_bounded_timeout_and_no_retries)
+M20 provider catches only APIError: CAUGHT (test_any_sdk_error_maps_to_provider_error)
+M21 request body cap disabled: CAUGHT (test_forged_tenant_and_validation_do_not_echo_input)
+M22 tenant taken from X-Tenant-ID header: CAUGHT (test_adversarial_api_scope_and_safe_logs)
+M23 readiness accepts superuser/BYPASSRLS: CAUGHT (test_readiness_refuses_runtime_role_that_gains_bypassrls)
+M24 ingestion not atomic (commit between document and chunks): CAUGHT (test_atomic_save_rollback_and_cross_tenant_write_denied)
+#
+# Not covered: mutating the readiness role-name literal, middleware deadline value,
+# chunk size/overlap constants (unit-tested separately), logging redaction of new fields.

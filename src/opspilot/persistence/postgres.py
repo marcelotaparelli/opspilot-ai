@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import re
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import Any
@@ -110,9 +111,7 @@ class PostgresRepository:
             for row in rows
         ]
 
-    async def vector(
-        self, tenant: UUID, vector: list[float], space: str, limit: int
-    ) -> list[Hit]:
+    async def vector(self, tenant: UUID, vector: list[float], space: str, limit: int) -> list[Hit]:
         validate_vectors([vector], 1)
         async with self.transaction(tenant) as connection:
             result = await connection.execute(
@@ -134,7 +133,20 @@ class PostgresRepository:
             )
             return self.hits([dict(row) for row in result.mappings().all()])
 
+    @staticmethod
+    def any_term_query(question: str) -> str:
+        """Match chunks containing any question word (OR); ts_rank_cd orders them.
+
+        websearch_to_tsquery/plainto_tsquery AND every word and `simple` has no
+        stopword list, so "How do I restart the service?" previously matched nothing.
+        Tokens contain only word characters: quoting cannot inject tsquery operators.
+        """
+        return " | ".join(f"'{term}'" for term in dict.fromkeys(re.findall(r"\w+", question)))
+
     async def lexical(self, tenant: UUID, question: str, limit: int) -> list[Hit]:
+        query = self.any_term_query(question)
+        if not query:
+            return []
         async with self.transaction(tenant) as connection:
             result = await connection.execute(
                 text(
@@ -142,12 +154,12 @@ class PostgresRepository:
                     "ts_rank_cd(c.search_vector, q.query) AS score "
                     "FROM chunks c JOIN documents d "
                     "ON d.id=c.document_id AND d.tenant_id=c.tenant_id "
-                    "CROSS JOIN websearch_to_tsquery('simple', :question) AS q(query) "
+                    "CROSS JOIN to_tsquery('simple', :query) AS q(query) "
                     "WHERE c.tenant_id=:tenant AND d.tenant_id=:tenant "
                     "AND c.search_vector @@ q.query "
                     "ORDER BY score DESC, c.id LIMIT :limit"
                 ),
-                {"tenant": tenant, "question": question, "limit": limit},
+                {"tenant": tenant, "query": query, "limit": limit},
             )
             return self.hits([dict(row) for row in result.mappings().all()])
 

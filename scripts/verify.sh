@@ -7,5 +7,5 @@ uv run --locked ruff check .
 uv run --locked mypy
 uv run --locked pytest -m 'not integration'
 uv run --locked pytest -m integration
-docker compose config --quiet
+docker compose --env-file "${COMPOSE_ENV_FILE:-.env.example}" config --quiet
 docker build --tag opspilot-ai:phase1 .

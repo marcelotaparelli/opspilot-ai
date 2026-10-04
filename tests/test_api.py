@@ -113,6 +113,9 @@ async def test_adversarial_api_scope_and_safe_logs(
             )
             assert answer.status_code == 200
             assert "PRIVATE_SENTINEL_SECRET" not in answer.text
+            assert answer.json()["answer"] == MALICIOUS
+            assert len(answer.json()["citations"]) == 1
+    assert provider.contexts
     assert all(chunk.tenant_id == TENANT_A for context in provider.contexts for chunk in context)
     secrets = (
         TOKEN_A,
@@ -154,7 +157,10 @@ async def test_readiness_failure_is_controlled(settings: Settings) -> None:
         transport=httpx.ASGITransport(app=app), base_url="http://test"
     ) as client:
         assert (await client.get("/health")).status_code == 200
-        assert (await client.get("/ready")).status_code == 503
+        response = await client.get("/ready")
+        assert response.status_code == 503
+        assert response.json()["error"] == "persistence_unavailable"
+        assert response.json()["request_id"] == response.headers["x-request-id"]
 
 
 async def test_unexpected_error_redacts_exception(settings: Settings) -> None:
@@ -198,3 +204,5 @@ async def test_request_timeout_is_bounded(settings: Settings) -> None:
     ) as client:
         response = await client.get("/ready")
         assert response.status_code == 504
+        assert response.json()["error"] == "request_timeout"
+        assert response.json()["request_id"] == response.headers["x-request-id"]

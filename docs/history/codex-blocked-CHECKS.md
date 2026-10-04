@@ -1,7 +1,10 @@
+> **SUPERSEDED / HISTORICAL.** Not the current state. Kept for audit history only.
+> Current measured record: [docs/VALIDATION.md](../VALIDATION.md).
+
 # Execution record and blocked gates
 
 These are observed results, not predicted outcomes. Full command/error records are in
-[validation.json](validation.json). The implementation sandbox is Debian 12 with Node
+[validation.json](codex-blocked-validation.json). The implementation sandbox is Debian 12 with Node
 available. It has no Python/Python3, uv, Ruff, mypy, pytest, PostgreSQL, Docker or Git
 executable. There are no cached copies in the inspected locations. Shell HTTPS access
 failed with DNS `EAI_AGAIN`; direct-IP network access failed with `EPERM`. Installing

@@ -4,7 +4,7 @@ import asyncio
 import json
 from uuid import UUID
 
-from openai import APIError, AsyncOpenAI
+from openai import AsyncOpenAI, OpenAIError
 from pydantic import BaseModel, ConfigDict, Field
 
 from opspilot.config import Settings
@@ -54,7 +54,7 @@ class OpenAIProvider:
             vectors = [item.embedding for item in ordered]
             validate_vectors(vectors, len(texts))
             return vectors
-        except (APIError, TimeoutError, ValueError, AttributeError, TypeError):
+        except (OpenAIError, TimeoutError, ValueError, AttributeError, TypeError):
             raise ProviderError from None
 
     async def answer(self, question: str, chunks: tuple[Chunk, ...]) -> GeneratedAnswer:
@@ -73,7 +73,7 @@ class OpenAIProvider:
                 raise ProviderError
             parsed = response.output_parsed
             return GeneratedAnswer(parsed.answer, tuple(parsed.cited_chunk_ids))
-        except (APIError, TimeoutError, ValueError, AttributeError, TypeError):
+        except (OpenAIError, TimeoutError, ValueError, AttributeError, TypeError):
             raise ProviderError from None
 
     async def close(self) -> None:
