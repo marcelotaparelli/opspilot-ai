@@ -2,7 +2,7 @@
 
 ENGINEERING RELEASE: PASS
 
-OPENAI LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
+OPENAI LIVE EVIDENCE: PASS — POST-RELEASE INTEGRATION ONLY
 
 GITLAB LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
 
@@ -33,7 +33,13 @@ SBOM/audits and 56/58/53-resource offline plans pass. Full image findings remain
 [clean-room](evidence/release/clean-room-validation.md). These pre-publication records retain
 their original no-push/static-CI scope; they do not describe the current GitHub release or
 hosted CI status. Earlier blocked handoffs are historical.
-Both providers remain unverified live; held-out retrieval-v2 was not rerun for this release.
-No real-model,
+The [post-release OpenAI smoke](evidence/release/live-openai-smoke.json), recorded at
+2026-10-04T23:45:24+00:00, passed against real OpenAI and database-backed RAG. It used
+`text-embedding-3-small` (256 dimensions) and `gpt-4.1-mini`, accepted both strict schemas,
+and retrieved 1 evidence item with 1 citation. Usage, served models, trace IDs and a classified
+bounded timeout passed; `secret_in_logs_or_spans` is false. Pricing was not configured, so
+no measured cost is claimed. [Provider details and GitLab prerequisites](evidence/release/live-provider-status.md).
+GitLab remains unverified live; held-out retrieval-v2 was not rerun for this release.
+No real-model quality,
 AWS runtime/TLS/SQL-log privacy/performance or exactly-once guarantee is implied. Static
 identity, manual recovery, narrow defaults and known blueprint risks remain documented.

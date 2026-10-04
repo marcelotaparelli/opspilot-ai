@@ -1,5 +1,12 @@
 # Phase 4 release evidence
 
+This page preserves the pre-publication Phase 4/v0.1.0 gate snapshot. Its provider and CI
+statuses below describe that historical gate. Separately, the
+[post-release OpenAI live smoke](live-openai-smoke.json) passed at
+2026-10-04T23:45:24+00:00; see [current provider status](live-provider-status.md).
+It was not part of the original gate. GitLab live evidence remains NOT EXECUTED.
+The published v0.1.0 tag and release are unchanged.
+
 ENGINEERING RELEASE: PASS
 
 OPENAI LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
@@ -26,7 +33,7 @@ The old [VM attempt](vm-revalidation.md), [restricted attempt](revalidation.md) 
 | [Terraform validation](terraform-validation.md) / [plans](terraform-plans.json) | PASS, 56/58/53 creates; no apply |
 | [IaC risks](iac-findings.md) / [full scan](iac-scan.json) | Four accepted blueprint risks, no suppressions |
 | [CI](ci-audit.md) | Static/source PASS; hosted run NOT EXECUTED |
-| [Live providers](live-provider-status.md) | Both NOT EXECUTED; rehearsals are not live evidence |
+| Live providers at the original gate | Both NOT EXECUTED; rehearsals are not live evidence. [Current post-release status](live-provider-status.md) is separate. |
 | [Changed files](files-changed.json) | Complete Phase 4 inventory relative to validated base HEAD |
 
 The engineering result does not establish real-model quality, external-provider permissions,

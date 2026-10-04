@@ -311,11 +311,12 @@ arbitrary project, double side effect, step bound). **17 / 17 were caught.**
 
 ## 12. Limitations
 
-- **Real external services untested:**
+- **External-service evidence limits:**
   - No real GitLab instance was used. The fake server implements only the endpoints the adapter
     calls, and its search is a substring match.
-  - The optional real smoke is documented in the README and was not run.
-  - No real LLM was used; `OpenAIPlanner` was exercised only through a mocked transport.
+  - The optional real GitLab smoke is documented in the README and was not run.
+  - Historical agent evaluation used mocked/scripted planners. The post-release OpenAI smoke
+    accepted the real planner structured schema; it does not evaluate agent/model quality.
 - **Static identity:** principals come from configured tokens, with no SSO, rotation workflow or
   per-user rate limits.
 - **One action per run:** a run produces at most one proposal. A changed action requires a new
@@ -354,9 +355,13 @@ visibility or version-specific behavior. Latest status:
 
 GITLAB LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
 
-OPENAI LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
+OPENAI LIVE EVIDENCE: PASS — POST-RELEASE INTEGRATION ONLY
 
 The real OpenAI smoke separately probes models, 256-dimensional embedding, actual strict
 answer/planner schemas, usage/cost/served models, trace IDs, secret exclusion and a tight
 classified timeout, with optional small PostgreSQL RAG. It reserves at most nine requests.
-Real acceptance of minLength/maxLength remains unmeasured; no mock result is live evidence.
+The [post-release live JSON](../evidence/release/live-openai-smoke.json) records acceptance of
+the exercised strict answer/planner schemas, including answer minLength/maxLength constraints,
+and database-backed RAG PASS. Usage, served models, traces and bounded timeout passed; no secret
+was found in captured logs/spans. Pricing was not configured, so no measured cost is claimed.
+This is integration evidence only; see [provider status](../evidence/release/live-provider-status.md).

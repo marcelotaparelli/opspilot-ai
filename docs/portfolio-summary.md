@@ -73,9 +73,16 @@ findings remain recorded. Engineering release and clean-room PASS; v0.1.0 is pub
 GitHub, and hosted GitHub Actions jobs `checks` and `terraform` PASS. Terraform remains a
 validated blueprint, not applied in production.
 
+Post-release [OpenAI live integration evidence](evidence/release/live-openai-smoke.json)
+passed on 2026-10-04 using `text-embedding-3-small` (256 dimensions) and `gpt-4.1-mini`.
+Strict answer/planner schemas, database-backed RAG (1 evidence item / 1 citation), citation
+membership, usage, served models, trace IDs and bounded timeout passed. No secret was found
+in captured logs/spans. Pricing was not configured; no measured cost is claimed.
+
 ## Limitations
 
-No real OpenAI/GitLab evidence: NOT EXECUTED — CREDENTIALS NOT PROVIDED for both. Real strict
-schema support, semantic retrieval quality, factual entailment and AWS performance remain
-unmeasured. Static tokens lack SSO/lifecycle, recovery needs client invocation, exact vector
-search has linear work, and the default cloud topology has limited redundancy.
+GITLAB LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED. OpenAI live evidence covers
+the exercised integration and schema acceptance only; semantic retrieval quality, factual
+entailment and AWS performance remain unmeasured. Static tokens lack SSO/lifecycle, recovery
+needs client invocation, exact vector search has linear work, and the default cloud topology
+has limited redundancy.

@@ -25,7 +25,12 @@ The image retains **44 HIGH unfixed / 0 fixable HIGH/CRITICAL** findings.
 Terraform is a validated blueprint, not applied in production.
 [Current status](docs/CURRENT-STATE.md) · [Local validation evidence](docs/evidence/release/README.md).
 
-OPENAI LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
+OPENAI LIVE EVIDENCE: PASS — POST-RELEASE INTEGRATION ONLY
+
+[OpenAI live smoke](docs/evidence/release/live-openai-smoke.json) passed on 2026-10-04 after
+v0.1.0: real 256-dimensional embedding, strict answer/planner schemas, database-backed RAG,
+citation membership, usage/served models, trace IDs and bounded timeout. Pricing was not
+configured; no measured cost or real-model quality claim. [Details](docs/evidence/release/live-provider-status.md).
 
 GITLAB LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
 
@@ -106,8 +111,9 @@ missing predicates/context leakage, not arbitrary SQL executed as that role.
 The answer adapter requests strict output with `store=False`, explicit timeouts and zero SDK
 retries. Application checks reject fabricated/duplicate citation IDs and invalid answers;
 uncited output becomes a fixed abstention. Metadata comes from stored chunks. Citation
-membership does not establish entailment. **Real API acceptance of the constrained schemas,
-including `minLength`/`maxLength`, remains unmeasured.**
+membership does not establish entailment. The post-release live smoke accepted the exercised
+strict answer and planner schemas, including the answer schema string constraints
+`minLength`/`maxLength`; this is integration evidence for the recorded models and run.
 
 ## Approval-gated agent
 

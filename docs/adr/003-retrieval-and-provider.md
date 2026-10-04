@@ -35,5 +35,9 @@ Framework-native telemetry is disabled to keep one controlled export boundary.
 
 The answer/planner schemas contain constrained strings, including minLength/maxLength.
 Mocked SDK acceptance does not establish the real API's support. The opt-in smoke tests the
-actual schemas with at most nine reserved requests; acceptance/rejection remains
-NOT EXECUTED — CREDENTIALS NOT PROVIDED. See [live status](../evidence/release/live-provider-status.md).
+actual schemas with at most nine reserved requests. The post-release
+[OpenAI live artifact](../evidence/release/live-openai-smoke.json) records acceptance of the
+exercised strict answer and planner schemas with `gpt-4.1-mini`, plus real 256-dimensional
+`text-embedding-3-small` embeddings and database-backed RAG PASS. This proves integration
+for the recorded run, not semantic quality or factual entailment. Pricing was not configured;
+no measured cost is claimed. See [live status](../evidence/release/live-provider-status.md).

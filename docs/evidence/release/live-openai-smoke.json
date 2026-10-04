@@ -1,0 +1,143 @@
+{
+  "smoke": "live-openai",
+  "timestamp": "2026-10-04T23:45:24+00:00",
+  "provider": "openai",
+  "embedding_model": "text-embedding-3-small",
+  "answer_model": "gpt-4.1-mini",
+  "requests_budget": 9,
+  "requests_reserved": 9,
+  "steps": [
+    {
+      "step": "models_exist",
+      "status": "ok",
+      "ms": 1515,
+      "models_found": [
+        "gpt-4.1-mini",
+        "text-embedding-3-small"
+      ]
+    },
+    {
+      "step": "embedding",
+      "status": "ok",
+      "ms": 1689,
+      "dimensions": 256,
+      "expected_dimensions": 256
+    },
+    {
+      "step": "structured_generation",
+      "status": "ok",
+      "ms": 2027,
+      "schema": "ModelAnswer",
+      "schema_accepted": true,
+      "citations_within_evidence": true
+    },
+    {
+      "step": "planner_structured_output",
+      "status": "ok",
+      "ms": 1722,
+      "schema": "Envelope(decision union)",
+      "schema_accepted": true,
+      "tool": "search_knowledge"
+    },
+    {
+      "step": "rag_end_to_end",
+      "status": "ok",
+      "ms": 2959,
+      "retrieved": 1,
+      "citations": 1
+    },
+    {
+      "step": "timeout",
+      "status": "ok",
+      "ms": 9,
+      "timed_out": true,
+      "elapsed_ms": 2
+    }
+  ],
+  "usage": [
+    {
+      "operation": "embedding",
+      "configured_model": "text-embedding-3-small",
+      "served_model": "text-embedding-3-small",
+      "input_tokens": 5,
+      "output_tokens": 0,
+      "estimated_cost_usd": null,
+      "error_type": null,
+      "trace_id_present": true
+    },
+    {
+      "operation": "answer",
+      "configured_model": "gpt-4.1-mini",
+      "served_model": "gpt-4.1-mini-2025-04-14",
+      "input_tokens": 209,
+      "output_tokens": 53,
+      "estimated_cost_usd": null,
+      "error_type": null,
+      "trace_id_present": true
+    },
+    {
+      "operation": "plan",
+      "configured_model": "gpt-4.1-mini",
+      "served_model": "gpt-4.1-mini-2025-04-14",
+      "input_tokens": 457,
+      "output_tokens": 107,
+      "estimated_cost_usd": null,
+      "error_type": null,
+      "trace_id_present": true
+    },
+    {
+      "operation": "embedding",
+      "configured_model": "text-embedding-3-small",
+      "served_model": "text-embedding-3-small",
+      "input_tokens": 17,
+      "output_tokens": 0,
+      "estimated_cost_usd": null,
+      "error_type": null,
+      "trace_id_present": true
+    },
+    {
+      "operation": "embedding",
+      "configured_model": "text-embedding-3-small",
+      "served_model": "text-embedding-3-small",
+      "input_tokens": 7,
+      "output_tokens": 0,
+      "estimated_cost_usd": null,
+      "error_type": null,
+      "trace_id_present": true
+    },
+    {
+      "operation": "answer",
+      "configured_model": "gpt-4.1-mini",
+      "served_model": "gpt-4.1-mini-2025-04-14",
+      "input_tokens": 209,
+      "output_tokens": 53,
+      "estimated_cost_usd": null,
+      "error_type": null,
+      "trace_id_present": true
+    },
+    {
+      "operation": "embedding",
+      "configured_model": "text-embedding-3-small",
+      "served_model": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "estimated_cost_usd": null,
+      "error_type": "timeout",
+      "trace_id_present": true
+    }
+  ],
+  "pricing_configured": false,
+  "secret_in_logs_or_spans": false,
+  "checks": {
+    "operations_observed": true,
+    "usage_captured": true,
+    "served_model_recorded": true,
+    "cost_captured_when_configured": true,
+    "trace_ids_present": true,
+    "citations_within_evidence": true,
+    "rag_has_evidence": true,
+    "timeout_classified_and_bounded": true
+  },
+  "passed": true,
+  "scope": "integration evidence only; makes no retrieval/answer quality claim"
+}

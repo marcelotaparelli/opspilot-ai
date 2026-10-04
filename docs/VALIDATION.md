@@ -2,7 +2,7 @@
 
 ENGINEERING RELEASE: PASS
 
-OPENAI LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
+OPENAI LIVE EVIDENCE: PASS — POST-RELEASE INTEGRATION ONLY
 
 GITLAB LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
 
@@ -22,7 +22,8 @@ were subsequently confirmed by the owner; this documentation task does not rerun
 | [Retrieval-v2](evaluation/retrieval-v2.md) | Historical 24 DEV / 36 once-consumed held-out synthetic queries; held-out not rerun |
 | [Phase 2](evidence/phase2/validation-summary.json) | Historical approval/recovery/concurrency, 16 agent cases and 17/17 mutations |
 | [Phase 3](evidence/phase3/) | Historical 201 unit / 64 integration, 16 agent / 10 security, 14/14 mutations, telemetry/load |
-| [Phase 4](evidence/release/README.md) | FINAL PASS: 241 unit / 72 integration, 5 migrations, regressions, scans, runtime, plans and cold clean-room |
+| [Phase 4](evidence/release/README.md) | Historical release gate FINAL PASS: 241 unit / 72 integration, 5 migrations, regressions, scans, runtime, plans and cold clean-room |
+| [Post-release OpenAI live smoke](evidence/release/live-openai-smoke.json) | PASS at 2026-10-04T23:45:24+00:00: real embedding, strict answer/planner schemas, database-backed RAG, citation membership, usage, served models, traces and bounded timeout; integration only |
 
 Final suites each collected 313 tests: non-integration selected/passed 241, deselected 72;
 integration selected/passed 72, deselected 241; no failures/skips. Telemetry and offline
@@ -48,7 +49,11 @@ without .git/.env/venv/cache/runtime; repeat install, quality/suites/regressions
 no-cache Docker and new-volume HTTP. [Executed clean-room](evidence/release/clean-room-validation.md)
 passed these stages individually; verify.sh was not invoked as a single command.
 
-Live evidence is separate from engineering PASS. Real OpenAI schema/model/usage behavior,
+Live evidence is separate from the historical engineering PASS. The post-release OpenAI JSON
+records `passed: true`, `text-embedding-3-small` / `gpt-4.1-mini`, 256-dimensional embeddings,
+strict answer/planner schema acceptance, 1 retrieved evidence item and 1 citation, usage, served
+models and trace IDs. Timeout classification/bounds passed; `secret_in_logs_or_spans: false`.
+`pricing_configured: false` and all cost values are null; no measured cost is claimed.
 GitLab permissions/search/cleanup and AWS runtime remain NOT EXECUTED. Hosted Actions passed
 for v0.1.0; Terraform validation in CI does not establish a production deployment.
-No live credentials were requested. No new mutation score or real semantic-quality claim.
+No new mutation score or real semantic-quality claim; this update did not rerun live providers.
