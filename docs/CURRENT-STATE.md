@@ -1,12 +1,11 @@
-Phase: 1
-Status: VALIDATED LOCALLY (owner approval pending)
-Validation record: docs/VALIDATION.md (2026-10-04, fresh VM, every gate re-executed)
-Base commit: b174103be22e3186d9d947854cb845970cf29560 (initial, author Codex)
+Phase: 2 (safe agentic workflow)
+Status: IMPLEMENTED AND VALIDATED LOCALLY (owner approval pending)
+Phase 1 / 1.5: approved by the owner
+Records: docs/architecture/agent-workflow.md, docs/evidence/phase2/
 Push performed: NO
-Phase 2 started: NO
+Phase 3 started: NO
 
-Not executed: GitHub-hosted CI run, live OpenAI calls, load/latency measurements,
-vulnerability audit, real-embedding retrieval evaluation.
+Not executed: real GitLab instance (optional smoke documented), real LLM planner calls,
+GitHub-hosted CI run, load testing, vulnerability audit.
 
-Next action:
-Owner review of docs/VALIDATION.md and Phase 1 approval. Do not start Phase 2 before that.
+Next action: owner review of Phase 2. Do not start Phase 3 before approval.

@@ -16,7 +16,8 @@ jobs:
       MIGRATION_DATABASE_URL: postgresql+asyncpg://postgres:ci-admin-ephemeral@localhost:5432/opspilot
       TEST_DATABASE_URL: postgresql+asyncpg://opspilot_app:ci-app-ephemeral@localhost:5432/opspilot
       TEST_ADMIN_DATABASE_URL: postgresql+asyncpg://postgres:ci-admin-ephemeral@localhost:5432/opspilot
-      TENANT_TOKENS: '{"ci-token-with-at-least-32-characters-long":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa","ci-other-token-with-at-least-32-characters":"bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"}'
+      TENANT_TOKENS: '{"ci-token-with-at-least-32-characters-long":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa","ci-other-token-with-at-least-32-characters":"bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb","ci-approver-token-with-at-least-32-characters":{"tenant":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa","subject":"ci-approver","roles":["approver"]}}'
+      AGENT_POLICY: '{"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa":{"projects":{"payments-ops":{"gitlab_project_id":101,"labels":["ops","incident"],"assignees":{"approver":7}}}}}'
       PROVIDER: fake
     steps:
       - uses: actions/checkout@v4
@@ -36,6 +37,8 @@ jobs:
         run: ./scripts/verify.sh
       - name: Measure retrieval against real PostgreSQL
         run: uv run --locked python -m opspilot.evaluation --seed --output eval-results-ci.json
+      - name: Agent control evaluation (scripted model behaviour, fake GitLab)
+        run: PYTHONPATH=. uv run --locked python -m scripts.agent_eval --output agent-eval-ci.json
       - name: Start built API and smoke test real HTTP
         env:
           DATABASE_URL: postgresql+asyncpg://opspilot_app:ci-app-ephemeral@db:5432/opspilot
@@ -43,15 +46,19 @@ jobs:
           OPSPILOT_TOKEN: ci-token-with-at-least-32-characters-long
           OPSPILOT_OTHER_TOKEN: ci-other-token-with-at-least-32-characters
         run: |
-          docker compose --env-file .env.example up --build --detach --wait --wait-timeout 90
+          docker compose -f compose.yaml -f compose.smoke.yaml --env-file .env.example up --build --detach --wait --wait-timeout 120
           uv run --locked python scripts/smoke.py --output smoke-results-ci.json
+          OPSPILOT_APPROVER_TOKEN=ci-approver-token-with-at-least-32-characters \
+            uv run --locked python scripts/agent_smoke.py --output agent-smoke-ci.json
       - uses: actions/upload-artifact@v4
         if: success()
         with:
           name: measured-retrieval
           path: |
             eval-results-ci.json
+            agent-eval-ci.json
             smoke-results-ci.json
+            agent-smoke-ci.json
       - name: Stop PostgreSQL
         if: always()
-        run: docker compose down
+        run: docker compose -f compose.yaml -f compose.smoke.yaml down

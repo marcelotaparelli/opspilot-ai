@@ -1,5 +1,10 @@
 # retrieval-v2: representative retrieval evaluation
 
+> **Post-freeze note (Phase 2).** Phase 2 changed `persistence/postgres.py` in its readiness
+> check only (schema version 2 and RLS on the agent tables); vector and lexical SQL are
+> byte-identical. Because that file is fingerprinted, `run --split heldout --freeze` now refuses
+> to run, which is the intended behaviour. The held-out numbers below belong to commit `7ba3378`.
+
 Measured 2026-10-04 on PostgreSQL 17.6 / pgvector 0.8.0 with the deterministic fake embedder
 (`fake:sha256-bow-v1:256`). Machine-readable results are in [`evidence/`](evidence). The held-out
 split was executed **once**, after the freeze described below.

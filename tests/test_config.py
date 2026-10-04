@@ -11,7 +11,9 @@ from tests.helpers import TENANT_A, TOKEN_A
 )
 def test_async_postgres_required(url: str) -> None:
     with pytest.raises((ValidationError, ValueError)):
-        Settings(database_url=SecretStr(url), tenant_tokens={TOKEN_A: TENANT_A})
+        Settings.model_validate(
+            {"database_url": SecretStr(url), "tenant_tokens": {TOKEN_A: str(TENANT_A)}}
+        )
 
 
 def test_openai_requires_secret(settings: Settings) -> None:

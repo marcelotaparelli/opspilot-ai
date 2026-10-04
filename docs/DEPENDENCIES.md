@@ -1,7 +1,7 @@
 # Dependency decisions
 
 Only direct necessities are added. No Python dependency was added or changed during
-runtime validation (re-checked 2026-10-04: `uv lock --check` passes and `uv.lock` is unchanged;
+Phase 1 runtime validation (re-checked 2026-10-04: `uv lock --check` passes and `uv.lock` is unchanged;
 PyYAML was used once via an ephemeral `uv run --no-project --with` to parse the CI workflow
 and is not a project dependency). `pyproject.toml` pins direct versions; the real `uv lock` resolved 33 packages
 including the project, and `uv sync --all-extras --dev` installed/audited 32 packages.
@@ -12,6 +12,8 @@ review; they are not part of that runtime/development lock. This is not a vulner
 
 | Dependency | Need / why stdlib is insufficient | Relevant transitives / maintenance impact |
 | --- | --- | --- |
+| LangGraph 1.2.12 (Phase 2) | Owner-mandated agent framework; used only for typed `StateGraph`, conditional routing, recursion limit and topology export ([ADR 004](adr/004-langgraph-control-flow-postgres-durability.md)). Checkpointer, `interrupt()`, prebuilt agents and LangChain tools are deliberately unused | Largest addition: the lock grew from 33 to 58 entries (+25). Via `langchain-core`: `langsmith` (requests, urllib3, charset-normalizer, requests-toolbelt, httpx2/httpcore2/httpx2-jsfetch, truststore, websockets, zstandard, orjson, uuid-utils), jsonpatch/jsonpointer, langchain-protocol, pyyaml, tenacity; `langgraph-checkpoint` (ormsgpack); `langgraph-sdk`; xxhash. LangSmith tracing is off unless `LANGSMITH_*`/`LANGCHAIN_TRACING*` variables are set; this project sets none. Upgrade LangGraph and langchain-core together and re-run the agent suite |
+| HTTPX (runtime direct since Phase 2) | The GitLab adapter calls it directly (timeouts, no redirects, mock transport in tests). It was already in the lock through openai/langgraph; declaring it avoids relying on a transitive. Same pin 0.28.1, no new packages | anyio, httpcore, certifi, idna, h11 (already present) |
 | FastAPI | ASGI HTTP routing, dependency injection and generated Pydantic contracts; stdlib has no comparable async API framework | Starlette, Pydantic, typing-extensions; follow framework/Starlette security updates together |
 | Pydantic v2 | Bounded contracts, environment validation and SDK JSON schemas; dataclasses alone do not validate arbitrary HTTP JSON | pydantic-core native wheels, annotated-types, typing-inspection, typing-extensions; native parser updates and compatibility require locked upgrades |
 | SQLAlchemy 2 with asyncio extra | Typed mature async engine, pooling, transactions, bound SQL and adapter lifecycle; stdlib has no PostgreSQL client/pool | greenlet native wheel, typing-extensions; dialect compatibility with asyncpg must be integration-tested |
@@ -38,7 +40,13 @@ explicitly but not yet pinned to digests/commit SHAs. No dependency vulnerabilit
 or current support guarantee was measured. CI credentials are ephemeral examples, and
 no real provider credentials are used in tests. No auto-upgrade bot is installed.
 
-Excluded: LangChain, LlamaIndex, LangGraph, tokenizers, rerankers, NumPy, pgvector Python,
+Phase 2 alternatives considered: a hand-written loop (similar size, but no declared topology or
+framework backstop; see ADR 004), the LangGraph Postgres checkpointer (adds psycopg plus a second
+persistence model, so rejected), and `python-gitlab` (the three REST calls needed do not justify
+another client and its dependency tree; httpx was already present).
+
+Excluded: LangChain (beyond the transitive `langchain-core` LangGraph requires), LlamaIndex,
+CrewAI, AutoGen, MCP SDKs, tokenizers, rerankers, NumPy, pgvector Python,
 pydantic-settings, structlog, Alembic and OpenTelemetry. Stdlib suffices for chunking,
 RRF, hashing, JSON, correlation, deadlines, logging and this single schema migration.
 OpenTelemetry's extension point is documented in README rather than adding an exporter

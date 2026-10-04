@@ -66,9 +66,33 @@ Citation titles, sources, offsets and quotes come from persisted evidence, not t
 Schema validation and citation membership do not prove factual entailment.
 
 The API provides `POST /v1/documents`, `POST /v1/query`, `GET /health`, and `GET /ready`.
-Readiness verifies database connectivity, schema version, vector extension, forced RLS
-and the restricted runtime role. Startup checks the same conditions. Lifespan shutdown
-closes the SDK client and SQLAlchemy pool. There are no agent tools or side effects.
+Readiness verifies database connectivity, schema version (2), vector extension, forced RLS
+on every tenant table and the restricted runtime role. Startup checks the same conditions.
+Lifespan shutdown closes the SDK clients, the GitLab client and the SQLAlchemy pool.
+
+### Agent workflow (Phase 2)
+
+A bounded LangGraph agent can search tenant knowledge and **propose** one GitLab issue. A
+second person with the `approver` role then approves that exact action, identified by the
+SHA-256 of its canonical JSON. Only then does the application create the issue, once. The model
+cannot choose the tenant, projects outside the allowlist, URLs, tools beyond
+`search_knowledge`/`prepare_gitlab_issue`/`final_answer`, or approvals. PostgreSQL holds runs,
+proposals, approvals, executions and an append-only audit trail under the same RLS. Unknown
+GitLab outcomes are reconciled by an idempotency marker instead of being retried blindly; there
+is no exactly-once claim. Design, trust boundaries, failure modes and limits:
+[docs/architecture/agent-workflow.md](docs/architecture/agent-workflow.md).
+
+| Endpoint | Who |
+| --- | --- |
+| `POST /v1/agent/runs` `{request}` | principal with role `agent` |
+| `GET /v1/agent/runs/{id}` | same tenant |
+| `POST /v1/agent/runs/{id}/approve` / `reject` `{action_hash}` | role `approver`, not the requester |
+| `POST /v1/agent/runs/{id}/resume` | same tenant; continues after a restart or an ambiguous result |
+
+`TENANT_TOKENS` values may be a tenant UUID (Phase 1 form, role `agent`) or
+`{"tenant", "subject", "roles"}`. `AGENT_POLICY` maps tenants to allowed GitLab projects;
+`GITLAB_BASE_URL`/`GITLAB_TOKEN` enable execution (https only; empty means approved actions
+fail closed).
 
 ## 3. How to run
 
@@ -157,6 +181,13 @@ docker compose --env-file .env.example up --build --detach --wait --wait-timeout
 PROVIDER=fake OPSPILOT_TOKEN=replace-with-random-token-at-least-32-characters \
   OPSPILOT_OTHER_TOKEN=another-random-token-at-least-32-characters \
   uv run --locked python scripts/smoke.py --output smoke-results-local.json
+# Agent smoke: the real adapter against a fake GitLab container (never real credentials).
+docker compose -f compose.yaml -f compose.smoke.yaml --env-file .env.example up --build -d --wait
+OPSPILOT_TOKEN=replace-with-random-token-at-least-32-characters \
+  OPSPILOT_APPROVER_TOKEN=approver-random-token-at-least-32-characters \
+  uv run --locked python scripts/agent_smoke.py
+# Agent control evaluation (needs DATABASE_URL to a dedicated, migrated database).
+PYTHONPATH=. uv run --locked python -m scripts.agent_eval --output agent-eval.json
 ```
 
 Integration fixtures allocate random tenants and delete only those tenants through the
@@ -165,10 +196,11 @@ Unit tests use a separate in-memory port implementation, never an SQLite substit
 PostgreSQL behavior. SDK adapter tests use the actual official SDK with an HTTP transport
 mock and no network/provider credentials.
 
-Measured on 2026-10-04: `scripts/verify.sh` exit 0. Ruff checked 28 Python files; strict
-mypy checked source, tests and scripts. Pytest collected 113 tests: the unit command
-selected and passed 98 (15 deselected); the integration command selected and passed 15
-(98 deselected) against real PostgreSQL. Zero failures, zero skips. The database tests
+Measured on 2026-10-04 (Phase 2): `scripts/verify.sh` exit 0. Ruff checked 50 Python files;
+strict mypy checked source, tests and scripts. Pytest collected 228 tests: the unit command
+selected and passed 172 (56 deselected); the integration command selected and passed 56
+(172 deselected) against real PostgreSQL. Zero failures, zero skips. Agent tests and evidence:
+[agent-workflow.md §8, §11](docs/architecture/agent-workflow.md). Phase 1 detail follows. The database tests
 compare vector order/scores/top-k with an independent cosine computation, run a
 natural-language lexical query, remove the application tenant predicates and show RLS
 alone still isolates retrieval, context and citations, run 60 concurrent transactions over
@@ -268,6 +300,10 @@ A `retrieval-v2` with a frozen test split, natural-language paraphrases, at leas
 distractors per tenant and a real embedding model run is proposed, not implemented.
 
 ## 6. Initial threat model
+
+Phase 2 trust boundaries (untrusted user input, model output and retrieved documents versus
+application-enforced identity, policy, approval and execution) are drawn in
+[agent-workflow.md §1](docs/architecture/agent-workflow.md#1-trust-boundaries).
 
 An authenticated tenant may submit malicious documents, malformed input, hostile questions,
 fake tenant headers and instructions requesting other tenants' data. Text is supplied in

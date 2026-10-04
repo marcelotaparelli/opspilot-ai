@@ -15,6 +15,17 @@ from sqlalchemy.ext.asyncio import AsyncConnection, create_async_engine
 from opspilot.config import Settings
 from opspilot.domain import Chunk, DependencyError, Document, Hit, validate_vectors
 
+# Every tenant-owned table; readiness requires forced RLS on all of them.
+RLS_TABLES = (
+    "documents",
+    "chunks",
+    "agent_runs",
+    "agent_proposals",
+    "agent_approvals",
+    "agent_executions",
+    "agent_events",
+)
+
 
 class PostgresRepository:
     def __init__(self, settings: Settings) -> None:
@@ -174,13 +185,14 @@ class PostgresRepository:
                         text(
                             "SELECT NOT r.rolsuper AND NOT r.rolbypassrls "
                             "AND r.rolname = 'opspilot_app' "
-                            "AND (SELECT version FROM schema_version WHERE singleton) = 1 "
+                            "AND (SELECT version FROM schema_version WHERE singleton) = 2 "
                             "AND EXISTS (SELECT 1 FROM pg_extension WHERE extname='vector') "
-                            "AND (SELECT count(*) FROM pg_class WHERE "
-                            "oid IN ('documents'::regclass, 'chunks'::regclass) "
-                            "AND relrowsecurity AND relforcerowsecurity) = 2 "
+                            "AND (SELECT count(*) FROM pg_class WHERE relname = ANY(:tables) "
+                            "AND relnamespace = 'public'::regnamespace "
+                            "AND relrowsecurity AND relforcerowsecurity) = :count "
                             "FROM pg_roles r WHERE r.rolname = current_user"
-                        )
+                        ),
+                        {"tables": list(RLS_TABLES), "count": len(RLS_TABLES)},
                     )
                     if result.scalar_one() is not True:
                         raise DependencyError

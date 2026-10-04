@@ -1,0 +1,23 @@
+# Local smoke only: replaces GitLab with scripts/fake_gitlab.py so the real adapter is
+# exercised over the container network. Never use this override with real credentials.
+services:
+  fake-gitlab:
+    image: python:3.12.10-slim-bookworm
+    command: ["python", "/fake/fake_gitlab.py", "--token", "smoke-fake-gitlab-token", "--projects", "101"]
+    volumes:
+      - ./scripts/fake_gitlab.py:/fake/fake_gitlab.py:ro
+    ports:
+      - "127.0.0.1:8081:8080"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/_control/issues', timeout=2)"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+  api:
+    environment:
+      GITLAB_BASE_URL: http://fake-gitlab:8080
+      GITLAB_TOKEN: smoke-fake-gitlab-token
+      GITLAB_ALLOW_HTTP: "true"
+    depends_on:
+      fake-gitlab:
+        condition: service_healthy

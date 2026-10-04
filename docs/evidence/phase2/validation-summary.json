@@ -1,0 +1,92 @@
+{
+  "recorded_at": "2026-10-04",
+  "phase": 2,
+  "scope": "Safe agentic workflow; fake LLM planners and fake GitLab server; no paid calls; no real GitLab; no push",
+  "environment": {
+    "python": "3.12.10",
+    "uv": "0.7.3",
+    "postgresql": "17.6",
+    "pgvector": "0.8.0",
+    "docker": "29.8.2",
+    "compose": "5.6.0",
+    "langgraph": "1.2.12"
+  },
+  "gates": [
+    {
+      "gate": "uv lock --check",
+      "exit_code": 0,
+      "lock_entries": 58
+    },
+    {
+      "gate": "ruff format --check / ruff check",
+      "exit_code": 0,
+      "files": 50
+    },
+    {
+      "gate": "mypy --strict",
+      "exit_code": 0,
+      "files": 50
+    },
+    {
+      "gate": "pytest -m 'not integration'",
+      "collected": 228,
+      "passed": 172,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 56,
+      "junit": "junit-unit.xml"
+    },
+    {
+      "gate": "pytest -m integration (real PostgreSQL, fake GitLab over HTTP, subprocess SIGKILL)",
+      "collected": 228,
+      "passed": 56,
+      "failed": 0,
+      "skipped": 0,
+      "deselected": 172,
+      "junit": "junit-integration.xml"
+    },
+    {
+      "gate": "mutation checks",
+      "injected": 17,
+      "caught": 17,
+      "required_caught": "7/7",
+      "details": "mutation-results.txt"
+    },
+    {
+      "gate": "agent eval v1",
+      "details": "agent-eval-v1.json"
+    },
+    {
+      "gate": "scripts/verify.sh",
+      "exit_code": 0
+    },
+    {
+      "gate": "docker build",
+      "exit_code": 0,
+      "user": "10001:10001"
+    },
+    {
+      "gate": "compose up (base + smoke override, empty volume)",
+      "exit_code": 0
+    },
+    {
+      "gate": "HTTP smoke RAG + cross-tenant",
+      "exit_code": 0,
+      "details": "http-smoke-rag.json"
+    },
+    {
+      "gate": "HTTP smoke agent (approval gate, one issue)",
+      "exit_code": 0,
+      "details": "http-smoke-agent.json"
+    },
+    {
+      "gate": "default compose without GitLab: approved action fails closed",
+      "result": "failed / gitlab_unconfigured"
+    },
+    {
+      "gate": "CI workflow replayed locally with workflow env",
+      "exit_code": 0,
+      "github_hosted_run": false
+    }
+  ]
+}

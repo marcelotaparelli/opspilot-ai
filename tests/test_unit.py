@@ -223,10 +223,12 @@ async def test_unreachable_database_readiness_is_bounded_and_controlled() -> Non
 
     # Real asyncpg driver against a closed local port; no server is required.
     repository = PostgresRepository(
-        Settings(
-            database_url=SecretStr("postgresql+asyncpg://opspilot_app:secret@127.0.0.1:9/x"),
-            tenant_tokens={TOKEN_A: TENANT_A},
-            database_timeout_seconds=1,
+        Settings.model_validate(
+            {
+                "database_url": SecretStr("postgresql+asyncpg://opspilot_app:secret@127.0.0.1:9/x"),
+                "tenant_tokens": {TOKEN_A: str(TENANT_A)},
+                "database_timeout_seconds": 1,
+            }
         )
     )
     started = time.monotonic()

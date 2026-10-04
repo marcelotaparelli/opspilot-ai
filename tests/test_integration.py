@@ -16,7 +16,7 @@ from opspilot.config import Settings
 from opspilot.domain import DependencyError, Hit, Metadata
 from opspilot.persistence.postgres import PostgresRepository
 from opspilot.retrieval import RetrievalMode
-from tests.helpers import MALICIOUS, TOKEN_A, TOKEN_B, RecordingProvider
+from tests.helpers import MALICIOUS, TOKEN_A, TOKEN_B, RecordingProvider, configured
 
 pytestmark = pytest.mark.integration
 
@@ -42,7 +42,7 @@ async def test_real_hybrid_tenant_isolation_and_injection(
     assert MALICIOUS in provider.contexts[0][0].text
     assert all(chunk.tenant_id == a for chunk in provider.contexts[0])
     # API authentication must fix the scope even with an adversarial tenant header.
-    config = settings.model_copy(update={"tenant_tokens": {TOKEN_A: a, TOKEN_B: b}})
+    config = configured(settings, {TOKEN_A: a, TOKEN_B: b})
     app = create_app(config, service)
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=app), base_url="http://test"
@@ -244,7 +244,7 @@ async def test_real_http_ingestion_and_query(
 ) -> None:
     repository, a, b = postgres
     provider = RecordingProvider()
-    config = settings.model_copy(update={"tenant_tokens": {TOKEN_A: a, TOKEN_B: b}})
+    config = configured(settings, {TOKEN_A: a, TOKEN_B: b})
     app = create_app(config, RagService(repository, provider, provider))
     async with httpx.AsyncClient(
         transport=httpx.ASGITransport(app=app), base_url="http://test"
@@ -451,9 +451,11 @@ async def test_rls_alone_protects_pipeline_when_application_filters_are_removed(
     finally:
         await admin.dispose()
     unfiltered = UnfilteredRepository(
-        Settings(
-            database_url=SecretStr(os.environ["TEST_DATABASE_URL"]),
-            tenant_tokens={TOKEN_A: a},
+        Settings.model_validate(
+            {
+                "database_url": SecretStr(os.environ["TEST_DATABASE_URL"]),
+                "tenant_tokens": {TOKEN_A: str(a)},
+            }
         )
     )
     try:
@@ -520,12 +522,11 @@ async def test_prompt_injection_cannot_reach_other_tenant_through_real_llm_adapt
         answer = {"answer": "PRIVATE_B_SECRET", "cited_chunk_ids": cite}
         return httpx.Response(200, json=response_body(json.dumps(answer)))
 
-    config = settings.model_copy(
-        update={
-            "provider": "openai",
-            "openai_api_key": SecretStr("mock-key"),
-            "tenant_tokens": {TOKEN_A: a, TOKEN_B: b},
-        }
+    config = configured(
+        settings,
+        {TOKEN_A: a, TOKEN_B: b},
+        provider="openai",
+        openai_api_key=SecretStr("mock-key"),
     )
     client = AsyncOpenAI(
         api_key="mock-key",

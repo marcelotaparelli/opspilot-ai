@@ -1,4 +1,4 @@
-"""One versioned transactional migration, run separately with DDL credentials."""
+"""Versioned transactional migrations, run separately with DDL credentials."""
 
 import asyncio
 import os
@@ -9,6 +9,10 @@ from sqlalchemy import text
 from sqlalchemy.engine import make_url
 from sqlalchemy.exc import ArgumentError
 from sqlalchemy.ext.asyncio import create_async_engine
+
+# Ordered, append-only migrations applied in one transaction under an advisory lock.
+MIGRATIONS = {1: "schema.sql", 2: "schema_v2.sql"}
+LATEST = max(MIGRATIONS)
 
 
 class MigrationSettings(BaseModel):
@@ -46,17 +50,24 @@ async def migrate() -> None:
                 )
                 result = await connection.execute(text("SELECT version FROM schema_version"))
                 version = result.scalar()
-                if version == 1:
-                    return
-                if version is not None:
+                current = 0 if version is None else int(version)
+                if current > LATEST:
                     raise RuntimeError("unsupported schema version")
-                sql = files("opspilot.persistence").joinpath("schema.sql").read_text()
-                for statement in sql.split(";"):
-                    if statement.strip():
-                        await connection.execute(text(statement))
-                await connection.execute(
-                    text("INSERT INTO schema_version (singleton, version) VALUES (true, 1)")
-                )
+                for number in range(current + 1, LATEST + 1):
+                    sql = files("opspilot.persistence").joinpath(MIGRATIONS[number]).read_text()
+                    for statement in sql.split(";"):
+                        if statement.strip():
+                            await connection.execute(text(statement))
+                if current == 0:
+                    await connection.execute(
+                        text("INSERT INTO schema_version (singleton, version) VALUES (true, :v)"),
+                        {"v": LATEST},
+                    )
+                elif current < LATEST:
+                    await connection.execute(
+                        text("UPDATE schema_version SET version = :v WHERE singleton"),
+                        {"v": LATEST},
+                    )
     finally:
         await engine.dispose()
 

@@ -1,12 +1,16 @@
 """Strict, bounded HTTP contracts, with metadata normalization."""
 
 import unicodedata
-from typing import Annotated, Self
+from datetime import datetime
+from typing import TYPE_CHECKING, Annotated, Self
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from opspilot.chunking import normalize_content
+
+if TYPE_CHECKING:
+    from opspilot.agent.store import RunBundle
 
 BoundedTag = Annotated[str, Field(min_length=1, max_length=40)]
 
@@ -95,3 +99,125 @@ class QueryOutput(Contract):
 class ErrorOutput(Contract):
     error: str
     request_id: str
+
+
+class AgentRunInput(Contract):
+    request: str = Field(min_length=1, max_length=2000)
+
+    @field_validator("request", mode="before")
+    @classmethod
+    def normalized_request(cls, value: object) -> object:
+        return clean(value) if isinstance(value, str) else value
+
+
+class DecisionInput(Contract):
+    # The approver must name the exact action they reviewed.
+    action_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class ContextRef(Contract):
+    chunk_id: UUID
+    document_id: UUID
+    title: str
+
+
+class ProposalView(Contract):
+    action_hash: str
+    project: str
+    project_id: int
+    title: str
+    description: str
+    labels: list[str]
+    assignee_ids: list[int]
+    created_at: datetime
+
+
+class ApprovalView(Contract):
+    decision: str
+    action_hash: str
+    decided_by: str
+    decided_at: datetime
+
+
+class ExecutionView(Contract):
+    status: str
+    attempts: int
+    issue_iid: int | None
+    issue_url: str | None
+    last_error: str | None
+
+
+class AgentRunView(Contract):
+    run_id: UUID
+    status: str
+    requested_by: str
+    steps: int
+    answer: str | None
+    cited_chunk_ids: list[UUID]
+    context: list[ContextRef]
+    proposal: ProposalView | None
+    approval: ApprovalView | None
+    execution: ExecutionView | None
+    error: str | None
+    created_at: datetime
+    updated_at: datetime
+    request_id: str
+
+
+def run_view(bundle: "RunBundle", request_id: str) -> AgentRunView:
+    run, proposal, approval, execution = (
+        bundle.run,
+        bundle.proposal,
+        bundle.approval,
+        bundle.execution,
+    )
+    state = run.state
+    return AgentRunView(
+        run_id=run.id,
+        status=run.status,
+        requested_by=run.requested_by,
+        steps=run.steps,
+        answer=state.get("answer"),
+        cited_chunk_ids=[UUID(item) for item in state.get("cited_chunk_ids", [])],
+        context=[
+            ContextRef(
+                chunk_id=UUID(ref["chunk_id"]),
+                document_id=UUID(ref["document_id"]),
+                title=ref["title"],
+            )
+            for ref in state.get("context", [])
+        ],
+        proposal=ProposalView(
+            action_hash=proposal.action_hash,
+            project=proposal.action.project,
+            project_id=proposal.action.project_id,
+            title=proposal.action.title,
+            description=proposal.action.description,
+            labels=list(proposal.action.labels),
+            assignee_ids=list(proposal.action.assignee_ids),
+            created_at=proposal.created_at,
+        )
+        if proposal
+        else None,
+        approval=ApprovalView(
+            decision=approval.decision,
+            action_hash=approval.action_hash,
+            decided_by=approval.decided_by,
+            decided_at=approval.decided_at,
+        )
+        if approval
+        else None,
+        execution=ExecutionView(
+            status=execution.status,
+            attempts=execution.attempts,
+            issue_iid=execution.issue_iid,
+            issue_url=execution.issue_url,
+            last_error=execution.last_error,
+        )
+        if execution
+        else None,
+        error=state.get("error"),
+        created_at=run.created_at,
+        updated_at=run.updated_at,
+        request_id=request_id,
+    )

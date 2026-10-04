@@ -36,6 +36,10 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
       ANSWER_MODEL: ${ANSWER_MODEL:-gpt-4.1-mini}
+      AGENT_POLICY: ${AGENT_POLICY:-}
+      GITLAB_BASE_URL: ${GITLAB_BASE_URL:-}
+      GITLAB_TOKEN: ${GITLAB_TOKEN:-}
+      GITLAB_ALLOW_HTTP: ${GITLAB_ALLOW_HTTP:-false}
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:

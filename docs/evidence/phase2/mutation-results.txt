@@ -1,0 +1,21 @@
+# Phase 2 mutation checks, 2026-10-04 (PostgreSQL 17.6, Python 3.12.10, LangGraph 1.2.12)
+# One single-site defect per line, full suite (unit + integration on real PostgreSQL + fake GitLab),
+# file restored afterwards, bytecode caches purged. Schema mutants rebuild the agent tables.
+# [required] = mutants the owner required. First failing test shown.
+P01 [required] remove approval check (executor hash binding): CAUGHT (FAILED tests/test_agent_workflow.py::test_changed_action_invalidates_approval_before_execution)
+P02 [required] accept a different action hash at approval: CAUGHT (FAILED tests/test_agent_api.py::test_agent_http_flow_and_error_contract - Ass...)
+P03 [required] ignore authorization (no re-check before side effect): CAUGHT (FAILED tests/test_agent_workflow.py::test_policy_is_rechecked_at_execution_time)
+P04 [required] remove tenant filter (agent store load): CAUGHT (FAILED tests/test_agent_workflow.py::test_explicit_tenant_filters_hold_even_when_rls_is_bypassed)
+P05 [required] allow arbitrary project: CAUGHT (FAILED tests/test_agent_eval.py::test_agent_eval_safety_metrics - AssertionEr...)
+P06 [required] execute side effect twice (no reconcile lookup): CAUGHT (FAILED tests/test_agent_eval.py::test_agent_eval_safety_metrics - AssertionEr...)
+P07 [required] remove max-step termination: CAUGHT (FAILED tests/test_agent_eval.py::test_agent_eval_safety_metrics - AssertionEr...)
+P08 self-approval allowed: CAUGHT (FAILED tests/test_agent_eval.py::test_agent_eval_safety_metrics - AssertionEr...)
+P09 approver role not required: CAUGHT (FAILED tests/test_agent_api.py::test_agent_http_flow_and_error_contract - Ass...)
+P10 agent role not required to start: CAUGHT (FAILED tests/test_agent_api.py::test_agent_http_flow_and_error_contract - ass...)
+P11 model tool allowlist disabled: CAUGHT (FAILED tests/test_agent_unit.py::test_model_cannot_select_forbidden_tools[create_gitlab_issue])
+P12 RLS on agent_runs disabled (USING true): CAUGHT (FAILED tests/test_agent_workflow.py::test_agent_tables_are_isolated_by_rls_without_predicates)
+P13 claim ignores a live owner (concurrent double execution): CAUGHT (FAILED tests/test_agent_workflow.py::test_database_failure_after_side_effect_recovers_without_duplicate)
+P14 invalid-output bound removed: CAUGHT (FAILED tests/test_agent_eval.py::test_agent_eval_safety_metrics - AssertionEr...)
+P15 5xx treated as definite failure (not ambiguous): CAUGHT (FAILED tests/test_agent_gitlab.py::test_status_classification[500-unknown-gitlab_server_error-False])
+P16 read timeout treated as not sent (blind retry): CAUGHT (FAILED tests/test_agent_gitlab.py::test_transport_failures_distinguish_not_sent_from_unknown[error3-unknown])
+P17 approval state guard removed (decide on any status): CAUGHT (FAILED tests/test_agent_api.py::test_agent_http_flow_and_error_contract - Ass...)
