@@ -1,0 +1,46 @@
+name: phase-1
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      # Ephemeral CI credentials only. No repository/provider secrets needed.
+      POSTGRES_PASSWORD: ci-admin-ephemeral
+      APP_DB_PASSWORD: ci-app-ephemeral
+      DATABASE_URL: postgresql+asyncpg://opspilot_app:ci-app-ephemeral@localhost:5432/opspilot
+      MIGRATION_DATABASE_URL: postgresql+asyncpg://postgres:ci-admin-ephemeral@localhost:5432/opspilot
+      TEST_DATABASE_URL: postgresql+asyncpg://opspilot_app:ci-app-ephemeral@localhost:5432/opspilot
+      TEST_ADMIN_DATABASE_URL: postgresql+asyncpg://postgres:ci-admin-ephemeral@localhost:5432/opspilot
+      TENANT_TOKENS: '{"ci-token-with-at-least-32-characters-long":"aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"}'
+      PROVIDER: fake
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.7.3"
+          python-version: "3.12"
+      - name: Require resolved lockfile
+        run: |
+          test -f uv.lock || { echo 'BLOCKED: generate and commit uv.lock in a network-enabled environment'; exit 1; }
+          uv sync --locked
+      - name: Start real PostgreSQL and apply schema
+        run: |
+          docker compose up --detach --wait db
+          uv run --locked python -m opspilot.persistence.migrate
+      - name: Quality gates
+        run: ./scripts/verify.sh
+      - name: Measure retrieval against real PostgreSQL
+        run: uv run --locked python -m opspilot.evaluation --seed --output eval-results-ci.json
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: measured-retrieval
+          path: eval-results-ci.json
+      - name: Stop PostgreSQL
+        if: always()
+        run: docker compose down

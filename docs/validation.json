@@ -1,0 +1,96 @@
+{
+  "recorded_at": "2026-10-04T09:50:58.439Z",
+  "environment": "restricted implementation workspace; no shell network",
+  "checks": [
+    {
+      "command": "uv lock",
+      "exit_code": 127,
+      "stdout": "",
+      "stderr": "bash: line 1: uv: command not found"
+    },
+    {
+      "command": "uv run ruff format --check .",
+      "exit_code": 127,
+      "stdout": "",
+      "stderr": "bash: line 1: uv: command not found"
+    },
+    {
+      "command": "uv run ruff check .",
+      "exit_code": 127,
+      "stdout": "",
+      "stderr": "bash: line 1: uv: command not found"
+    },
+    {
+      "command": "uv run mypy",
+      "exit_code": 127,
+      "stdout": "",
+      "stderr": "bash: line 1: uv: command not found"
+    },
+    {
+      "command": "uv run pytest -m 'not integration'",
+      "exit_code": 127,
+      "stdout": "",
+      "stderr": "bash: line 1: uv: command not found"
+    },
+    {
+      "command": "uv run pytest -m integration",
+      "exit_code": 127,
+      "stdout": "",
+      "stderr": "bash: line 1: uv: command not found"
+    },
+    {
+      "command": "uv run pytest -m integration tests/test_integration.py -k isolation",
+      "exit_code": 127,
+      "stdout": "",
+      "stderr": "bash: line 1: uv: command not found"
+    },
+    {
+      "command": "uv run python -m opspilot.evaluation --seed --k 5",
+      "exit_code": 127,
+      "stdout": "",
+      "stderr": "bash: line 1: uv: command not found"
+    },
+    {
+      "command": "docker build --tag opspilot-ai:phase1 .",
+      "exit_code": 127,
+      "stdout": "",
+      "stderr": "bash: line 1: docker: command not found"
+    },
+    {
+      "command": "docker compose --env-file .env.example config --quiet",
+      "exit_code": 127,
+      "stdout": "",
+      "stderr": "bash: line 1: docker: command not found"
+    },
+    {
+      "command": "python3 -m compileall -q src tests",
+      "exit_code": 127,
+      "stdout": "",
+      "stderr": "bash: line 1: python3: command not found"
+    },
+    {
+      "command": "git init -b main",
+      "exit_code": 127,
+      "stdout": "",
+      "stderr": "bash: line 1: git: command not found"
+    },
+    {
+      "command": "bash -n scripts/init-db.sh scripts/verify.sh",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "Node static dataset JSON/reference validation",
+      "exit_code": 0,
+      "stdout": "5 documents, 3 cases; relevant UUIDs resolve within the declared tenant",
+      "stderr": ""
+    },
+    {
+      "command": "sh -n scripts/init-db.sh scripts/verify.sh",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

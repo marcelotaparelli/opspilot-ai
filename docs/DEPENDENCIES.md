@@ -1,0 +1,40 @@
+# Dependency decisions
+
+Only direct necessities are added. `pyproject.toml` pins direct versions; this workspace
+could not execute uv or resolve transitive dependencies. The transitive names below
+describe expected package relationships, not a resolved SBOM. Produce a real `uv.lock`
+and review `uv tree` before accepting the reproducibility/supply-chain gate.
+
+| Dependency | Need / why stdlib is insufficient | Relevant transitives / maintenance impact |
+| --- | --- | --- |
+| FastAPI | ASGI HTTP routing, dependency injection and generated Pydantic contracts; stdlib has no comparable async API framework | Starlette, Pydantic, typing-extensions; follow framework/Starlette security updates together |
+| Pydantic v2 | Bounded contracts, environment validation and SDK JSON schemas; dataclasses alone do not validate arbitrary HTTP JSON | pydantic-core native wheels, annotated-types, typing-inspection, typing-extensions; native parser updates and compatibility require locked upgrades |
+| SQLAlchemy 2 with asyncio extra | Typed mature async engine, pooling, transactions, bound SQL and adapter lifecycle; stdlib has no PostgreSQL client/pool | greenlet native wheel, typing-extensions; dialect compatibility with asyncpg must be integration-tested |
+| asyncpg | Actual asynchronous PostgreSQL protocol implementation; stdlib has no such driver | Native wheel / protocol code; PostgreSQL version and Python wheel compatibility are maintenance concerns |
+| OpenAI official SDK | Required major-provider SDK behind ports; supplies structured Responses parsing and embedding contract support | HTTPX, httpcore/h11/certifi, anyio/idna/sniffio, Pydantic, distro, jiter native wheel, tqdm, typing-extensions; widest runtime dependency graph, confined to adapter, zero retries |
+| Uvicorn without standard extras | ASGI server supporting lifespan and graceful shutdown; stdlib HTTP servers do not implement ASGI | click, h11; omits optional uvloop/watchfiles/websocket extras to reduce graph |
+| HTTPX (dev direct) | Async ASGI and HTTP mock transports test the real API/SDK contracts without socket calls; stdlib lacks these transports | Also SDK runtime transitive; anyio/httpcore/certifi/idna; direct dev pin aligns mock interfaces with runtime SDK |
+| pytest | Parametrized fixtures, failure reports and explicit real-integration markers; unittest would work but pytest is required and supports this fixture model | pluggy, packaging, iniconfig, platform-dependent colorama; dev-only execution surface |
+| pytest-asyncio | Runs async tests with isolated event loops and async fixtures; pytest alone cannot await async tests | pytest; dev-only, fixture loop-scope behavior must be reviewed on upgrades |
+| Ruff | Required formatter/linter, import and async rules; stdlib has no equivalent | Native binary wheels, no Python runtime dependency graph; dev/CI only |
+| mypy | Strict static checking across source and tests; Python runtime does not enforce Protocol/annotation contracts | mypy-extensions, typing-extensions, native wheels; dev-only, stubs and library typing change on upgrades |
+| hatchling (build) | Builds/installable src-layout wheel; Python stdlib has no PEP 517 wheel backend | packaging, pathspec, pluggy, trove-classifiers; build-only, isolated backend resolution must be reviewed in addition to runtime lock |
+| uv (tool/container/CI) | Required dependency resolution, Python selection and frozen installs; stdlib venv does not resolve/lock dependencies | Rust binary and platform artifacts; pin 0.7.3, verify trusted distribution and update intentionally |
+
+PostgreSQL 17 and pgvector 0.8.0 are infrastructure dependencies: PostgreSQL provides
+transactional persistence, RLS and indexed full-text search; pgvector provides typed
+vectors and cosine operators in the same authorization/transaction boundary. There is
+no Python pgvector/numpy dependency: validated finite float arrays are JSON-encoded and
+passed as **bound parameters**, explicitly cast to `vector` in SQL. PostgreSQL enforces
+dimensionality. Numeric interpolation into SQL is never used.
+
+Docker images and GitHub Actions also introduce supply-chain trust. Versions are selected
+explicitly but not yet pinned to digests/commit SHAs. No dependency vulnerability audit
+or current support guarantee was measured. CI credentials are ephemeral examples, and
+no real provider credentials are used in tests. No auto-upgrade bot is installed.
+
+Excluded: LangChain, LlamaIndex, LangGraph, tokenizers, rerankers, NumPy, pgvector Python,
+pydantic-settings, structlog, Alembic and OpenTelemetry. Stdlib suffices for chunking,
+RRF, hashing, JSON, correlation, deadlines, logging and this single schema migration.
+OpenTelemetry's extension point is documented in README rather than adding an exporter
+and its dependency graph in this phase.
