@@ -1,0 +1,688 @@
+{
+  "version": 2,
+  "name": "retrieval-v2",
+  "description": "Hand-written operational knowledge for a fictional payments company (acme) plus confusable documents from a second tenant (globex) used only as isolation sentinels.",
+  "tenants": {
+    "acme": "c0c0c0c0-c0c0-4c0c-8c0c-c0c0c0c0c0c0",
+    "globex": "d0d0d0d0-d0d0-4d0d-8d0d-d0d0d0d0d0d0"
+  },
+  "documents": [
+    {
+      "key": "redis-rate-limiter-fail-open",
+      "tenant": "acme",
+      "title": "Rate limiter behaviour when Redis is unreachable",
+      "tags": [
+        "redis",
+        "edge"
+      ],
+      "content": "The edge gateway keeps per-client request counters in the shared Redis cluster. If a counter lookup does not complete within 200 ms, the gateway fails open: the request is admitted without being counted, and the RateLimiterFailOpen alert fires after 60 seconds. Fail-open was chosen so that a cache outage does not become a checkout outage, but it means abusive clients are unthrottled for the duration. While the alert is active: (1) confirm cluster health on the cache dashboard, (2) enable the static fallback limits in the nginx edge config by setting limit_req_fallback=on, which caps each source IP at 50 requests per second, and (3) page the cache owner if Redis is not back within 15 minutes. Remove the static fallback once counters are flowing again, because it penalises customers behind shared NAT."
+    },
+    {
+      "key": "redis-session-eviction",
+      "tenant": "acme",
+      "title": "Sessions disappearing because of Redis memory eviction",
+      "tags": [
+        "redis",
+        "auth"
+      ],
+      "content": "Customers reporting that they are logged out every few minutes usually indicates that the sessions Redis instance hit its maxmemory ceiling. The instance runs with the allkeys-lru eviction policy, so under memory pressure it silently discards the least recently used keys, including session tokens. Check used_memory against maxmemory with INFO memory and look at the evicted_keys counter. Short term, raise maxmemory if the host has headroom. Long term, sessions must live on the dedicated sessions instance with volatile-ttl eviction and must never share an instance with the product cache."
+    },
+    {
+      "key": "redis-sentinel-failover",
+      "tenant": "acme",
+      "title": "Redis Sentinel failover and stale client connections",
+      "tags": [
+        "redis"
+      ],
+      "content": "When Sentinel promotes a replica, services that resolved the primary address at startup keep writing to the old node, which is now a replica and answers READONLY You can't write against a read only replica. The fix is to recycle the client connection pool, not the Redis nodes. Confirm the new topology with ROLE on each node and SENTINEL get-master-addr-by-name cache-main. Services using the shared client library 3.4 or newer subscribe to +switch-master events and reconnect automatically; older services need a rolling restart."
+    },
+    {
+      "key": "catalog-cache-stampede",
+      "tenant": "acme",
+      "title": "Product catalog cache stampede",
+      "tags": [
+        "redis",
+        "postgresql"
+      ],
+      "content": "At the top of every hour the catalog entries written by the nightly import expire together, and thousands of concurrent misses go straight to PostgreSQL. Symptoms are a sudden CPU spike on the catalog database and p99 latency above two seconds for product pages. Mitigations already in place: TTLs carry up to 10 percent random jitter and the catalog service coalesces concurrent misses for the same key into a single database read. If a stampede still happens, temporarily extend TTLs with the catalog-ttl feature flag instead of scaling the database."
+    },
+    {
+      "key": "redis-slow-commands",
+      "tenant": "acme",
+      "title": "Redis latency caused by blocking commands",
+      "tags": [
+        "redis"
+      ],
+      "content": "A single KEYS pattern scan blocks the Redis event loop for every client. If latency on the cache cluster jumps while CPU stays moderate, run SLOWLOG GET 20 and look for KEYS, large DEL calls or Lua scripts that iterate whole keyspaces. Replace KEYS with incremental SCAN and delete big collections with UNLINK. The KEYS command is disabled through rename-command in production, so any occurrence comes from an ad-hoc administrative session."
+    },
+    {
+      "key": "redis-tls-rotation",
+      "tenant": "acme",
+      "title": "Rotating the TLS certificate of the cache cluster",
+      "tags": [
+        "redis",
+        "tls"
+      ],
+      "content": "The cache cluster terminates TLS on each node with a certificate issued by the internal CA and valid for 90 days. Renewal is automated, but nodes only load the new certificate on restart, so the platform team restarts replicas first and the primary last, after a manual failover. Clients pin the internal CA, not the leaf certificate, so no client change is required."
+    },
+    {
+      "key": "redis-idempotency-cache",
+      "tenant": "acme",
+      "title": "Idempotency results stored in Redis",
+      "tags": [
+        "redis",
+        "payments"
+      ],
+      "content": "payments-api stores the outcome of every payment creation in Redis for 24 hours, keyed by the merchant's Idempotency-Key. If that Redis instance cannot be reached, payments-api refuses new payment creation with HTTP 503 instead of processing it: without the stored outcome a client retry could be charged a second time. This fail-closed behaviour is deliberate and must not be switched off during an incident; reads, refunds and webhooks keep working."
+    },
+    {
+      "key": "postgres-connection-exhaustion",
+      "tenant": "acme",
+      "title": "Database connection slots exhausted",
+      "tags": [
+        "postgresql"
+      ],
+      "content": "Application logs showing ERR_CONN_POOL_EXHAUSTED together with the server message remaining connection slots are reserved for non-replication superuser connections mean that every PostgreSQL connection is in use. Services must connect through PgBouncer in transaction mode; direct connections bypass the pooler and are the usual cause. Find offenders with SELECT usename, application_name, count(*) FROM pg_stat_activity GROUP BY 1, 2 ORDER BY 3 DESC. Do not raise max_connections as a first response: each backend costs memory and the limit is sized for the instance."
+    },
+    {
+      "key": "postgres-replica-lag",
+      "tenant": "acme",
+      "title": "Read replica lag and stale reads",
+      "tags": [
+        "postgresql"
+      ],
+      "content": "Reporting and the customer dashboard read from the replica. When replay falls behind, users see balances that do not reflect payments they just made. Check replay_lag in pg_stat_replication on the primary. Above 30 seconds the data access layer automatically routes balance reads to the primary; above five minutes, page the database on-call because the replica may be stuck on a conflicting query, which can be cancelled with pg_cancel_backend."
+    },
+    {
+      "key": "postgres-migration-locks",
+      "tenant": "acme",
+      "title": "Schema migrations blocking production traffic",
+      "tags": [
+        "postgresql",
+        "deploy"
+      ],
+      "content": "An ALTER TABLE that rewrites a table or takes an ACCESS EXCLUSIVE lock queues behind long transactions and then blocks every later query on that table. All migrations therefore set lock_timeout to 5s and are retried by the deploy pipeline. Build indexes with CREATE INDEX CONCURRENTLY outside a transaction, avoid column defaults that force a rewrite, and split constraint creation into NOT VALID followed by VALIDATE CONSTRAINT. Each migration must also stay compatible with the release currently running, because old and new pods overlap during a rollout."
+    },
+    {
+      "key": "postgres-wal-disk-full",
+      "tenant": "acme",
+      "title": "Primary disk filling up with WAL",
+      "tags": [
+        "postgresql",
+        "disk"
+      ],
+      "content": "If the data volume of the primary grows quickly while table sizes are stable, an inactive replication slot is usually retaining write-ahead log. Query pg_replication_slots for slots where active is false and compare restart_lsn with the current position. Confirm with the owner that the consumer is gone, for example a decommissioned CDC connector, then drop the slot with pg_drop_replication_slot. Never delete files from pg_wal by hand."
+    },
+    {
+      "key": "postgres-wraparound",
+      "tenant": "acme",
+      "title": "Transaction ID wraparound warnings",
+      "tags": [
+        "postgresql"
+      ],
+      "content": "The warning database must be vacuumed within N transactions means autovacuum has not been able to freeze old rows, often because of a long-open transaction or an abandoned prepared transaction. Identify them in pg_stat_activity and pg_prepared_xacts, end them, then run VACUUM (FREEZE, VERBOSE) on the tables with the oldest relfrozenxid. Escalate immediately; if the counter reaches the hard limit the cluster stops accepting writes."
+    },
+    {
+      "key": "postgres-deadlocks-ledger",
+      "tenant": "acme",
+      "title": "Deadlocks in the ledger service",
+      "tags": [
+        "postgresql",
+        "ledger"
+      ],
+      "content": "Deadlock detected errors in the ledger service come from two transfers locking the same pair of accounts in opposite order. The service must lock account rows in ascending account ID order. The transaction is aborted by PostgreSQL and the ledger worker retries it once; repeated deadlocks on the same accounts indicate a code path that bypasses the ordering helper."
+    },
+    {
+      "key": "postgres-pitr",
+      "tenant": "acme",
+      "title": "Point-in-time recovery of the payments database",
+      "tags": [
+        "postgresql",
+        "backup"
+      ],
+      "content": "When to use this procedure. Point-in-time recovery is the last resort for logical damage that replication cannot fix: rows deleted or overwritten by a faulty job, a bad manual statement, or corruption introduced by application code. Replicas copy the damage within seconds, so failing over does not help. Hardware loss of the primary is handled by replica promotion instead and is not covered here. Prerequisites. Full base backups are taken nightly with pgBackRest and write-ahead log segments are archived continuously to object storage. Retention is 14 days, so the target time must fall inside that window. The restore needs a fresh instance with at least the same disk size as the primary; requesting one through the platform portal takes about 20 minutes, so start that request first. Step 1, contain. Declare an incident, then put payments-api into maintenance mode with deployctl maintenance payments-api on so that no new writes land while the investigation runs. Notify finance, because settlement files generated during the damaged period may need to be regenerated. Step 2, choose the target. Use the audit log and the faulty job's start time to pick a target timestamp just before the first damaging statement. Write it down in UTC in the incident document; most mistakes in past drills were time-zone errors. Step 3, restore. On the new instance run pgbackrest restore with --type=time and --target set to the chosen timestamp, followed by --target-action=promote. Replay can take a long time for a busy day of WAL; progress is visible in the server log. Step 4, verify. Compare row counts, account balances and ledger checksums with finance before switching anything. If the restored data is wrong, choose another target and restore again; the original primary is untouched at this point. Step 5, switch. Repoint PgBouncer to the restored instance, disable maintenance mode and watch the checkout dashboard. Never restore on top of the existing primary: keep it stopped but intact for seven days for forensics. The recovery time objective for this procedure is four hours, and the team practices it every quarter."
+    },
+    {
+      "key": "auth-signing-key-rotation",
+      "tenant": "acme",
+      "title": "Rotating the OAuth token signing key",
+      "tags": [
+        "auth",
+        "keys"
+      ],
+      "content": "Access tokens are signed with an RS256 key published in the JWKS endpoint. Rotation publishes the new public key 48 hours before it is used for signing, because some partners cache the key set for 24 hours. After the switch, the old key stays in the JWKS document for another 24 hours so that tokens issued just before rotation still validate. Rotating without the overlap causes invalid_token errors for every partner integration."
+    },
+    {
+      "key": "auth-saml-cert-expiry",
+      "tenant": "acme",
+      "title": "Enterprise SSO logins failing after certificate expiry",
+      "tags": [
+        "auth",
+        "sso"
+      ],
+      "content": "When an enterprise customer reports that nobody can sign in through their identity provider, check whether the SAML signing certificate in their connection has expired; the login service logs SAML_SIGNATURE_INVALID. The customer must upload the new certificate from their identity provider in the admin console. We cannot extend an expired certificate. Accounts with a local password can still use it as a fallback if the customer administrator enabled that option."
+    },
+    {
+      "key": "auth-account-lockout",
+      "tenant": "acme",
+      "title": "Locked user accounts",
+      "tags": [
+        "auth",
+        "support"
+      ],
+      "content": "After ten failed password attempts in fifteen minutes an account is locked for one hour. Support can unlock regular user accounts from the admin console after verifying identity through the registered email. Accounts with the administrator role cannot be unlocked by support; the customer's other administrator or the security team must do it, to prevent social-engineering takeovers."
+    },
+    {
+      "key": "auth-mfa-sms-outage",
+      "tenant": "acme",
+      "title": "SMS one-time code provider outage",
+      "tags": [
+        "auth",
+        "mfa"
+      ],
+      "content": "If the SMS provider stops delivering verification codes, users with an authenticator app or recovery codes are unaffected. Do not disable multi-factor authentication globally. Post a status page notice, ask affected users to use recovery codes, and switch to the secondary SMS route in the messaging settings. Re-enable the primary route only after its delivery rate is back above 98 percent for 30 minutes."
+    },
+    {
+      "key": "auth-samesite-iframe",
+      "tenant": "acme",
+      "title": "Embedded checkout losing the session",
+      "tags": [
+        "auth",
+        "checkout"
+      ],
+      "content": "The embedded checkout runs inside a merchant page in an iframe. Browsers drop cookies without SameSite=None; Secure in that context, so the customer appears logged out between steps. Session cookies for the checkout domain must be issued with SameSite=None and Secure; cookies for the dashboard keep SameSite=Lax."
+    },
+    {
+      "key": "secrets-leaked-api-key",
+      "tenant": "acme",
+      "title": "Credential accidentally published",
+      "tags": [
+        "secrets",
+        "security"
+      ],
+      "content": "If an API key, token or password is pushed to a public repository or pasted in a ticket, treat it as compromised even if the commit was removed. Revoke it immediately in the issuing system, issue a replacement, and search the audit log for use of the old credential since the time of exposure. Rewriting git history does not help because forks and caches keep the value. Open a security incident so the exposure is recorded."
+    },
+    {
+      "key": "secrets-vault-db-credentials",
+      "tenant": "acme",
+      "title": "Database credentials issued by Vault",
+      "tags": [
+        "secrets",
+        "postgresql"
+      ],
+      "content": "Services do not have static database passwords. Vault issues credentials with a one-hour lease that the sidecar renews. If a service suddenly fails with password authentication failed, check whether the sidecar stopped renewing, for example after its Vault token expired, and restart the sidecar. Do not create a static password as a workaround."
+    },
+    {
+      "key": "secrets-webhook-signing-rotation",
+      "tenant": "acme",
+      "title": "Rotating the processor webhook secret",
+      "tags": [
+        "secrets",
+        "webhooks"
+      ],
+      "content": "The card processor signs the events it sends us with a shared secret. Rotation is done in two steps: add the new secret so that the receiver accepts both, ask the processor to switch, then remove the old secret after 24 hours without failures. Removing the old secret first causes every incoming event to be rejected."
+    },
+    {
+      "key": "secrets-handling-standard",
+      "tenant": "acme",
+      "title": "Secrets handling standard",
+      "tags": [
+        "secrets",
+        "standard"
+      ],
+      "content": "Scope. This standard applies to every credential used by production or staging systems: database passwords, API keys for third parties, signing keys, TLS private keys and tokens used by pipelines. Storage. Secrets live in Vault. They are never committed to a repository, never stored in environment files checked into Git, and never pasted into tickets or chat. Kubernetes workloads receive secrets through the Vault sidecar or through secret objects synchronised from Vault; a secret created by hand in a namespace is a finding in the next audit. Lifetime. Prefer dynamic credentials with short leases over static ones. Static secrets that cannot be made dynamic are rotated at least every 90 days, and immediately when a person with access leaves the team. Rotation pattern. Wherever the consumer allows it, rotate with an overlap: introduce the new value, make every consumer accept both values, switch the producer, and only then retire the old value. Rotations that cannot overlap need a maintenance window agreed with the owners of every consumer. Exposure. A secret that may have been seen by someone without access is treated as exposed. Follow the credential exposure runbook: revoke, replace, review usage, and record a security incident. Local development. Developers use separate development credentials that grant no access to production data. Copying a production secret to a laptop is not allowed, even temporarily."
+    },
+    {
+      "key": "access-break-glass",
+      "tenant": "acme",
+      "title": "Emergency production access",
+      "tags": [
+        "access",
+        "security"
+      ],
+      "content": "Engineers do not have standing write access to production. During an incident, request break-glass access through the access portal; it grants a time-limited role for four hours, requires an incident ID, and every command is recorded. Access is reviewed by security the next business day."
+    },
+    {
+      "key": "iam-s3-access-denied",
+      "tenant": "acme",
+      "title": "AccessDenied from the object storage bucket",
+      "tags": [
+        "access",
+        "storage"
+      ],
+      "content": "A service receiving AccessDenied when reading the reports bucket either lacks the s3:GetObject action in its role or is blocked by the bucket policy, which only allows principals tagged team=reporting. Check both with the policy simulator. Do not attach broad managed policies to fix it."
+    },
+    {
+      "key": "ci-deploy-token-scope",
+      "tenant": "acme",
+      "title": "Least privilege for pipeline credentials",
+      "tags": [
+        "access",
+        "ci"
+      ],
+      "content": "Pipeline deploy credentials are scoped per environment and per service. A pipeline must not use a token that can deploy every namespace, and tokens for production are only available to protected branches. Requests for broader scope go through the platform team with a written justification."
+    },
+    {
+      "key": "deploy-canary",
+      "tenant": "acme",
+      "title": "Progressive delivery for payments-api",
+      "tags": [
+        "deploy"
+      ],
+      "content": "Releases go to 5 percent of traffic for 15 minutes, then 25 percent for 30 minutes, then everyone. The deploy controller compares the canary's error rate and p99 latency with the stable version; if errors exceed 2 percent or latency doubles, it aborts and shifts all traffic back automatically. Do not skip stages for routine releases; hotfixes may use the expedited profile with 10-minute stages."
+    },
+    {
+      "key": "deploy-rollback",
+      "tenant": "acme",
+      "title": "Rolling back a release",
+      "tags": [
+        "deploy"
+      ],
+      "content": "To return payments-api to the previous release run deployctl rollback payments-api --to <release-id>; the release ID is shown in the deploy channel. Rollback redeploys the old image but does not undo database migrations, so every migration must remain compatible with the previous release for at least one release cycle. If a migration was destructive, roll forward with a fix instead. Announce the rollback in #deploys and link the incident."
+    },
+    {
+      "key": "deploy-feature-flag-kill-switch",
+      "tenant": "acme",
+      "title": "Kill switches versus redeploying",
+      "tags": [
+        "deploy",
+        "flags"
+      ],
+      "content": "Most new behaviour ships behind a flag in the flag service. When a recently enabled feature misbehaves, turning its flag off takes effect within ten seconds and avoids a full redeploy. Prefer that over reverting the release, and record the flag change in the incident timeline. Flags older than 90 days must be removed from the code."
+    },
+    {
+      "key": "ci-flaky-tests",
+      "tenant": "acme",
+      "title": "Handling flaky integration tests",
+      "tags": [
+        "ci"
+      ],
+      "content": "A test that fails and passes on the same commit is quarantined with the quarantine label, which moves it to the non-blocking suite and opens a ticket for the owning team. Automatic retries are not allowed on the main branch because they hide real race conditions. A quarantined test that has not been fixed within two weeks is deleted together with the code it was meant to protect, after review."
+    },
+    {
+      "key": "ci-runner-disk-full",
+      "tenant": "acme",
+      "title": "CI runners running out of disk",
+      "tags": [
+        "ci",
+        "disk"
+      ],
+      "content": "Jobs failing with no space left on device on self-hosted runners usually mean the Docker layer cache has grown without bound. The nightly maintenance job runs docker system prune with a 72-hour filter; if a runner fills up during the day, drain it from the pool and run the prune manually. Do not delete the runner work directory while a job is active."
+    },
+    {
+      "key": "ci-image-signing",
+      "tenant": "acme",
+      "title": "Unsigned images rejected by the cluster",
+      "tags": [
+        "ci",
+        "security"
+      ],
+      "content": "The admission controller only allows images signed by the release pipeline. A deployment stuck with pods failing admission and the event image signature verification failed usually means the image was built locally or by a fork pipeline. Rebuild through the release pipeline, which signs the image and attaches provenance; never disable the admission policy for a namespace."
+    },
+    {
+      "key": "deploy-freeze-window",
+      "tenant": "acme",
+      "title": "Change freeze during billing close",
+      "tags": [
+        "deploy",
+        "billing"
+      ],
+      "content": "No production changes are deployed from the last two business days of the month until the second business day of the next month, while invoices and settlements are generated. Emergency fixes need written approval from the on-call engineering director, and the change must be announced in #billing-close before it starts."
+    },
+    {
+      "key": "deploy-config-drift",
+      "tenant": "acme",
+      "title": "Configuration drift between Git and the cluster",
+      "tags": [
+        "deploy",
+        "kubernetes"
+      ],
+      "content": "Cluster configuration is reconciled from the infrastructure repository every five minutes. Values changed directly with kubectl edit are overwritten at the next sync, which is why manual hotfixes appear to revert themselves. Make the change in the repository through a pull request; for an emergency, pause reconciliation for that application, apply the change, and open the pull request within the same shift."
+    },
+    {
+      "key": "k8s-crashloop-missing-secret",
+      "tenant": "acme",
+      "title": "Pods restarting in a loop at startup",
+      "tags": [
+        "kubernetes"
+      ],
+      "content": "A CrashLoopBackOff right after a deploy is most often a missing or misnamed environment variable that comes from a secret. kubectl describe pod shows the last state and exit code, and kubectl logs --previous shows the startup error of the crashed container. Check that the secret exists in the namespace and that the key referenced in the deployment matches. Fix the reference rather than adding the value inline."
+    },
+    {
+      "key": "k8s-oomkilled",
+      "tenant": "acme",
+      "title": "Containers killed for exceeding memory",
+      "tags": [
+        "kubernetes"
+      ],
+      "content": "An exit code of 137 with reason OOMKilled means the container crossed its memory limit. For JVM services the heap must be at most 75 percent of the container limit because metaspace, threads and off-heap buffers also count. Raise the limit only with evidence from the memory dashboard; a steady climb across days points to a leak that more memory will only delay."
+    },
+    {
+      "key": "k8s-probes",
+      "tenant": "acme",
+      "title": "Readiness and liveness probes",
+      "tags": [
+        "kubernetes"
+      ],
+      "content": "Readiness decides whether a pod receives traffic; liveness decides whether it is restarted. A liveness probe that calls the database turns a database incident into a cluster-wide restart storm, so liveness must only check that the process is responsive. Readiness may check dependencies. Give slow-starting services a startupProbe instead of a long initial delay."
+    },
+    {
+      "key": "k8s-imagepull",
+      "tenant": "acme",
+      "title": "Images that cannot be pulled",
+      "tags": [
+        "kubernetes",
+        "registry"
+      ],
+      "content": "ImagePullBackOff with unauthorized: authentication required means the pull secret for the private registry has expired. Registry tokens are rotated every 30 days by the platform pipeline; namespaces created by hand do not receive the refreshed secret. Recreate the namespace through the platform template or copy the current pull secret from the platform namespace."
+    },
+    {
+      "key": "k8s-node-pressure",
+      "tenant": "acme",
+      "title": "Pods evicted because of node pressure",
+      "tags": [
+        "kubernetes",
+        "disk"
+      ],
+      "content": "When the kubelet reports DiskPressure or MemoryPressure it evicts pods, starting with those that exceed their requests. Evicted pods are rescheduled elsewhere, but repeated evictions on one node usually mean a container is writing logs to the node filesystem. Cordon the node, find the noisy container, and ship its logs to stdout."
+    },
+    {
+      "key": "service-restart-procedure",
+      "tenant": "acme",
+      "title": "Restarting a service safely",
+      "tags": [
+        "kubernetes",
+        "operations"
+      ],
+      "content": "To bounce a stateless service such as payments-api, use kubectl rollout restart deployment/payments-api -n payments. The rollout replaces pods one by one, waiting for each new pod to become ready, so capacity is preserved. Do not delete all pods at once and do not scale the deployment to zero. Watch kubectl rollout status until it completes and check the error-rate panel before closing the task. Stateful components such as Redis or PostgreSQL have their own procedures and must not be bounced this way."
+    },
+    {
+      "key": "net-coredns",
+      "tenant": "acme",
+      "title": "Intermittent name resolution failures inside the cluster",
+      "tags": [
+        "network",
+        "dns"
+      ],
+      "content": "Errors such as no such host or i/o timeout when calling other services, appearing in bursts under load, usually come from CoreDNS saturation. The default ndots of 5 makes every external lookup try several search domains first. Scale CoreDNS with the autoscaler profile, set ndots to 2 for services that mostly call external hosts, and use fully qualified names with a trailing dot for third-party APIs."
+    },
+    {
+      "key": "net-tls-chain",
+      "tenant": "acme",
+      "title": "TLS handshake failures after certificate renewal",
+      "tags": [
+        "network",
+        "tls"
+      ],
+      "content": "If some clients, typically older Java runtimes or embedded devices, fail the TLS handshake right after the public certificate was renewed, the ingress is probably serving the leaf certificate without the intermediate. Verify with openssl s_client -showcerts against the public endpoint and check that two certificates are sent. Fix the secret to contain the full chain; browsers often hide this problem because they cache intermediates."
+    },
+    {
+      "key": "net-vpn-flapping",
+      "tenant": "acme",
+      "title": "Partner VPN tunnel flapping",
+      "tags": [
+        "network",
+        "settlement"
+      ],
+      "content": "Settlement files from the acquiring bank arrive over a site-to-site IPsec tunnel. When the tunnel drops repeatedly, check whether dead peer detection timers match on both sides and whether the bank changed its public IP. The tunnel has a standby on the second firewall; switch to it and open a ticket with the bank's network team quoting the tunnel ID PX-ACQ-02."
+    },
+    {
+      "key": "net-egress-allowlist",
+      "tenant": "acme",
+      "title": "Outbound calls blocked by the egress firewall",
+      "tags": [
+        "network",
+        "security"
+      ],
+      "content": "Production workloads can only reach external hosts on the egress allowlist. A new third-party integration failing with connection timeouts while it works from a laptop is almost always missing from that list. Request the addition with the destination hostname, port and business owner; changes are reviewed by security and applied within one business day."
+    },
+    {
+      "key": "net-lb-healthcheck",
+      "tenant": "acme",
+      "title": "Load balancer returning 502 for healthy pods",
+      "tags": [
+        "network",
+        "kubernetes"
+      ],
+      "content": "If the public load balancer answers 502 while pods are healthy, compare the load balancer health check path with the service's readiness endpoint. After the move to /ready the old /status path returns 404 and the load balancer marks every backend unhealthy. Update the health check in the infrastructure repository."
+    },
+    {
+      "key": "api-customer-rate-limits",
+      "tenant": "acme",
+      "title": "Customer API quotas",
+      "tags": [
+        "api",
+        "rate-limiting"
+      ],
+      "content": "Each API key may make 600 requests per minute by default, with bursts up to 100 requests per second. Exceeding the quota returns HTTP 429 with a Retry-After header. Raising a quota requires approval from the customer's account manager and a capacity check by the API team; support must not change quotas directly."
+    },
+    {
+      "key": "rate-limit-internal-services",
+      "tenant": "acme",
+      "title": "Service-to-service rate limits",
+      "tags": [
+        "rate-limiting",
+        "mesh"
+      ],
+      "content": "Calls between internal services are limited by the local rate limit filter in each Envoy sidecar, configured per route in the mesh repository. These limits are enforced in memory inside every sidecar and do not depend on any shared store, so they keep working when shared infrastructure is degraded. A burst of 429 responses between internal services usually means a caller is retrying in a tight loop."
+    },
+    {
+      "key": "api-webhook-retries",
+      "tenant": "acme",
+      "title": "Webhook delivery and retries",
+      "tags": [
+        "api",
+        "webhooks"
+      ],
+      "content": "Webhook events are retried with exponential backoff for up to 24 hours when the merchant endpoint does not answer with a 2xx status within 10 seconds. After that the event is moved to the merchant's failed deliveries list, where it can be replayed from the dashboard. Delivery is at least once, so merchants must deduplicate by event ID, and every event is signed so that merchants can verify it before trusting the payload."
+    },
+    {
+      "key": "api-5xx-triage",
+      "tenant": "acme",
+      "title": "Elevated server errors on the public API",
+      "tags": [
+        "api",
+        "incident"
+      ],
+      "content": "When the 5xx ratio of the public API exceeds 1 percent for five minutes, the on-call engineer opens an incident, posts an initial status page message within 15 minutes, and checks the latest deploy, dependency dashboards and error logs in that order. If the latest deploy correlates with the errors, roll it back before investigating further."
+    },
+    {
+      "key": "api-idempotency",
+      "tenant": "acme",
+      "title": "Duplicate payments and idempotency keys",
+      "tags": [
+        "api",
+        "payments"
+      ],
+      "content": "Payment creation accepts an Idempotency-Key header. Repeating a request with the same key within 24 hours returns the original result instead of charging again. Duplicate charges reported by merchants almost always come from clients that generate a new key on retry. The key is scoped to the API key, so two merchants can use the same value safely."
+    },
+    {
+      "key": "api-gateway-timeout",
+      "tenant": "acme",
+      "title": "Requests ending with 504 at the gateway",
+      "tags": [
+        "api",
+        "edge"
+      ],
+      "content": "The API gateway waits at most 30 seconds for an upstream response before returning 504. Long-running operations such as bulk exports must be implemented as asynchronous jobs that return 202 and a job URL. Raising the gateway timeout is not an option because it holds connections and amplifies overload."
+    },
+    {
+      "key": "queue-kafka-lag",
+      "tenant": "acme",
+      "title": "Settlement consumer falling behind",
+      "tags": [
+        "queues",
+        "kafka"
+      ],
+      "content": "Lag on the settlement-events topic means settlements will be late. Consumers can be scaled up to the number of partitions, which is 24; extra consumers stay idle. If lag grows while consumers are at the limit, look for a slow downstream call in the consumer traces before repartitioning, because repartitioning changes key ordering."
+    },
+    {
+      "key": "queue-rabbitmq-dlq",
+      "tenant": "acme",
+      "title": "Dead-letter queue growing",
+      "tags": [
+        "queues",
+        "rabbitmq"
+      ],
+      "content": "Messages that fail processing three times are routed to the dead-letter exchange. A growing dead-letter queue needs triage, not blind replay: sample messages with the management console, fix the cause, then replay with the dlq-replay tool, which republishes at a limited rate."
+    },
+    {
+      "key": "queue-poison-message",
+      "tenant": "acme",
+      "title": "One bad message blocking a queue",
+      "tags": [
+        "queues"
+      ],
+      "content": "A consumer that crashes on the same message forever stops all progress on an ordered queue. The worker framework moves a message aside after three crashes if the poison-pill guard is enabled; older workers do not have it. Remove the message manually with the admin CLI, store it for analysis, and upgrade the worker."
+    },
+    {
+      "key": "queue-sqs-visibility",
+      "tenant": "acme",
+      "title": "Jobs processed twice from the task queue",
+      "tags": [
+        "queues"
+      ],
+      "content": "If background jobs run twice, check whether processing takes longer than the visibility timeout of the task queue, currently 60 seconds. The message becomes visible again and a second worker picks it up. Extend visibility while working with ChangeMessageVisibility heartbeats, and make job handlers idempotent anyway."
+    },
+    {
+      "key": "oncall-escalation",
+      "tenant": "acme",
+      "title": "Paging and escalation",
+      "tags": [
+        "oncall"
+      ],
+      "content": "Pages go to the primary on-call of the owning team. If the page is not acknowledged within 15 minutes it escalates to the secondary, and after 30 minutes to the engineering manager. For SEV1 incidents an incident commander from the rotation is assigned immediately and runs the bridge."
+    },
+    {
+      "key": "service-ownership",
+      "tenant": "acme",
+      "title": "Who owns which service",
+      "tags": [
+        "ownership"
+      ],
+      "content": "The service catalog is the source of truth for ownership. payments-api and ledger-worker belong to the Ledger team (Slack #ledger-oncall); the edge gateway and its request throttling belong to the Edge team (#edge-oncall); Redis and PostgreSQL clusters are run by the Data Platform team (#dataplat-oncall). If the catalog entry is empty, page the platform on-call, who will route it."
+    },
+    {
+      "key": "alert-hygiene",
+      "tenant": "acme",
+      "title": "Alert quality rules",
+      "tags": [
+        "monitoring"
+      ],
+      "content": "Every paging alert must link to a runbook and describe user impact. Alerts that fired more than five times in a week without action are reviewed in the weekly operations meeting and either fixed, downgraded to a ticket, or deleted."
+    },
+    {
+      "key": "slo-checkout",
+      "tenant": "acme",
+      "title": "Checkout availability objective",
+      "tags": [
+        "monitoring",
+        "slo"
+      ],
+      "content": "Checkout has a 99.9 percent monthly availability objective, measured as successful payment authorisation requests over all valid requests. When more than half of the monthly error budget is consumed, feature releases for checkout pause and the team works on reliability items until the burn rate falls."
+    },
+    {
+      "key": "postmortem-process",
+      "tenant": "acme",
+      "title": "After an incident",
+      "tags": [
+        "incident"
+      ],
+      "content": "Every SEV1 and SEV2 incident gets a blameless review within five business days. The document includes a timeline, the user impact, contributing factors and action items with owners. Action items are tracked in the reliability board and reviewed monthly."
+    },
+    {
+      "key": "dashboards-golden-signals",
+      "tenant": "acme",
+      "title": "Where to look first",
+      "tags": [
+        "monitoring"
+      ],
+      "content": "The Checkout Golden Signals dashboard shows request rate, error ratio, latency percentiles and saturation for every service on the payment path. Start incident investigation there before opening service-specific dashboards; each panel links to the relevant logs query."
+    },
+    {
+      "key": "status-page-communication",
+      "tenant": "acme",
+      "title": "Status page updates",
+      "tags": [
+        "incident",
+        "communication"
+      ],
+      "content": "Customer-facing status updates are written by the communications lead of the incident, never by the engineer debugging. Use the templates in the status tool: investigating, identified, monitoring, resolved. For SEV1 the first public update goes out within 15 minutes and later updates at least every 30 minutes, even when there is nothing new to say."
+    },
+    {
+      "key": "incident-response-handbook",
+      "tenant": "acme",
+      "title": "Incident response handbook",
+      "tags": [
+        "incident",
+        "handbook"
+      ],
+      "content": "Severity. SEV1 means checkout or payouts are unavailable or wrong for many customers. SEV2 means a major feature is degraded or a single large customer is fully affected. SEV3 covers minor degradations with a workaround. When unsure, pick the higher severity; downgrading later is cheap. Roles. Every SEV1 and SEV2 has an incident commander who coordinates and decides, a communications lead who owns customer and internal updates, and a scribe who keeps the timeline. The commander does not debug. Responders report findings to the commander rather than changing production on their own initiative. First thirty minutes. Open the incident channel and the bridge, page the owning team, and assign the three roles. State the customer impact in one sentence. Look at the golden signals dashboard and the most recent changes: deploys, flag changes and configuration syncs. Prefer mitigation over diagnosis: rolling back, disabling a flag or shifting traffic is better than a perfect root cause found an hour later. Handoffs. Long incidents rotate the commander every four hours. The outgoing commander writes a summary of current hypotheses, actions in flight and next checkpoints in the channel before handing over. Closing. The commander declares the incident resolved when the impact has ended and monitoring has been stable for 30 minutes. The scribe exports the timeline, and the owning team schedules the blameless review."
+    },
+    {
+      "key": "payments-api-runbook",
+      "tenant": "acme",
+      "title": "payments-api operational runbook",
+      "tags": [
+        "payments",
+        "runbook"
+      ],
+      "content": "Overview. payments-api accepts payment creation, capture and refund requests from merchants. It is owned by the Ledger team. It writes to the payments PostgreSQL cluster through PgBouncer, stores idempotency outcomes in a dedicated Redis instance, and publishes every state change to the settlement-events topic in Kafka. Scaling. The horizontal autoscaler keeps between 6 and 40 pods, targeting 65 percent CPU. Scaling beyond 40 pods does not help: the PgBouncer pool, not CPU, becomes the limit, and more pods only queue for connections. Restarting. payments-api is stateless and can be restarted with a rolling restart of its deployment; follow the general procedure for restarting a service safely. Never restart all pods at once during business hours. Dependency failures. If the idempotency Redis instance is unreachable, payment creation is rejected with 503 by design while captures and refunds continue. If PostgreSQL is unreachable, every write fails and the readiness endpoint reports not ready, which removes the pods from the load balancer. If Kafka is unavailable, state changes are kept in the outbox table and published when the brokers recover. Alerts. PaymentsHighErrorRate fires when more than 2 percent of requests fail for five minutes. PaymentsLatency fires when p99 latency stays above 1.5 seconds. Both link back to this runbook. Maintenance mode. deployctl maintenance payments-api on returns 503 with a Retry-After header for writes while reads continue; use it for data repairs. Releases. Releases use progressive delivery. To go back to the previous version, use deployctl rollback as described in the release rollback procedure."
+    },
+    {
+      "key": "globex-redis-rate-limiter",
+      "tenant": "globex",
+      "title": "Globex gateway limiter during cache outages",
+      "tags": [
+        "redis"
+      ],
+      "content": "GLOBEX-CONFIDENTIAL. The Globex gateway rate limiter fails closed when Redis is unreachable: requests above a conservative static limit are rejected with 429 until the cache cluster recovers. The alert is GlobexLimiterDegraded."
+    },
+    {
+      "key": "globex-rollback",
+      "tenant": "globex",
+      "title": "Globex release rollback",
+      "tags": [
+        "deploy"
+      ],
+      "content": "GLOBEX-CONFIDENTIAL. To roll back a Globex release, revert the merge commit and let the pipeline redeploy. Database migrations at Globex are always reversible and are rolled back together with the release."
+    },
+    {
+      "key": "globex-restart-service",
+      "tenant": "globex",
+      "title": "How Globex restarts a service",
+      "tags": [
+        "operations"
+      ],
+      "content": "GLOBEX-CONFIDENTIAL. Globex services are restarted by scaling the deployment to zero and back up during the nightly window. Ask in #globex-ops before restarting anything during the day."
+    },
+    {
+      "key": "globex-oncall",
+      "tenant": "globex",
+      "title": "Globex on-call escalation",
+      "tags": [
+        "oncall"
+      ],
+      "content": "GLOBEX-CONFIDENTIAL. Globex pages go to a shared operations rotation. Unacknowledged pages escalate to the head of engineering after 10 minutes. The incident commander is always the on-call engineer."
+    },
+    {
+      "key": "globex-api-quotas",
+      "tenant": "globex",
+      "title": "Globex API quotas",
+      "tags": [
+        "api"
+      ],
+      "content": "GLOBEX-CONFIDENTIAL. Globex customers may make 1,200 API requests per minute. Quota increases are self-service in the Globex console and take effect immediately."
+    },
+    {
+      "key": "globex-pitr",
+      "tenant": "globex",
+      "title": "Globex database restore",
+      "tags": [
+        "postgresql",
+        "backup"
+      ],
+      "content": "GLOBEX-CONFIDENTIAL. Globex restores the production database by restoring the nightly snapshot over the primary during a maintenance window. Data written after the snapshot is re-imported from the event log."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+# DEV-ONLY lexical ranking experiment, 2026-10-04 (24 dev queries; heldout.json never loaded)
+# Same candidate set for every variant: chunks matching to_tsquery('simple', OR of question words),
+# tenant-filtered, depth candidate_count(5)=20. Only the ORDER BY score differs. Hybrid = RRF(vector, variant).
+# Metrics: document-level means of Recall@1, Recall@5, MRR@5, NDCG@5.
+#
+# V0 score = ts_rank_cd(search_vector, query)                (production at dev run 1)
+# V1 score = ts_rank_cd(search_vector, query, 1)             (divide by 1 + log(length))
+# V2 score = ts_rank_cd(search_vector, query, 2)             (divide by length)
+# V3 score = ts_rank(search_vector, query)                   (ADOPTED)
+# V4 V0 after dropping query terms present in >50% of the tenant's chunks
+# V5 score = sum over terms of ln((N+1)/(df+0.5)) * matches(term)   (IDF-weighted presence)
+#
+variant                                    lexical R@1 R@5 MRR NDCG       hybrid R@1 R@5 MRR NDCG
+V0 ts_rank_cd norm0 (production)           [0.344, 0.542, 0.497, 0.435]   [0.344, 0.604, 0.484, 0.472]
+V1 ts_rank_cd norm1 (1+log len)            [0.385, 0.615, 0.556, 0.497]   [0.385, 0.594, 0.498, 0.485]
+V2 ts_rank_cd norm2 (len)                  [0.385, 0.521, 0.493, 0.466]   [0.427, 0.552, 0.503, 0.497]
+V3 ts_rank norm0                           [0.521, 0.674, 0.696, 0.618]   [0.385, 0.628, 0.529, 0.526]
+V4 drop terms in >50% of chunks + norm0    [0.427, 0.694, 0.604, 0.594]   [0.448, 0.628, 0.585, 0.554]
+V5 IDF-weighted term sum                   [0.542, 0.767, 0.722, 0.683]   [0.458, 0.733, 0.663, 0.608]
+#
+# Decision: V3. Mechanism (not score) is the justification: with OR queries every occurrence of any
+# word is a "cover" for ts_rank_cd, so it degenerates to occurrence counting and favours long,
+# stopword-dense chunks; ts_rank's OR path saturates per-term frequency and averages over terms.
+# V5 is better on dev but adds a per-query document-frequency round trip and new SQL construction;
+# recorded as a recommendation (IDF/BM25), not adopted. 6 variants were compared on dev only.

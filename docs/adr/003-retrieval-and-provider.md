@@ -13,8 +13,9 @@ isolation easier to reason about. They cost linear distance computation per tena
 no performance claim or ANN tuning is made. The simple dictionary is language-independent
 but has no stemming and no stopword list. Because of that, AND semantics
 (`websearch_to_tsquery`) made natural-language questions match nothing; validation replaced
-it with OR over the question's word tokens, ranked by `ts_rank_cd` (no IDF, so stopword-only
-overlap ranks low but can still match). RRF's 60 is the constant from Cormack, Clarke &
+it with OR over the question's word tokens. Under OR, `ts_rank_cd` cover density degenerated
+to occurrence counting and favoured long, stopword-dense chunks, so ranking moved to `ts_rank`,
+decided on the retrieval-v2 dev split (docs/evaluation/retrieval-v2.md). There is still no IDF. RRF's 60 is the constant from Cormack, Clarke &
 Buettcher (SIGIR 2009), kept as the `rrf()` default rather than tuned. Chunking uses lossless character windows, at the cost of poor structural
 boundaries and no token-aware optimization.
 

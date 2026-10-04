@@ -1,0 +1,2534 @@
+{
+  "benchmark": "retrieval-v2",
+  "split": "heldout",
+  "k": 5,
+  "freeze_manifest_sha256": "53d1042a30a047b1458da355685cd3416fd70ebb6c5458169b2c1b2fad2b1809",
+  "fingerprint": {
+    "dataset": {
+      "corpus.json": "eea076115b6928905f11a940d2108197dc4ac02960e01cecb35ab5c0e722d845",
+      "dev.json": "e0e409d26b18068b316106c7024d0657be28c973f1694f8b03932e8d72793c77",
+      "heldout.json": "b21714eb234648a65b77e270be35eb8fddc123180b437b59ca0093b6f35b9915"
+    },
+    "sources": {
+      "application.py": "56d728d2aceced83eb1057e17857023d2590d936258db8caacb7569b43c1a6a3",
+      "benchmark.py": "f722f446fc2667c8332b5294f9bef4b2a9f44238e1cc2c8fd31dbba04d1b1cce",
+      "chunking.py": "9bf414290ffa409e0aae0825afe7dc346353d99d609c8c3621ded2a54e13dfbe",
+      "domain.py": "5b359356a80bb7dde17a611e23a395fd8610f22a010407d62fdadcb53a8538b7",
+      "evaluation.py": "a78bcdc6a40eede0eacf604574915e6be1ff6c995c6c09e5fbdd80855e544e2f",
+      "persistence/postgres.py": "473fc7138ab95345189dcdff8dadfaaf751cf05793fe699ab26e073519c5d312",
+      "persistence/schema.sql": "35b22ec1e31d4d683464ea8eaf809eaef5598fe9b1379e76a3cac6788ba30e5f",
+      "providers/fake.py": "bbe8730b69e189a0d7b31b88ececdfd6a9551e60648c07f30a0f19a49487bccb",
+      "retrieval.py": "7081924dce15b2fbb4197f024eb606a8616327ded6e90a46d367e3709de2e8af"
+    },
+    "config": {
+      "k": 5,
+      "candidates_per_branch": 20,
+      "rrf_constant": 60,
+      "chunk_size": 1200,
+      "chunk_overlap": 200,
+      "embedding_space": "fake:sha256-bow-v1:256",
+      "lexical": "to_tsquery('simple') OR of question word tokens, ts_rank",
+      "vector": "exact cosine distance (pgvector <=>)",
+      "metrics": "document level; Recall@1/3/5, MRR@5, NDCG@5 (gain 2^g-1)"
+    }
+  },
+  "dataset": {
+    "queries": 36,
+    "queries_by_type": {
+      "ambiguous": 6,
+      "hard_negative": 6,
+      "identifier": 6,
+      "multi_relevant": 6,
+      "paraphrase": 6,
+      "explicit_terms": 6
+    },
+    "corpus_documents": {
+      "acme": 64,
+      "globex": 6
+    },
+    "corpus_chunks": {
+      "acme": 68,
+      "globex": 6
+    },
+    "relevant_per_query_mean": 1.7777777777777777,
+    "grade2_per_query_mean": 1.1666666666666667,
+    "queries_with_hard_negatives": 33,
+    "question_word_overlap_with_grade2_documents_by_type": {
+      "ambiguous": 0.4583333333333333,
+      "explicit_terms": 0.6291666666666667,
+      "hard_negative": 0.4697811447811448,
+      "identifier": 1.0,
+      "multi_relevant": 0.5180976430976431,
+      "paraphrase": 0.31538865546218486
+    }
+  },
+  "strategies": {
+    "lexical": {
+      "overall": {
+        "recall@1": 0.5319444444444444,
+        "recall@3": 0.6625000000000001,
+        "recall@5": 0.7643518518518518,
+        "mrr@5": 0.7532407407407408,
+        "ndcg@5": 0.7123858499080311,
+        "n": 36
+      },
+      "by_type": {
+        "ambiguous": {
+          "recall@1": 0.12222222222222223,
+          "recall@3": 0.26666666666666666,
+          "recall@5": 0.43333333333333335,
+          "mrr@5": 0.5416666666666666,
+          "ndcg@5": 0.42754217462393096,
+          "n": 6
+        },
+        "explicit_terms": {
+          "recall@1": 0.8333333333333334,
+          "recall@3": 0.9166666666666666,
+          "recall@5": 0.9166666666666666,
+          "mrr@5": 0.9166666666666666,
+          "ndcg@5": 0.9202160047690534,
+          "n": 6
+        },
+        "hard_negative": {
+          "recall@1": 0.8333333333333334,
+          "recall@3": 0.8333333333333334,
+          "recall@5": 0.8333333333333334,
+          "mrr@5": 0.8333333333333334,
+          "ndcg@5": 0.8333333333333334,
+          "n": 6
+        },
+        "identifier": {
+          "recall@1": 0.8333333333333334,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0,
+          "n": 6
+        },
+        "multi_relevant": {
+          "recall@1": 0.23611111111111108,
+          "recall@3": 0.2916666666666667,
+          "recall@5": 0.40277777777777773,
+          "mrr@5": 0.7083333333333334,
+          "ndcg@5": 0.4569686925038802,
+          "n": 6
+        },
+        "paraphrase": {
+          "recall@1": 0.3333333333333333,
+          "recall@3": 0.6666666666666666,
+          "recall@5": 1.0,
+          "mrr@5": 0.5194444444444445,
+          "ndcg@5": 0.6362548942179891,
+          "n": 6
+        }
+      },
+      "queries_without_relevant_in_top5": 4,
+      "hard_negative_outranks_relevant": {
+        "queries": 3,
+        "of": 33
+      }
+    },
+    "vector": {
+      "overall": {
+        "recall@1": 0.30648148148148147,
+        "recall@3": 0.39305555555555555,
+        "recall@5": 0.44027777777777777,
+        "mrr@5": 0.4375,
+        "ndcg@5": 0.42474655881873624,
+        "n": 36
+      },
+      "by_type": {
+        "ambiguous": {
+          "recall@1": 0.08888888888888889,
+          "recall@3": 0.2333333333333333,
+          "recall@5": 0.26666666666666666,
+          "mrr@5": 0.3333333333333333,
+          "ndcg@5": 0.29527063378414403,
+          "n": 6
+        },
+        "explicit_terms": {
+          "recall@1": 0.6666666666666666,
+          "recall@3": 0.8333333333333334,
+          "recall@5": 0.8333333333333334,
+          "mrr@5": 0.75,
+          "ndcg@5": 0.7718216255952429,
+          "n": 6
+        },
+        "hard_negative": {
+          "recall@1": 0.5,
+          "recall@3": 0.6666666666666666,
+          "recall@5": 0.6666666666666666,
+          "mrr@5": 0.5833333333333334,
+          "ndcg@5": 0.6051549589285762,
+          "n": 6
+        },
+        "identifier": {
+          "recall@1": 0.5,
+          "recall@3": 0.5,
+          "recall@5": 0.6666666666666666,
+          "mrr@5": 0.6666666666666666,
+          "ndcg@5": 0.6482826521865287,
+          "n": 6
+        },
+        "multi_relevant": {
+          "recall@1": 0.08333333333333333,
+          "recall@3": 0.125,
+          "recall@5": 0.20833333333333334,
+          "mrr@5": 0.2916666666666667,
+          "ndcg@5": 0.22794948241792545,
+          "n": 6
+        },
+        "paraphrase": {
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0,
+          "n": 6
+        }
+      },
+      "queries_without_relevant_in_top5": 18,
+      "hard_negative_outranks_relevant": {
+        "queries": 2,
+        "of": 33
+      }
+    },
+    "hybrid": {
+      "overall": {
+        "recall@1": 0.4115740740740741,
+        "recall@3": 0.5523148148148148,
+        "recall@5": 0.6773148148148148,
+        "mrr@5": 0.6305555555555555,
+        "ndcg@5": 0.6102875876139437,
+        "n": 36
+      },
+      "by_type": {
+        "ambiguous": {
+          "recall@1": 0.12222222222222223,
+          "recall@3": 0.3833333333333333,
+          "recall@5": 0.4666666666666666,
+          "mrr@5": 0.5555555555555556,
+          "ndcg@5": 0.44414278191616113,
+          "n": 6
+        },
+        "explicit_terms": {
+          "recall@1": 0.8333333333333334,
+          "recall@3": 0.9166666666666666,
+          "recall@5": 0.9166666666666666,
+          "mrr@5": 0.8888888888888888,
+          "ndcg@5": 0.9021862214273799,
+          "n": 6
+        },
+        "hard_negative": {
+          "recall@1": 0.6666666666666666,
+          "recall@3": 0.6666666666666666,
+          "recall@5": 0.8333333333333334,
+          "mrr@5": 0.7083333333333334,
+          "ndcg@5": 0.7384460930122322,
+          "n": 6
+        },
+        "identifier": {
+          "recall@1": 0.6666666666666666,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 0.8888888888888888,
+          "ndcg@5": 0.9166666666666666,
+          "n": 6
+        },
+        "multi_relevant": {
+          "recall@1": 0.18055555555555555,
+          "recall@3": 0.18055555555555555,
+          "recall@5": 0.34722222222222215,
+          "mrr@5": 0.5750000000000001,
+          "ndcg@5": 0.4115699510415152,
+          "n": 6
+        },
+        "paraphrase": {
+          "recall@1": 0.0,
+          "recall@3": 0.16666666666666666,
+          "recall@5": 0.5,
+          "mrr@5": 0.16666666666666666,
+          "ndcg@5": 0.24871381161970726,
+          "n": 6
+        }
+      },
+      "queries_without_relevant_in_top5": 7,
+      "hard_negative_outranks_relevant": {
+        "queries": 3,
+        "of": 33
+      }
+    }
+  },
+  "hybrid_diagnostics": {
+    "lexical_branch_empty": 0,
+    "vector_branch_empty": 0,
+    "hybrid_identical_to_vector": 2,
+    "hybrid_identical_to_lexical": 0,
+    "queries": 36,
+    "rrf_recomputation_mismatches": 0
+  },
+  "queries": [
+    {
+      "id": "ambig-02",
+      "type": "ambiguous",
+      "question": "certificate expired",
+      "relevance": {
+        "auth-saml-cert-expiry": 2,
+        "redis-tls-rotation": 1,
+        "net-tls-chain": 1
+      },
+      "hard_negatives": [
+        "auth-signing-key-rotation",
+        "k8s-imagepull"
+      ],
+      "lexical_candidates": 5,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "auth-saml-cert-expiry",
+            "redis-tls-rotation",
+            "net-tls-chain",
+            "secrets-vault-db-credentials",
+            "k8s-imagepull"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.3333333333333333,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "auth-saml-cert-expiry",
+            "redis-tls-rotation",
+            "net-tls-chain",
+            "ci-deploy-token-scope",
+            "service-ownership"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.3333333333333333,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "hybrid": {
+          "ranked": [
+            "auth-saml-cert-expiry",
+            "redis-tls-rotation",
+            "net-tls-chain",
+            "secrets-vault-db-credentials",
+            "ci-deploy-token-scope"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.3333333333333333,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        }
+      }
+    },
+    {
+      "id": "ambig-04",
+      "type": "ambiguous",
+      "question": "who do I contact about the rate limiter?",
+      "relevance": {
+        "service-ownership": 2,
+        "oncall-escalation": 1
+      },
+      "hard_negatives": [
+        "api-customer-rate-limits",
+        "redis-rate-limiter-fail-open",
+        "rate-limit-internal-services"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "service-restart-procedure",
+            "deploy-canary",
+            "auth-mfa-sms-outage",
+            "rate-limit-internal-services",
+            "incident-response-handbook"
+          ],
+          "hard_negative_outranks_relevant": true,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "vector": {
+          "ranked": [
+            "deploy-config-drift",
+            "auth-mfa-sms-outage",
+            "k8s-imagepull",
+            "api-idempotency",
+            "postgres-pitr"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "auth-mfa-sms-outage",
+            "k8s-imagepull",
+            "postgres-pitr",
+            "incident-response-handbook",
+            "queue-poison-message"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        }
+      }
+    },
+    {
+      "id": "ambig-07",
+      "type": "ambiguous",
+      "question": "secret rotation",
+      "relevance": {
+        "secrets-handling-standard": 2,
+        "secrets-webhook-signing-rotation": 2,
+        "secrets-vault-db-credentials": 1,
+        "auth-signing-key-rotation": 1,
+        "secrets-leaked-api-key": 1
+      },
+      "hard_negatives": [
+        "redis-tls-rotation",
+        "k8s-imagepull"
+      ],
+      "lexical_candidates": 8,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "secrets-webhook-signing-rotation",
+            "secrets-handling-standard",
+            "k8s-imagepull",
+            "k8s-crashloop-missing-secret"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.2,
+          "recall@3": 0.4,
+          "recall@5": 0.4,
+          "mrr@5": 1.0,
+          "ndcg@5": 0.7878483464942911
+        },
+        "vector": {
+          "ranked": [
+            "secrets-webhook-signing-rotation",
+            "rate-limit-internal-services",
+            "auth-signing-key-rotation",
+            "secrets-handling-standard",
+            "k8s-crashloop-missing-secret"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.2,
+          "recall@3": 0.4,
+          "recall@5": 0.6,
+          "mrr@5": 1.0,
+          "ndcg@5": 0.7716238027048642
+        },
+        "hybrid": {
+          "ranked": [
+            "secrets-webhook-signing-rotation",
+            "secrets-handling-standard",
+            "auth-signing-key-rotation",
+            "k8s-crashloop-missing-secret"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.2,
+          "recall@3": 0.6,
+          "recall@5": 0.6,
+          "mrr@5": 1.0,
+          "ndcg@5": 0.8683595134906049
+        }
+      }
+    },
+    {
+      "id": "ambig-08",
+      "type": "ambiguous",
+      "question": "login problems",
+      "relevance": {
+        "auth-saml-cert-expiry": 1,
+        "auth-account-lockout": 1,
+        "auth-mfa-sms-outage": 1,
+        "redis-session-eviction": 1,
+        "auth-samesite-iframe": 1
+      },
+      "hard_negatives": [
+        "auth-signing-key-rotation"
+      ],
+      "lexical_candidates": 1,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "auth-saml-cert-expiry"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.2,
+          "recall@3": 0.2,
+          "recall@5": 0.2,
+          "mrr@5": 1.0,
+          "ndcg@5": 0.3391602052736161
+        },
+        "vector": {
+          "ranked": [
+            "secrets-vault-db-credentials",
+            "payments-api-runbook",
+            "deploy-rollback",
+            "k8s-crashloop-missing-secret",
+            "rate-limit-internal-services"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "auth-saml-cert-expiry",
+            "secrets-vault-db-credentials",
+            "payments-api-runbook",
+            "deploy-rollback",
+            "k8s-crashloop-missing-secret"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.2,
+          "recall@3": 0.2,
+          "recall@5": 0.2,
+          "mrr@5": 1.0,
+          "ndcg@5": 0.3391602052736161
+        }
+      }
+    },
+    {
+      "id": "ambig-09",
+      "type": "ambiguous",
+      "question": "deployment is blocked",
+      "relevance": {
+        "ci-image-signing": 1,
+        "deploy-freeze-window": 1,
+        "ci-flaky-tests": 1
+      },
+      "hard_negatives": [
+        "deploy-rollback"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "payments-api-runbook",
+            "k8s-crashloop-missing-secret",
+            "service-restart-procedure",
+            "iam-s3-access-denied",
+            "incident-response-handbook"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "vector": {
+          "ranked": [
+            "postgres-wal-disk-full",
+            "payments-api-runbook",
+            "deploy-feature-flag-kill-switch",
+            "redis-idempotency-cache",
+            "k8s-probes"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "payments-api-runbook",
+            "postgres-wal-disk-full",
+            "iam-s3-access-denied",
+            "service-restart-procedure",
+            "postgres-pitr"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        }
+      }
+    },
+    {
+      "id": "ambig-10",
+      "type": "ambiguous",
+      "question": "502 errors",
+      "relevance": {
+        "net-lb-healthcheck": 2,
+        "api-5xx-triage": 1
+      },
+      "hard_negatives": [
+        "api-gateway-timeout"
+      ],
+      "lexical_candidates": 7,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "deploy-canary",
+            "postgres-deadlocks-ledger",
+            "net-coredns",
+            "api-5xx-triage",
+            "net-lb-healthcheck"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 1.0,
+          "mrr@5": 0.25,
+          "ndcg@5": 0.4382444959756785
+        },
+        "vector": {
+          "ranked": [
+            "api-gateway-timeout",
+            "deploy-freeze-window",
+            "net-coredns",
+            "k8s-node-pressure",
+            "postgres-wraparound"
+          ],
+          "hard_negative_outranks_relevant": true,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "net-coredns",
+            "postgres-deadlocks-ledger",
+            "api-5xx-triage",
+            "deploy-canary",
+            "net-lb-healthcheck"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.5,
+          "recall@5": 1.0,
+          "mrr@5": 0.3333333333333333,
+          "ndcg@5": 0.4573369727327457
+        }
+      }
+    },
+    {
+      "id": "hardneg-02",
+      "type": "hard_negative",
+      "question": "After a Redis replica was promoted, our writes fail because the node is read-only",
+      "relevance": {
+        "redis-sentinel-failover": 2
+      },
+      "hard_negatives": [
+        "postgres-replica-lag",
+        "redis-tls-rotation"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "redis-sentinel-failover",
+            "redis-rate-limiter-fail-open",
+            "payments-api-runbook",
+            "postgres-pitr",
+            "ci-flaky-tests"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "ci-flaky-tests",
+            "redis-sentinel-failover",
+            "net-tls-chain",
+            "redis-rate-limiter-fail-open",
+            "postgres-replica-lag"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 0.5,
+          "ndcg@5": 0.6309297535714574
+        },
+        "hybrid": {
+          "ranked": [
+            "redis-sentinel-failover",
+            "ci-flaky-tests",
+            "redis-rate-limiter-fail-open",
+            "net-tls-chain",
+            "postgres-pitr"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        }
+      }
+    },
+    {
+      "id": "hardneg-03",
+      "type": "hard_negative",
+      "question": "Can the support desk unlock an administrator who locked themselves out?",
+      "relevance": {
+        "auth-account-lockout": 2
+      },
+      "hard_negatives": [
+        "access-break-glass",
+        "auth-mfa-sms-outage"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "auth-account-lockout",
+            "auth-saml-cert-expiry",
+            "incident-response-handbook",
+            "redis-session-eviction",
+            "deploy-config-drift"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "auth-account-lockout",
+            "auth-samesite-iframe",
+            "secrets-leaked-api-key",
+            "incident-response-handbook",
+            "auth-mfa-sms-outage"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "hybrid": {
+          "ranked": [
+            "auth-account-lockout",
+            "incident-response-handbook",
+            "auth-samesite-iframe",
+            "api-idempotency",
+            "api-5xx-triage"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        }
+      }
+    },
+    {
+      "id": "hardneg-05",
+      "type": "hard_negative",
+      "question": "The build machines are out of disk space",
+      "relevance": {
+        "ci-runner-disk-full": 2
+      },
+      "hard_negatives": [
+        "postgres-wal-disk-full",
+        "k8s-node-pressure"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "postgres-pitr",
+            "status-page-communication",
+            "deploy-freeze-window",
+            "catalog-cache-stampede",
+            "secrets-handling-standard"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "vector": {
+          "ranked": [
+            "net-lb-healthcheck",
+            "catalog-cache-stampede",
+            "payments-api-runbook",
+            "oncall-escalation",
+            "postgres-pitr"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "postgres-pitr",
+            "catalog-cache-stampede",
+            "deploy-freeze-window",
+            "status-page-communication",
+            "payments-api-runbook"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        }
+      }
+    },
+    {
+      "id": "hardneg-06",
+      "type": "hard_negative",
+      "question": "Merchants receive the same webhook event twice; what is our delivery guarantee?",
+      "relevance": {
+        "api-webhook-retries": 2
+      },
+      "hard_negatives": [
+        "api-idempotency",
+        "queue-sqs-visibility",
+        "secrets-webhook-signing-rotation"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "api-webhook-retries",
+            "api-idempotency",
+            "payments-api-runbook",
+            "postgres-pitr",
+            "secrets-handling-standard"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "api-webhook-retries",
+            "postgres-pitr",
+            "postgres-deadlocks-ledger",
+            "oncall-escalation",
+            "k8s-imagepull"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "hybrid": {
+          "ranked": [
+            "api-webhook-retries",
+            "postgres-deadlocks-ledger",
+            "postgres-pitr",
+            "api-idempotency",
+            "deploy-config-drift"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        }
+      }
+    },
+    {
+      "id": "hardneg-07",
+      "type": "hard_negative",
+      "question": "Can we raise the gateway timeout so slow bulk exports finish?",
+      "relevance": {
+        "api-gateway-timeout": 2
+      },
+      "hard_negatives": [
+        "api-customer-rate-limits"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "api-gateway-timeout",
+            "api-webhook-retries",
+            "redis-rate-limiter-fail-open",
+            "auth-saml-cert-expiry",
+            "redis-session-eviction"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "api-gateway-timeout",
+            "k8s-oomkilled",
+            "incident-response-handbook",
+            "postgres-pitr",
+            "redis-rate-limiter-fail-open"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "hybrid": {
+          "ranked": [
+            "api-gateway-timeout",
+            "redis-rate-limiter-fail-open",
+            "redis-session-eviction",
+            "postgres-pitr",
+            "incident-response-handbook"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        }
+      }
+    },
+    {
+      "id": "hardneg-09",
+      "type": "hard_negative",
+      "question": "Changes I made with kubectl edit keep undoing themselves",
+      "relevance": {
+        "deploy-config-drift": 2
+      },
+      "hard_negatives": [
+        "deploy-rollback",
+        "k8s-crashloop-missing-secret"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "deploy-config-drift",
+            "secrets-handling-standard",
+            "incident-response-handbook",
+            "payments-api-runbook",
+            "postgres-pitr"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "api-customer-rate-limits",
+            "net-egress-allowlist",
+            "auth-samesite-iframe",
+            "postgres-wal-disk-full",
+            "postgres-replica-lag"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "net-egress-allowlist",
+            "postgres-replica-lag",
+            "auth-samesite-iframe",
+            "deploy-config-drift",
+            "postgres-wal-disk-full"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 1.0,
+          "mrr@5": 0.25,
+          "ndcg@5": 0.4306765580733931
+        }
+      }
+    },
+    {
+      "id": "ident-02",
+      "type": "identifier",
+      "question": "RateLimiterFailOpen",
+      "relevance": {
+        "redis-rate-limiter-fail-open": 2
+      },
+      "hard_negatives": [
+        "rate-limit-internal-services"
+      ],
+      "lexical_candidates": 1,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "redis-rate-limiter-fail-open"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "service-ownership",
+            "auth-samesite-iframe",
+            "auth-account-lockout",
+            "redis-session-eviction",
+            "api-webhook-retries"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "redis-rate-limiter-fail-open",
+            "service-ownership",
+            "auth-samesite-iframe",
+            "auth-account-lockout",
+            "redis-session-eviction"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        }
+      }
+    },
+    {
+      "id": "ident-03",
+      "type": "identifier",
+      "question": "SAML_SIGNATURE_INVALID in the login service",
+      "relevance": {
+        "auth-saml-cert-expiry": 2
+      },
+      "hard_negatives": [],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "auth-saml-cert-expiry",
+            "postgres-deadlocks-ledger",
+            "payments-api-runbook",
+            "auth-signing-key-rotation",
+            "deploy-feature-flag-kill-switch"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "postgres-deadlocks-ledger",
+            "k8s-crashloop-missing-secret",
+            "secrets-webhook-signing-rotation",
+            "postgres-pitr",
+            "k8s-imagepull"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "postgres-deadlocks-ledger",
+            "payments-api-runbook",
+            "auth-saml-cert-expiry",
+            "auth-signing-key-rotation",
+            "postgres-pitr"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 0.3333333333333333,
+          "ndcg@5": 0.5
+        }
+      }
+    },
+    {
+      "id": "ident-04",
+      "type": "identifier",
+      "question": "PX-ACQ-02",
+      "relevance": {
+        "net-vpn-flapping": 2
+      },
+      "hard_negatives": [],
+      "lexical_candidates": 1,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "net-vpn-flapping"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "net-vpn-flapping",
+            "k8s-oomkilled",
+            "payments-api-runbook",
+            "redis-idempotency-cache",
+            "queue-sqs-visibility"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "hybrid": {
+          "ranked": [
+            "net-vpn-flapping",
+            "k8s-oomkilled",
+            "payments-api-runbook",
+            "redis-idempotency-cache",
+            "queue-sqs-visibility"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        }
+      }
+    },
+    {
+      "id": "ident-06",
+      "type": "identifier",
+      "question": "pg_drop_replication_slot",
+      "relevance": {
+        "postgres-wal-disk-full": 2
+      },
+      "hard_negatives": [],
+      "lexical_candidates": 1,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "postgres-wal-disk-full"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "postgres-wal-disk-full",
+            "queue-sqs-visibility",
+            "api-gateway-timeout",
+            "k8s-node-pressure",
+            "secrets-handling-standard"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "hybrid": {
+          "ranked": [
+            "postgres-wal-disk-full",
+            "queue-sqs-visibility",
+            "api-gateway-timeout",
+            "k8s-node-pressure",
+            "secrets-handling-standard"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        }
+      }
+    },
+    {
+      "id": "ident-07",
+      "type": "identifier",
+      "question": "deployctl rollback payments-api --to",
+      "relevance": {
+        "deploy-rollback": 2,
+        "payments-api-runbook": 1
+      },
+      "hard_negatives": [
+        "service-restart-procedure"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "deploy-rollback",
+            "payments-api-runbook",
+            "postgres-pitr",
+            "service-restart-procedure"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.5,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "deploy-rollback",
+            "service-ownership",
+            "service-restart-procedure",
+            "payments-api-runbook",
+            "secrets-handling-standard"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.5,
+          "recall@3": 0.5,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 0.944847956559586
+        },
+        "hybrid": {
+          "ranked": [
+            "deploy-rollback",
+            "payments-api-runbook",
+            "service-ownership",
+            "service-restart-procedure",
+            "postgres-pitr"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.5,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        }
+      }
+    },
+    {
+      "id": "ident-10",
+      "type": "identifier",
+      "question": "settlement-events topic",
+      "relevance": {
+        "queue-kafka-lag": 2,
+        "payments-api-runbook": 1
+      },
+      "hard_negatives": [
+        "net-vpn-flapping"
+      ],
+      "lexical_candidates": 7,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "queue-kafka-lag",
+            "payments-api-runbook",
+            "redis-sentinel-failover",
+            "api-webhook-retries",
+            "net-vpn-flapping"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.5,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "queue-kafka-lag",
+            "deploy-canary",
+            "postgres-connection-exhaustion",
+            "payments-api-runbook",
+            "iam-s3-access-denied"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.5,
+          "recall@3": 0.5,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 0.944847956559586
+        },
+        "hybrid": {
+          "ranked": [
+            "queue-kafka-lag",
+            "payments-api-runbook",
+            "api-webhook-retries",
+            "secrets-webhook-signing-rotation",
+            "net-vpn-flapping"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.5,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        }
+      }
+    },
+    {
+      "id": "multi-01",
+      "type": "multi_relevant",
+      "question": "What should happen in the first half hour of a SEV1?",
+      "relevance": {
+        "incident-response-handbook": 2,
+        "oncall-escalation": 2,
+        "status-page-communication": 2,
+        "api-5xx-triage": 1
+      },
+      "hard_negatives": [
+        "postmortem-process"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "incident-response-handbook",
+            "postgres-pitr",
+            "catalog-cache-stampede"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.25,
+          "recall@3": 0.25,
+          "recall@5": 0.25,
+          "mrr@5": 1.0,
+          "ndcg@5": 0.4396592698888862
+        },
+        "vector": {
+          "ranked": [
+            "auth-saml-cert-expiry",
+            "incident-response-handbook",
+            "secrets-webhook-signing-rotation",
+            "k8s-crashloop-missing-secret"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.25,
+          "recall@5": 0.25,
+          "mrr@5": 0.5,
+          "ndcg@5": 0.27739411480640186
+        },
+        "hybrid": {
+          "ranked": [
+            "incident-response-handbook",
+            "postgres-pitr",
+            "secrets-handling-standard"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.25,
+          "recall@3": 0.25,
+          "recall@5": 0.25,
+          "mrr@5": 1.0,
+          "ndcg@5": 0.4396592698888862
+        }
+      }
+    },
+    {
+      "id": "multi-02",
+      "type": "multi_relevant",
+      "question": "Which credentials are rotated with a period where both the old and new value are accepted?",
+      "relevance": {
+        "auth-signing-key-rotation": 2,
+        "secrets-webhook-signing-rotation": 2,
+        "secrets-handling-standard": 2
+      },
+      "hard_negatives": [
+        "secrets-leaked-api-key",
+        "redis-tls-rotation",
+        "secrets-vault-db-credentials"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "secrets-handling-standard",
+            "postgres-pitr",
+            "postgres-migration-locks",
+            "redis-sentinel-failover",
+            "payments-api-runbook"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.3333333333333333,
+          "recall@3": 0.3333333333333333,
+          "recall@5": 0.3333333333333333,
+          "mrr@5": 1.0,
+          "ndcg@5": 0.4692787260227565
+        },
+        "vector": {
+          "ranked": [
+            "ci-flaky-tests",
+            "postgres-migration-locks",
+            "redis-sentinel-failover",
+            "postgres-pitr",
+            "postgres-connection-exhaustion"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "postgres-migration-locks",
+            "postgres-pitr",
+            "redis-sentinel-failover",
+            "secrets-handling-standard",
+            "ci-flaky-tests"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.3333333333333333,
+          "mrr@5": 0.25,
+          "ndcg@5": 0.20210734650054762
+        }
+      }
+    },
+    {
+      "id": "multi-04",
+      "type": "multi_relevant",
+      "question": "What rules must database schema changes follow so releases can be deployed and reverted safely?",
+      "relevance": {
+        "postgres-migration-locks": 2,
+        "deploy-rollback": 2
+      },
+      "hard_negatives": [
+        "deploy-canary",
+        "postgres-pitr"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "payments-api-runbook",
+            "api-webhook-retries",
+            "deploy-freeze-window",
+            "postgres-pitr",
+            "secrets-handling-standard"
+          ],
+          "hard_negative_outranks_relevant": true,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "vector": {
+          "ranked": [
+            "api-webhook-retries",
+            "api-gateway-timeout",
+            "redis-idempotency-cache",
+            "postgres-migration-locks",
+            "ci-deploy-token-scope"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.5,
+          "mrr@5": 0.25,
+          "ndcg@5": 0.26406812257259094
+        },
+        "hybrid": {
+          "ranked": [
+            "api-webhook-retries",
+            "postgres-pitr",
+            "payments-api-runbook",
+            "redis-idempotency-cache",
+            "api-gateway-timeout"
+          ],
+          "hard_negative_outranks_relevant": true,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        }
+      }
+    },
+    {
+      "id": "multi-08",
+      "type": "multi_relevant",
+      "question": "Someone deleted payment rows by mistake. What is the complete recovery process?",
+      "relevance": {
+        "postgres-pitr": 2,
+        "incident-response-handbook": 1
+      },
+      "hard_negatives": [
+        "postgres-wal-disk-full",
+        "deploy-rollback"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "postgres-pitr",
+            "payments-api-runbook",
+            "secrets-handling-standard",
+            "redis-rate-limiter-fail-open"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.5,
+          "recall@3": 0.5,
+          "recall@5": 0.5,
+          "mrr@5": 1.0,
+          "ndcg@5": 0.8262346571285599
+        },
+        "vector": {
+          "ranked": [
+            "postgres-pitr",
+            "oncall-escalation",
+            "secrets-handling-standard",
+            "postgres-wal-disk-full"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.5,
+          "recall@3": 0.5,
+          "recall@5": 0.5,
+          "mrr@5": 1.0,
+          "ndcg@5": 0.8262346571285599
+        },
+        "hybrid": {
+          "ranked": [
+            "postgres-pitr",
+            "secrets-handling-standard",
+            "payments-api-runbook",
+            "postgres-wal-disk-full"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.5,
+          "recall@3": 0.5,
+          "recall@5": 0.5,
+          "mrr@5": 1.0,
+          "ndcg@5": 0.8262346571285599
+        }
+      }
+    },
+    {
+      "id": "multi-09",
+      "type": "multi_relevant",
+      "question": "What happens to messages or events that keep failing to be processed or delivered?",
+      "relevance": {
+        "queue-rabbitmq-dlq": 2,
+        "queue-poison-message": 2,
+        "api-webhook-retries": 2
+      },
+      "hard_negatives": [
+        "queue-sqs-visibility",
+        "queue-kafka-lag"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "postgres-pitr",
+            "redis-sentinel-failover",
+            "secrets-handling-standard",
+            "api-webhook-retries",
+            "secrets-webhook-signing-rotation"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.3333333333333333,
+          "mrr@5": 0.25,
+          "ndcg@5": 0.20210734650054762
+        },
+        "vector": {
+          "ranked": [
+            "auth-samesite-iframe",
+            "alert-hygiene",
+            "k8s-oomkilled",
+            "redis-sentinel-failover",
+            "secrets-handling-standard"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "redis-sentinel-failover",
+            "secrets-handling-standard",
+            "postgres-pitr",
+            "alert-hygiene",
+            "api-webhook-retries"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.3333333333333333,
+          "mrr@5": 0.2,
+          "ndcg@5": 0.1815417925373527
+        }
+      }
+    },
+    {
+      "id": "multi-10",
+      "type": "multi_relevant",
+      "question": "What are the rules for getting access to production?",
+      "relevance": {
+        "access-break-glass": 2,
+        "ci-deploy-token-scope": 1,
+        "secrets-handling-standard": 1
+      },
+      "hard_negatives": [
+        "iam-s3-access-denied",
+        "net-egress-allowlist"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "secrets-handling-standard",
+            "access-break-glass",
+            "incident-response-handbook",
+            "ci-deploy-token-scope",
+            "postgres-pitr"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.3333333333333333,
+          "recall@3": 0.6666666666666666,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 0.804532155482531
+        },
+        "vector": {
+          "ranked": [
+            "queue-kafka-lag",
+            "queue-sqs-visibility",
+            "payments-api-runbook",
+            "net-lb-healthcheck",
+            "oncall-escalation"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "access-break-glass",
+            "payments-api-runbook",
+            "queue-kafka-lag",
+            "catalog-cache-stampede",
+            "ci-deploy-token-scope"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.3333333333333333,
+          "recall@3": 0.3333333333333333,
+          "recall@5": 0.6666666666666666,
+          "mrr@5": 1.0,
+          "ndcg@5": 0.819876640193745
+        }
+      }
+    },
+    {
+      "id": "para-02",
+      "type": "paraphrase",
+      "question": "People keep getting signed out of the web app every few minutes. What is going on?",
+      "relevance": {
+        "redis-session-eviction": 2
+      },
+      "hard_negatives": [
+        "auth-samesite-iframe",
+        "auth-account-lockout"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "postgres-pitr",
+            "incident-response-handbook",
+            "status-page-communication",
+            "redis-session-eviction",
+            "rate-limit-internal-services"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 1.0,
+          "mrr@5": 0.25,
+          "ndcg@5": 0.4306765580733931
+        },
+        "vector": {
+          "ranked": [
+            "postgres-pitr",
+            "oncall-escalation",
+            "net-vpn-flapping",
+            "redis-tls-rotation"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "postgres-pitr",
+            "status-page-communication",
+            "oncall-escalation",
+            "redis-session-eviction"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 1.0,
+          "mrr@5": 0.25,
+          "ndcg@5": 0.4306765580733931
+        }
+      }
+    },
+    {
+      "id": "para-03",
+      "type": "paraphrase",
+      "question": "A customer's account total doesn't include the transfer they completed a moment ago",
+      "relevance": {
+        "postgres-replica-lag": 2
+      },
+      "hard_negatives": [
+        "queue-kafka-lag",
+        "catalog-cache-stampede",
+        "postgres-deadlocks-ledger"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "api-customer-rate-limits",
+            "postgres-pitr",
+            "postgres-replica-lag",
+            "incident-response-handbook",
+            "auth-account-lockout"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 0.3333333333333333,
+          "ndcg@5": 0.5
+        },
+        "vector": {
+          "ranked": [
+            "secrets-handling-standard",
+            "redis-rate-limiter-fail-open",
+            "secrets-leaked-api-key",
+            "auth-saml-cert-expiry",
+            "queue-rabbitmq-dlq"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "api-customer-rate-limits",
+            "secrets-handling-standard",
+            "auth-saml-cert-expiry",
+            "ci-flaky-tests",
+            "incident-response-handbook"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        }
+      }
+    },
+    {
+      "id": "para-06",
+      "type": "paraphrase",
+      "question": "Partner integrations started rejecting our access tokens right after we changed the key we sign them with",
+      "relevance": {
+        "auth-signing-key-rotation": 2
+      },
+      "hard_negatives": [
+        "auth-saml-cert-expiry",
+        "secrets-webhook-signing-rotation",
+        "secrets-handling-standard"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "auth-signing-key-rotation",
+            "secrets-handling-standard",
+            "api-customer-rate-limits",
+            "k8s-crashloop-missing-secret",
+            "net-tls-chain"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "postgres-wraparound",
+            "postgres-replica-lag",
+            "net-lb-healthcheck",
+            "incident-response-handbook",
+            "payments-api-runbook"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "postgres-wraparound",
+            "auth-signing-key-rotation",
+            "secrets-handling-standard",
+            "k8s-crashloop-missing-secret",
+            "redis-session-eviction"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 0.5,
+          "ndcg@5": 0.6309297535714574
+        }
+      }
+    },
+    {
+      "id": "para-07",
+      "type": "paraphrase",
+      "question": "Shoppers paying through a merchant's embedded form lose their login halfway through",
+      "relevance": {
+        "auth-samesite-iframe": 2
+      },
+      "hard_negatives": [
+        "redis-session-eviction"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "auth-saml-cert-expiry",
+            "postgres-pitr",
+            "api-webhook-retries",
+            "redis-idempotency-cache",
+            "auth-samesite-iframe"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 1.0,
+          "mrr@5": 0.2,
+          "ndcg@5": 0.38685280723454163
+        },
+        "vector": {
+          "ranked": [
+            "auth-saml-cert-expiry",
+            "net-vpn-flapping",
+            "ci-deploy-token-scope",
+            "secrets-vault-db-credentials",
+            "secrets-handling-standard"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "auth-saml-cert-expiry",
+            "net-vpn-flapping",
+            "secrets-handling-standard",
+            "ci-deploy-token-scope",
+            "api-webhook-retries"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        }
+      }
+    },
+    {
+      "id": "para-08",
+      "type": "paraphrase",
+      "question": "A container keeps getting terminated for using too much RAM. Should we simply give it more?",
+      "relevance": {
+        "k8s-oomkilled": 2
+      },
+      "hard_negatives": [
+        "k8s-node-pressure"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "payments-api-runbook",
+            "redis-rate-limiter-fail-open",
+            "k8s-oomkilled",
+            "postgres-pitr"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 0.3333333333333333,
+          "ndcg@5": 0.5
+        },
+        "vector": {
+          "ranked": [
+            "ci-deploy-token-scope",
+            "redis-sentinel-failover",
+            "incident-response-handbook",
+            "postgres-migration-locks",
+            "payments-api-runbook"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "payments-api-runbook",
+            "incident-response-handbook",
+            "auth-saml-cert-expiry",
+            "k8s-oomkilled",
+            "redis-rate-limiter-fail-open"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 1.0,
+          "mrr@5": 0.25,
+          "ndcg@5": 0.4306765580733931
+        }
+      }
+    },
+    {
+      "id": "para-10",
+      "type": "paraphrase",
+      "question": "Old Android phones and Java apps can no longer connect securely since we renewed our public certificate",
+      "relevance": {
+        "net-tls-chain": 2
+      },
+      "hard_negatives": [
+        "redis-tls-rotation",
+        "auth-saml-cert-expiry"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "net-tls-chain",
+            "secrets-leaked-api-key",
+            "auth-saml-cert-expiry",
+            "redis-tls-rotation",
+            "redis-sentinel-failover"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "postgres-migration-locks",
+            "incident-response-handbook",
+            "catalog-cache-stampede",
+            "payments-api-runbook",
+            "net-vpn-flapping"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "postgres-migration-locks",
+            "payments-api-runbook",
+            "redis-tls-rotation",
+            "secrets-leaked-api-key",
+            "redis-sentinel-failover"
+          ],
+          "hard_negative_outranks_relevant": true,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        }
+      }
+    },
+    {
+      "id": "term-03",
+      "type": "explicit_terms",
+      "question": "Redis SCAN instead of KEYS to avoid latency spikes",
+      "relevance": {
+        "redis-slow-commands": 2
+      },
+      "hard_negatives": [
+        "redis-sentinel-failover",
+        "catalog-cache-stampede"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "redis-slow-commands",
+            "catalog-cache-stampede",
+            "secrets-handling-standard",
+            "payments-api-runbook",
+            "redis-idempotency-cache"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "redis-slow-commands",
+            "redis-idempotency-cache",
+            "catalog-cache-stampede",
+            "postgres-pitr",
+            "payments-api-runbook"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "hybrid": {
+          "ranked": [
+            "redis-slow-commands",
+            "catalog-cache-stampede",
+            "redis-idempotency-cache",
+            "postgres-pitr",
+            "payments-api-runbook"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        }
+      }
+    },
+    {
+      "id": "term-04",
+      "type": "explicit_terms",
+      "question": "CrashLoopBackOff after deploy because a secret environment variable is missing",
+      "relevance": {
+        "k8s-crashloop-missing-secret": 2
+      },
+      "hard_negatives": [
+        "k8s-imagepull",
+        "secrets-handling-standard"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "k8s-crashloop-missing-secret",
+            "secrets-handling-standard",
+            "redis-rate-limiter-fail-open",
+            "ci-flaky-tests",
+            "secrets-webhook-signing-rotation"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "k8s-crashloop-missing-secret",
+            "secrets-handling-standard",
+            "k8s-probes",
+            "rate-limit-internal-services"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "hybrid": {
+          "ranked": [
+            "k8s-crashloop-missing-secret",
+            "secrets-handling-standard",
+            "secrets-webhook-signing-rotation",
+            "ci-deploy-token-scope"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        }
+      }
+    },
+    {
+      "id": "term-05",
+      "type": "explicit_terms",
+      "question": "CoreDNS ndots setting for services calling external APIs",
+      "relevance": {
+        "net-coredns": 2
+      },
+      "hard_negatives": [
+        "net-egress-allowlist"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "net-coredns",
+            "postgres-connection-exhaustion",
+            "secrets-vault-db-credentials",
+            "k8s-oomkilled",
+            "redis-rate-limiter-fail-open"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "net-coredns",
+            "service-restart-procedure",
+            "ci-deploy-token-scope",
+            "payments-api-runbook",
+            "postgres-connection-exhaustion"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "hybrid": {
+          "ranked": [
+            "net-coredns",
+            "postgres-connection-exhaustion",
+            "auth-signing-key-rotation",
+            "payments-api-runbook",
+            "ci-deploy-token-scope"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        }
+      }
+    },
+    {
+      "id": "term-06",
+      "type": "explicit_terms",
+      "question": "Kafka consumer lag and partition count limits for settlements",
+      "relevance": {
+        "queue-kafka-lag": 2
+      },
+      "hard_negatives": [
+        "net-vpn-flapping",
+        "postgres-replica-lag",
+        "payments-api-runbook"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "queue-kafka-lag",
+            "payments-api-runbook",
+            "secrets-handling-standard",
+            "postgres-connection-exhaustion"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "dashboards-golden-signals",
+            "queue-kafka-lag",
+            "payments-api-runbook",
+            "ci-deploy-token-scope",
+            "service-restart-procedure"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 0.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 0.5,
+          "ndcg@5": 0.6309297535714574
+        },
+        "hybrid": {
+          "ranked": [
+            "queue-kafka-lag",
+            "payments-api-runbook",
+            "postgres-connection-exhaustion",
+            "ci-deploy-token-scope"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        }
+      }
+    },
+    {
+      "id": "term-07",
+      "type": "explicit_terms",
+      "question": "Canary error rate threshold that triggers an automatic rollback",
+      "relevance": {
+        "deploy-canary": 2,
+        "deploy-rollback": 1
+      },
+      "hard_negatives": [
+        "api-5xx-triage",
+        "payments-api-runbook"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "api-5xx-triage",
+            "deploy-canary",
+            "postgres-migration-locks",
+            "auth-saml-cert-expiry",
+            "postgres-pitr"
+          ],
+          "hard_negative_outranks_relevant": true,
+          "recall@1": 0.0,
+          "recall@3": 0.5,
+          "recall@5": 0.5,
+          "mrr@5": 0.5,
+          "ndcg@5": 0.52129602861432
+        },
+        "vector": {
+          "ranked": [
+            "api-5xx-triage",
+            "ci-deploy-token-scope",
+            "payments-api-runbook",
+            "postgres-migration-locks",
+            "redis-idempotency-cache"
+          ],
+          "hard_negative_outranks_relevant": true,
+          "recall@1": 0.0,
+          "recall@3": 0.0,
+          "recall@5": 0.0,
+          "mrr@5": 0.0,
+          "ndcg@5": 0.0
+        },
+        "hybrid": {
+          "ranked": [
+            "api-5xx-triage",
+            "postgres-migration-locks",
+            "deploy-canary",
+            "redis-slow-commands",
+            "dashboards-golden-signals"
+          ],
+          "hard_negative_outranks_relevant": true,
+          "recall@1": 0.0,
+          "recall@3": 0.5,
+          "recall@5": 0.5,
+          "mrr@5": 0.3333333333333333,
+          "ndcg@5": 0.41311732856427996
+        }
+      }
+    },
+    {
+      "id": "term-10",
+      "type": "explicit_terms",
+      "question": "Liveness probe calling the database causes a restart storm",
+      "relevance": {
+        "k8s-probes": 2
+      },
+      "hard_negatives": [
+        "net-lb-healthcheck",
+        "service-restart-procedure"
+      ],
+      "lexical_candidates": 20,
+      "vector_candidates": 20,
+      "results": {
+        "lexical": {
+          "ranked": [
+            "k8s-probes",
+            "secrets-vault-db-credentials",
+            "catalog-cache-stampede",
+            "payments-api-runbook",
+            "secrets-handling-standard"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "vector": {
+          "ranked": [
+            "k8s-probes",
+            "postgres-pitr",
+            "k8s-crashloop-missing-secret",
+            "secrets-vault-db-credentials",
+            "payments-api-runbook"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        },
+        "hybrid": {
+          "ranked": [
+            "k8s-probes",
+            "secrets-vault-db-credentials",
+            "payments-api-runbook",
+            "redis-sentinel-failover",
+            "secrets-handling-standard"
+          ],
+          "hard_negative_outranks_relevant": false,
+          "recall@1": 1.0,
+          "recall@3": 1.0,
+          "recall@5": 1.0,
+          "mrr@5": 1.0,
+          "ndcg@5": 1.0
+        }
+      }
+    }
+  ],
+  "tie_sensitivity": {
+    "replicates": 10,
+    "strategies": {
+      "lexical": {
+        "recall@1": {
+          "min": 0.5319444444444444,
+          "mean": 0.5388888888888889,
+          "max": 0.5458333333333333
+        },
+        "recall@3": {
+          "min": 0.6625000000000001,
+          "mean": 0.6763888888888889,
+          "max": 0.6902777777777778
+        },
+        "recall@5": {
+          "min": 0.7504629629629629,
+          "mean": 0.7601851851851851,
+          "max": 0.7699074074074074
+        },
+        "mrr@5": {
+          "min": 0.7532407407407408,
+          "mean": 0.764351851851852,
+          "max": 0.7740740740740741
+        },
+        "ndcg@5": {
+          "min": 0.7039460326670178,
+          "mean": 0.7143183029423348,
+          "max": 0.7279901694642623
+        }
+      },
+      "vector": {
+        "recall@1": {
+          "min": 0.30648148148148147,
+          "mean": 0.30648148148148147,
+          "max": 0.30648148148148147
+        },
+        "recall@3": {
+          "min": 0.39305555555555555,
+          "mean": 0.39305555555555555,
+          "max": 0.39305555555555555
+        },
+        "recall@5": {
+          "min": 0.44027777777777777,
+          "mean": 0.44027777777777777,
+          "max": 0.44027777777777777
+        },
+        "mrr@5": {
+          "min": 0.4375,
+          "mean": 0.4375,
+          "max": 0.4375
+        },
+        "ndcg@5": {
+          "min": 0.42474655881873624,
+          "mean": 0.4247465588187362,
+          "max": 0.42474655881873624
+        }
+      },
+      "hybrid": {
+        "recall@1": {
+          "min": 0.4115740740740741,
+          "mean": 0.412962962962963,
+          "max": 0.42546296296296293
+        },
+        "recall@3": {
+          "min": 0.5662037037037037,
+          "mean": 0.5939814814814814,
+          "max": 0.6217592592592592
+        },
+        "recall@5": {
+          "min": 0.6680555555555556,
+          "mean": 0.6763888888888889,
+          "max": 0.6773148148148148
+        },
+        "mrr@5": {
+          "min": 0.6319444444444444,
+          "mean": 0.6394907407407407,
+          "max": 0.6550925925925926
+        },
+        "ndcg@5": {
+          "min": 0.6107689028387279,
+          "mean": 0.6163366969506868,
+          "max": 0.6211321527812808
+        }
+      }
+    }
+  }
+}

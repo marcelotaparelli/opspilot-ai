@@ -1,0 +1,32 @@
+{
+  "note": "Frozen 2026-10-04T11:58:47Z after DEV run 2 (lexical ranking ts_rank_cd -> ts_rank, decided on dev). No held-out run before this point. Held-out is executed once against this manifest.",
+  "fingerprint": {
+    "dataset": {
+      "corpus.json": "eea076115b6928905f11a940d2108197dc4ac02960e01cecb35ab5c0e722d845",
+      "dev.json": "e0e409d26b18068b316106c7024d0657be28c973f1694f8b03932e8d72793c77",
+      "heldout.json": "b21714eb234648a65b77e270be35eb8fddc123180b437b59ca0093b6f35b9915"
+    },
+    "sources": {
+      "application.py": "56d728d2aceced83eb1057e17857023d2590d936258db8caacb7569b43c1a6a3",
+      "benchmark.py": "f722f446fc2667c8332b5294f9bef4b2a9f44238e1cc2c8fd31dbba04d1b1cce",
+      "chunking.py": "9bf414290ffa409e0aae0825afe7dc346353d99d609c8c3621ded2a54e13dfbe",
+      "domain.py": "5b359356a80bb7dde17a611e23a395fd8610f22a010407d62fdadcb53a8538b7",
+      "evaluation.py": "a78bcdc6a40eede0eacf604574915e6be1ff6c995c6c09e5fbdd80855e544e2f",
+      "persistence/postgres.py": "473fc7138ab95345189dcdff8dadfaaf751cf05793fe699ab26e073519c5d312",
+      "persistence/schema.sql": "35b22ec1e31d4d683464ea8eaf809eaef5598fe9b1379e76a3cac6788ba30e5f",
+      "providers/fake.py": "bbe8730b69e189a0d7b31b88ececdfd6a9551e60648c07f30a0f19a49487bccb",
+      "retrieval.py": "7081924dce15b2fbb4197f024eb606a8616327ded6e90a46d367e3709de2e8af"
+    },
+    "config": {
+      "k": 5,
+      "candidates_per_branch": 20,
+      "rrf_constant": 60,
+      "chunk_size": 1200,
+      "chunk_overlap": 200,
+      "embedding_space": "fake:sha256-bow-v1:256",
+      "lexical": "to_tsquery('simple') OR of question word tokens, ts_rank",
+      "vector": "exact cosine distance (pgvector <=>)",
+      "metrics": "document level; Recall@1/3/5, MRR@5, NDCG@5 (gain 2^g-1)"
+    }
+  }
+}

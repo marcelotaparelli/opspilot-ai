@@ -1,0 +1,352 @@
+{
+  "version": 2,
+  "split": "dev",
+  "corpus": "corpus.json",
+  "queries": [
+    {
+      "id": "ambig-01",
+      "tenant": "acme",
+      "type": "ambiguous",
+      "question": "Redis is down. What happens?",
+      "relevance": {
+        "redis-rate-limiter-fail-open": 2,
+        "redis-idempotency-cache": 2,
+        "redis-sentinel-failover": 1,
+        "payments-api-runbook": 1
+      },
+      "hard_negatives": [
+        "redis-tls-rotation",
+        "redis-slow-commands",
+        "rate-limit-internal-services"
+      ],
+      "notes": "Which Redis? Rate limiter and idempotency cache both answer."
+    },
+    {
+      "id": "ambig-03",
+      "tenant": "acme",
+      "type": "ambiguous",
+      "question": "how do we roll back?",
+      "relevance": {
+        "deploy-rollback": 2,
+        "deploy-feature-flag-kill-switch": 1,
+        "deploy-canary": 1,
+        "payments-api-runbook": 1
+      },
+      "hard_negatives": [
+        "postgres-migration-locks"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "ambig-05",
+      "tenant": "acme",
+      "type": "ambiguous",
+      "question": "permission denied",
+      "relevance": {
+        "iam-s3-access-denied": 2,
+        "access-break-glass": 1,
+        "ci-deploy-token-scope": 1
+      },
+      "hard_negatives": [
+        "secrets-vault-db-credentials",
+        "auth-account-lockout"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "ambig-06",
+      "tenant": "acme",
+      "type": "ambiguous",
+      "question": "the queue is stuck",
+      "relevance": {
+        "queue-poison-message": 2,
+        "queue-rabbitmq-dlq": 1,
+        "queue-kafka-lag": 1
+      },
+      "hard_negatives": [
+        "queue-sqs-visibility"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "hardneg-01",
+      "tenant": "acme",
+      "type": "hard_negative",
+      "question": "When the cache cluster is unavailable, does the gateway still reject customers who are over quota?",
+      "relevance": {
+        "redis-rate-limiter-fail-open": 2
+      },
+      "hard_negatives": [
+        "api-customer-rate-limits",
+        "redis-idempotency-cache",
+        "rate-limit-internal-services"
+      ],
+      "notes": "Quota vocabulary points to the wrong document."
+    },
+    {
+      "id": "hardneg-04",
+      "tenant": "acme",
+      "type": "hard_negative",
+      "question": "Expired registry credentials stop pods from fetching their images",
+      "relevance": {
+        "k8s-imagepull": 2
+      },
+      "hard_negatives": [
+        "ci-image-signing",
+        "k8s-crashloop-missing-secret"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "hardneg-08",
+      "tenant": "acme",
+      "type": "hard_negative",
+      "question": "Is it acceptable to switch off two-factor login while text message codes are not arriving?",
+      "relevance": {
+        "auth-mfa-sms-outage": 2
+      },
+      "hard_negatives": [
+        "auth-account-lockout"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "hardneg-10",
+      "tenant": "acme",
+      "type": "hard_negative",
+      "question": "A service suddenly gets password authentication failed from PostgreSQL",
+      "relevance": {
+        "secrets-vault-db-credentials": 2
+      },
+      "hard_negatives": [
+        "postgres-connection-exhaustion",
+        "auth-account-lockout"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "ident-01",
+      "tenant": "acme",
+      "type": "identifier",
+      "question": "ERR_CONN_POOL_EXHAUSTED",
+      "relevance": {
+        "postgres-connection-exhaustion": 2
+      },
+      "hard_negatives": [],
+      "notes": "Application error code."
+    },
+    {
+      "id": "ident-05",
+      "tenant": "acme",
+      "type": "identifier",
+      "question": "limit_req_fallback=on",
+      "relevance": {
+        "redis-rate-limiter-fail-open": 2
+      },
+      "hard_negatives": [],
+      "notes": "Config key."
+    },
+    {
+      "id": "ident-08",
+      "tenant": "acme",
+      "type": "identifier",
+      "question": "READONLY You can't write against a read only replica",
+      "relevance": {
+        "redis-sentinel-failover": 2
+      },
+      "hard_negatives": [
+        "postgres-replica-lag"
+      ],
+      "notes": "Exact Redis error."
+    },
+    {
+      "id": "ident-09",
+      "tenant": "acme",
+      "type": "identifier",
+      "question": "#billing-close",
+      "relevance": {
+        "deploy-freeze-window": 2
+      },
+      "hard_negatives": [],
+      "notes": "Channel name."
+    },
+    {
+      "id": "multi-03",
+      "tenant": "acme",
+      "type": "multi_relevant",
+      "question": "Which components refuse requests instead of letting them through when a dependency is down?",
+      "relevance": {
+        "redis-idempotency-cache": 2,
+        "payments-api-runbook": 1
+      },
+      "hard_negatives": [
+        "redis-rate-limiter-fail-open",
+        "rate-limit-internal-services"
+      ],
+      "notes": "Fail-closed vs fail-open; globex limiter (fails closed) is another tenant's sentinel."
+    },
+    {
+      "id": "multi-05",
+      "tenant": "acme",
+      "type": "multi_relevant",
+      "question": "What limits apply to how often clients can call our API?",
+      "relevance": {
+        "api-customer-rate-limits": 2,
+        "redis-rate-limiter-fail-open": 1
+      },
+      "hard_negatives": [
+        "api-gateway-timeout",
+        "rate-limit-internal-services"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "multi-06",
+      "tenant": "acme",
+      "type": "multi_relevant",
+      "question": "What protects a customer from being charged twice?",
+      "relevance": {
+        "api-idempotency": 2,
+        "redis-idempotency-cache": 2,
+        "payments-api-runbook": 1
+      },
+      "hard_negatives": [
+        "queue-sqs-visibility",
+        "api-webhook-retries"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "multi-07",
+      "tenant": "acme",
+      "type": "multi_relevant",
+      "question": "How should Kubernetes health checks be configured for our services?",
+      "relevance": {
+        "k8s-probes": 2,
+        "net-lb-healthcheck": 1
+      },
+      "hard_negatives": [
+        "k8s-node-pressure",
+        "k8s-crashloop-missing-secret"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "para-01",
+      "tenant": "acme",
+      "type": "paraphrase",
+      "question": "Our shared cache is down. Are abusive callers still being throttled at the edge?",
+      "relevance": {
+        "redis-rate-limiter-fail-open": 2
+      },
+      "hard_negatives": [
+        "rate-limit-internal-services",
+        "api-customer-rate-limits",
+        "redis-idempotency-cache"
+      ],
+      "notes": "Doc says the limiter fails open (clients unthrottled); question never says Redis, fail-open or rate limit."
+    },
+    {
+      "id": "para-04",
+      "tenant": "acme",
+      "type": "paraphrase",
+      "question": "The main database volume keeps growing even though none of the tables got bigger",
+      "relevance": {
+        "postgres-wal-disk-full": 2
+      },
+      "hard_negatives": [
+        "postgres-wraparound",
+        "ci-runner-disk-full",
+        "k8s-node-pressure"
+      ],
+      "notes": "Inactive replication slot retaining WAL."
+    },
+    {
+      "id": "para-05",
+      "tenant": "acme",
+      "type": "paraphrase",
+      "question": "Two money movements touching the same pair of balances keep aborting each other",
+      "relevance": {
+        "postgres-deadlocks-ledger": 2
+      },
+      "hard_negatives": [
+        "postgres-migration-locks",
+        "api-idempotency"
+      ],
+      "notes": "Lock ordering deadlocks."
+    },
+    {
+      "id": "para-09",
+      "tenant": "acme",
+      "type": "paraphrase",
+      "question": "Some background work gets executed by two different workers",
+      "relevance": {
+        "queue-sqs-visibility": 2
+      },
+      "hard_negatives": [
+        "api-idempotency",
+        "queue-poison-message",
+        "api-webhook-retries"
+      ],
+      "notes": "Visibility timeout shorter than processing."
+    },
+    {
+      "id": "term-01",
+      "tenant": "acme",
+      "type": "explicit_terms",
+      "question": "How do I restart the service?",
+      "relevance": {
+        "service-restart-procedure": 2,
+        "payments-api-runbook": 1
+      },
+      "hard_negatives": [
+        "redis-sentinel-failover",
+        "redis-tls-rotation",
+        "deploy-rollback"
+      ],
+      "notes": "Phase 1 regression question (AND-semantics bug). Pinned to dev because it was used during development.",
+      "pinned_dev": true
+    },
+    {
+      "id": "term-02",
+      "tenant": "acme",
+      "type": "explicit_terms",
+      "question": "PgBouncer transaction mode versus direct PostgreSQL connections running out of slots",
+      "relevance": {
+        "postgres-connection-exhaustion": 2
+      },
+      "hard_negatives": [
+        "secrets-vault-db-credentials",
+        "payments-api-runbook"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "term-08",
+      "tenant": "acme",
+      "type": "explicit_terms",
+      "question": "VACUUM FREEZE and relfrozenxid wraparound risk",
+      "relevance": {
+        "postgres-wraparound": 2
+      },
+      "hard_negatives": [
+        "postgres-wal-disk-full"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "term-09",
+      "tenant": "acme",
+      "type": "explicit_terms",
+      "question": "Break-glass production access requires an incident ID",
+      "relevance": {
+        "access-break-glass": 2
+      },
+      "hard_negatives": [
+        "ci-deploy-token-scope",
+        "iam-s3-access-denied"
+      ],
+      "notes": ""
+    }
+  ]
+}

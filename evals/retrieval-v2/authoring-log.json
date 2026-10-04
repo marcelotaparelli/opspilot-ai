@@ -1,0 +1,11 @@
+{
+  "recorded_at_utc": "2026-10-04T11:51:20+00:00",
+  "event": "authoring complete; no retrieval run on retrieval-v2 yet",
+  "policy": "corpus.json and heldout.json are immutable from here; dev.json may be corrected with a documented reason",
+  "split_rule": "per query type: pinned_dev queries go to dev, then queries ordered by sha256(id) fill dev to 4; rest held-out",
+  "sha256": {
+    "corpus.json": "eea076115b6928905f11a940d2108197dc4ac02960e01cecb35ab5c0e722d845",
+    "dev.json": "e0e409d26b18068b316106c7024d0657be28c973f1694f8b03932e8d72793c77",
+    "heldout.json": "b21714eb234648a65b77e270be35eb8fddc123180b437b59ca0093b6f35b9915"
+  }
+}

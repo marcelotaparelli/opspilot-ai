@@ -44,8 +44,10 @@ and ordinal. HTTP document IDs are assigned by the server.
 Retrieval uses exact cosine distance on `vector(256)`, PostgreSQL full-text search with
 the language-independent `simple` configuration, and RRF with constant 60 (the value from
 the original RRF paper; not tuned). Lexical search matches chunks containing **any** word
-of the question (OR) and ranks them with `ts_rank_cd`; `simple` has no stemming or stopword
-list and `ts_rank_cd` has no IDF, so stopword-only overlap yields low-ranked matches. Each branch
+of the question (OR) and ranks them with `ts_rank`, which saturates per-term frequency
+(`ts_rank_cd` degenerated to occurrence counting under OR and favoured long chunks; see
+[retrieval-v2](docs/evaluation/retrieval-v2.md) §7.1). `simple` has no stemming or stopword list
+and there is no IDF, so stopword overlap still influences ranking. Each branch
 fetches up to `min(4*K, 80)` candidates. PostgreSQL rankings break ties by chunk UUID;
 RRF ties also use UUID. An embedding-space identifier prevents vector comparisons across
 fake/real providers and model versions. Lexical search can use text from either space.
@@ -186,6 +188,30 @@ not been executed on GitHub; no push was made.
 
 ## 5. How to run evals
 
+**retrieval-v2 is the benchmark of record.** It has 64 hand-written operational documents (plus 6
+cross-tenant sentinels), 60 graded queries in 6 types with hard negatives, a result-blind
+24 dev / 36 held-out split, and a held-out run executed once against a hash-verified freeze. Full
+methodology, failure analysis and limits: [docs/evaluation/retrieval-v2.md](docs/evaluation/retrieval-v2.md).
+
+Held-out results (36 queries; fake embedder `fake:sha256-bow-v1:256`; K=5):
+
+| Strategy | Recall@1 | Recall@3 | Recall@5 | MRR@5 | NDCG@5 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Lexical | 0.5319 | 0.6625 | 0.7644 | 0.7532 | 0.7124 |
+| Vector | 0.3065 | 0.3931 | 0.4403 | 0.4375 | 0.4247 |
+| Hybrid | 0.4116 | 0.5523 | 0.6773 | 0.6306 | 0.6103 |
+
+Lexical beats hybrid by +0.123 MRR@5 (paired bootstrap 95% CI [+0.045, +0.217]). With a
+non-semantic fake embedder, equal-weight RRF lets the vector branch outvote correct lexical
+hits. These numbers do not describe a real embedding model.
+
+```bash
+uv run python -m opspilot.benchmark validate
+uv run python -m opspilot.benchmark run --split dev --seed --tie-replicates 10 --output dev.json
+```
+
+### retrieval-v1 (historical, saturated)
+
 The dataset [evals/retrieval-v1.json](evals/retrieval-v1.json) contains five corpus documents
 across two evaluation tenants and three questions with relevant document or chunk UUIDs.
 It includes an injection fixture and a private cross-tenant sentinel. This is a small
@@ -228,6 +254,8 @@ Command: `uv run python -m opspilot.evaluation --seed --k 5 --output docs/eviden
 run against a dedicated `opspilot_eval` database; a rerun without `--seed` was byte-identical.
 The same metrics were measured before the lexical fix
 ([report](docs/evidence/retrieval-v1-fake-pre-lexical-fix.json)).
+After the later switch to `ts_rank` it still scores 1.0 everywhere
+([report](docs/evidence/retrieval-v1-fake-ts_rank.json)); the historical reports are unchanged.
 
 **These perfect scores carry almost no information.** Only four documents belong to the
 queried tenant (fewer than K=5), so vector Recall@5 is 1.0 for any ranking. Each question

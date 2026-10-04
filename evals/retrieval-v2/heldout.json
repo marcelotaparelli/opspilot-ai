@@ -1,0 +1,525 @@
+{
+  "version": 2,
+  "split": "heldout",
+  "corpus": "corpus.json",
+  "queries": [
+    {
+      "id": "ambig-02",
+      "tenant": "acme",
+      "type": "ambiguous",
+      "question": "certificate expired",
+      "relevance": {
+        "auth-saml-cert-expiry": 2,
+        "redis-tls-rotation": 1,
+        "net-tls-chain": 1
+      },
+      "hard_negatives": [
+        "auth-signing-key-rotation",
+        "k8s-imagepull"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "ambig-04",
+      "tenant": "acme",
+      "type": "ambiguous",
+      "question": "who do I contact about the rate limiter?",
+      "relevance": {
+        "service-ownership": 2,
+        "oncall-escalation": 1
+      },
+      "hard_negatives": [
+        "api-customer-rate-limits",
+        "redis-rate-limiter-fail-open",
+        "rate-limit-internal-services"
+      ],
+      "notes": "Ownership doc says 'request throttling', not 'rate limiter'."
+    },
+    {
+      "id": "ambig-07",
+      "tenant": "acme",
+      "type": "ambiguous",
+      "question": "secret rotation",
+      "relevance": {
+        "secrets-handling-standard": 2,
+        "secrets-webhook-signing-rotation": 2,
+        "secrets-vault-db-credentials": 1,
+        "auth-signing-key-rotation": 1,
+        "secrets-leaked-api-key": 1
+      },
+      "hard_negatives": [
+        "redis-tls-rotation",
+        "k8s-imagepull"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "ambig-08",
+      "tenant": "acme",
+      "type": "ambiguous",
+      "question": "login problems",
+      "relevance": {
+        "auth-saml-cert-expiry": 1,
+        "auth-account-lockout": 1,
+        "auth-mfa-sms-outage": 1,
+        "redis-session-eviction": 1,
+        "auth-samesite-iframe": 1
+      },
+      "hard_negatives": [
+        "auth-signing-key-rotation"
+      ],
+      "notes": "No single best answer; all grade 1."
+    },
+    {
+      "id": "ambig-09",
+      "tenant": "acme",
+      "type": "ambiguous",
+      "question": "deployment is blocked",
+      "relevance": {
+        "ci-image-signing": 1,
+        "deploy-freeze-window": 1,
+        "ci-flaky-tests": 1
+      },
+      "hard_negatives": [
+        "deploy-rollback"
+      ],
+      "notes": "No single best answer."
+    },
+    {
+      "id": "ambig-10",
+      "tenant": "acme",
+      "type": "ambiguous",
+      "question": "502 errors",
+      "relevance": {
+        "net-lb-healthcheck": 2,
+        "api-5xx-triage": 1
+      },
+      "hard_negatives": [
+        "api-gateway-timeout"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "hardneg-02",
+      "tenant": "acme",
+      "type": "hard_negative",
+      "question": "After a Redis replica was promoted, our writes fail because the node is read-only",
+      "relevance": {
+        "redis-sentinel-failover": 2
+      },
+      "hard_negatives": [
+        "postgres-replica-lag",
+        "redis-tls-rotation"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "hardneg-03",
+      "tenant": "acme",
+      "type": "hard_negative",
+      "question": "Can the support desk unlock an administrator who locked themselves out?",
+      "relevance": {
+        "auth-account-lockout": 2
+      },
+      "hard_negatives": [
+        "access-break-glass",
+        "auth-mfa-sms-outage"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "hardneg-05",
+      "tenant": "acme",
+      "type": "hard_negative",
+      "question": "The build machines are out of disk space",
+      "relevance": {
+        "ci-runner-disk-full": 2
+      },
+      "hard_negatives": [
+        "postgres-wal-disk-full",
+        "k8s-node-pressure"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "hardneg-06",
+      "tenant": "acme",
+      "type": "hard_negative",
+      "question": "Merchants receive the same webhook event twice; what is our delivery guarantee?",
+      "relevance": {
+        "api-webhook-retries": 2
+      },
+      "hard_negatives": [
+        "api-idempotency",
+        "queue-sqs-visibility",
+        "secrets-webhook-signing-rotation"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "hardneg-07",
+      "tenant": "acme",
+      "type": "hard_negative",
+      "question": "Can we raise the gateway timeout so slow bulk exports finish?",
+      "relevance": {
+        "api-gateway-timeout": 2
+      },
+      "hard_negatives": [
+        "api-customer-rate-limits"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "hardneg-09",
+      "tenant": "acme",
+      "type": "hard_negative",
+      "question": "Changes I made with kubectl edit keep undoing themselves",
+      "relevance": {
+        "deploy-config-drift": 2
+      },
+      "hard_negatives": [
+        "deploy-rollback",
+        "k8s-crashloop-missing-secret"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "ident-02",
+      "tenant": "acme",
+      "type": "identifier",
+      "question": "RateLimiterFailOpen",
+      "relevance": {
+        "redis-rate-limiter-fail-open": 2
+      },
+      "hard_negatives": [
+        "rate-limit-internal-services"
+      ],
+      "notes": "Alert name; one CamelCase token."
+    },
+    {
+      "id": "ident-03",
+      "tenant": "acme",
+      "type": "identifier",
+      "question": "SAML_SIGNATURE_INVALID in the login service",
+      "relevance": {
+        "auth-saml-cert-expiry": 2
+      },
+      "hard_negatives": [],
+      "notes": "Log code."
+    },
+    {
+      "id": "ident-04",
+      "tenant": "acme",
+      "type": "identifier",
+      "question": "PX-ACQ-02",
+      "relevance": {
+        "net-vpn-flapping": 2
+      },
+      "hard_negatives": [],
+      "notes": "Tunnel identifier."
+    },
+    {
+      "id": "ident-06",
+      "tenant": "acme",
+      "type": "identifier",
+      "question": "pg_drop_replication_slot",
+      "relevance": {
+        "postgres-wal-disk-full": 2
+      },
+      "hard_negatives": [],
+      "notes": "SQL function."
+    },
+    {
+      "id": "ident-07",
+      "tenant": "acme",
+      "type": "identifier",
+      "question": "deployctl rollback payments-api --to",
+      "relevance": {
+        "deploy-rollback": 2,
+        "payments-api-runbook": 1
+      },
+      "hard_negatives": [
+        "service-restart-procedure"
+      ],
+      "notes": "CLI."
+    },
+    {
+      "id": "ident-10",
+      "tenant": "acme",
+      "type": "identifier",
+      "question": "settlement-events topic",
+      "relevance": {
+        "queue-kafka-lag": 2,
+        "payments-api-runbook": 1
+      },
+      "hard_negatives": [
+        "net-vpn-flapping"
+      ],
+      "notes": "Topic name."
+    },
+    {
+      "id": "multi-01",
+      "tenant": "acme",
+      "type": "multi_relevant",
+      "question": "What should happen in the first half hour of a SEV1?",
+      "relevance": {
+        "incident-response-handbook": 2,
+        "oncall-escalation": 2,
+        "status-page-communication": 2,
+        "api-5xx-triage": 1
+      },
+      "hard_negatives": [
+        "postmortem-process"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "multi-02",
+      "tenant": "acme",
+      "type": "multi_relevant",
+      "question": "Which credentials are rotated with a period where both the old and new value are accepted?",
+      "relevance": {
+        "auth-signing-key-rotation": 2,
+        "secrets-webhook-signing-rotation": 2,
+        "secrets-handling-standard": 2
+      },
+      "hard_negatives": [
+        "secrets-leaked-api-key",
+        "redis-tls-rotation",
+        "secrets-vault-db-credentials"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "multi-04",
+      "tenant": "acme",
+      "type": "multi_relevant",
+      "question": "What rules must database schema changes follow so releases can be deployed and reverted safely?",
+      "relevance": {
+        "postgres-migration-locks": 2,
+        "deploy-rollback": 2
+      },
+      "hard_negatives": [
+        "deploy-canary",
+        "postgres-pitr"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "multi-08",
+      "tenant": "acme",
+      "type": "multi_relevant",
+      "question": "Someone deleted payment rows by mistake. What is the complete recovery process?",
+      "relevance": {
+        "postgres-pitr": 2,
+        "incident-response-handbook": 1
+      },
+      "hard_negatives": [
+        "postgres-wal-disk-full",
+        "deploy-rollback"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "multi-09",
+      "tenant": "acme",
+      "type": "multi_relevant",
+      "question": "What happens to messages or events that keep failing to be processed or delivered?",
+      "relevance": {
+        "queue-rabbitmq-dlq": 2,
+        "queue-poison-message": 2,
+        "api-webhook-retries": 2
+      },
+      "hard_negatives": [
+        "queue-sqs-visibility",
+        "queue-kafka-lag"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "multi-10",
+      "tenant": "acme",
+      "type": "multi_relevant",
+      "question": "What are the rules for getting access to production?",
+      "relevance": {
+        "access-break-glass": 2,
+        "ci-deploy-token-scope": 1,
+        "secrets-handling-standard": 1
+      },
+      "hard_negatives": [
+        "iam-s3-access-denied",
+        "net-egress-allowlist"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "para-02",
+      "tenant": "acme",
+      "type": "paraphrase",
+      "question": "People keep getting signed out of the web app every few minutes. What is going on?",
+      "relevance": {
+        "redis-session-eviction": 2
+      },
+      "hard_negatives": [
+        "auth-samesite-iframe",
+        "auth-account-lockout"
+      ],
+      "notes": "Cause is maxmemory eviction of session keys."
+    },
+    {
+      "id": "para-03",
+      "tenant": "acme",
+      "type": "paraphrase",
+      "question": "A customer's account total doesn't include the transfer they completed a moment ago",
+      "relevance": {
+        "postgres-replica-lag": 2
+      },
+      "hard_negatives": [
+        "queue-kafka-lag",
+        "catalog-cache-stampede",
+        "postgres-deadlocks-ledger"
+      ],
+      "notes": "Stale reads from a lagging replica."
+    },
+    {
+      "id": "para-06",
+      "tenant": "acme",
+      "type": "paraphrase",
+      "question": "Partner integrations started rejecting our access tokens right after we changed the key we sign them with",
+      "relevance": {
+        "auth-signing-key-rotation": 2
+      },
+      "hard_negatives": [
+        "auth-saml-cert-expiry",
+        "secrets-webhook-signing-rotation",
+        "secrets-handling-standard"
+      ],
+      "notes": "JWKS overlap missing."
+    },
+    {
+      "id": "para-07",
+      "tenant": "acme",
+      "type": "paraphrase",
+      "question": "Shoppers paying through a merchant's embedded form lose their login halfway through",
+      "relevance": {
+        "auth-samesite-iframe": 2
+      },
+      "hard_negatives": [
+        "redis-session-eviction"
+      ],
+      "notes": "SameSite=None; Secure cookies in iframes."
+    },
+    {
+      "id": "para-08",
+      "tenant": "acme",
+      "type": "paraphrase",
+      "question": "A container keeps getting terminated for using too much RAM. Should we simply give it more?",
+      "relevance": {
+        "k8s-oomkilled": 2
+      },
+      "hard_negatives": [
+        "k8s-node-pressure"
+      ],
+      "notes": "OOMKilled / exit 137."
+    },
+    {
+      "id": "para-10",
+      "tenant": "acme",
+      "type": "paraphrase",
+      "question": "Old Android phones and Java apps can no longer connect securely since we renewed our public certificate",
+      "relevance": {
+        "net-tls-chain": 2
+      },
+      "hard_negatives": [
+        "redis-tls-rotation",
+        "auth-saml-cert-expiry"
+      ],
+      "notes": "Missing intermediate certificate in the chain."
+    },
+    {
+      "id": "term-03",
+      "tenant": "acme",
+      "type": "explicit_terms",
+      "question": "Redis SCAN instead of KEYS to avoid latency spikes",
+      "relevance": {
+        "redis-slow-commands": 2
+      },
+      "hard_negatives": [
+        "redis-sentinel-failover",
+        "catalog-cache-stampede"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "term-04",
+      "tenant": "acme",
+      "type": "explicit_terms",
+      "question": "CrashLoopBackOff after deploy because a secret environment variable is missing",
+      "relevance": {
+        "k8s-crashloop-missing-secret": 2
+      },
+      "hard_negatives": [
+        "k8s-imagepull",
+        "secrets-handling-standard"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "term-05",
+      "tenant": "acme",
+      "type": "explicit_terms",
+      "question": "CoreDNS ndots setting for services calling external APIs",
+      "relevance": {
+        "net-coredns": 2
+      },
+      "hard_negatives": [
+        "net-egress-allowlist"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "term-06",
+      "tenant": "acme",
+      "type": "explicit_terms",
+      "question": "Kafka consumer lag and partition count limits for settlements",
+      "relevance": {
+        "queue-kafka-lag": 2
+      },
+      "hard_negatives": [
+        "net-vpn-flapping",
+        "postgres-replica-lag",
+        "payments-api-runbook"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "term-07",
+      "tenant": "acme",
+      "type": "explicit_terms",
+      "question": "Canary error rate threshold that triggers an automatic rollback",
+      "relevance": {
+        "deploy-canary": 2,
+        "deploy-rollback": 1
+      },
+      "hard_negatives": [
+        "api-5xx-triage",
+        "payments-api-runbook"
+      ],
+      "notes": ""
+    },
+    {
+      "id": "term-10",
+      "tenant": "acme",
+      "type": "explicit_terms",
+      "question": "Liveness probe calling the database causes a restart storm",
+      "relevance": {
+        "k8s-probes": 2
+      },
+      "hard_negatives": [
+        "net-lb-healthcheck",
+        "service-restart-procedure"
+      ],
+      "notes": ""
+    }
+  ]
+}

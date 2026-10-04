@@ -1,0 +1,9 @@
+{
+  "command": "uv run python -m opspilot.benchmark run --split heldout --freeze evals/retrieval-v2/freeze.json --seed --tie-replicates 10 --output docs/evaluation/evidence/retrieval-v2-heldout-official.json",
+  "started_utc": "2026-10-04T11:59:00Z",
+  "finished_utc": "2026-10-04T11:59:09Z",
+  "exit_code": 0,
+  "freeze_manifest_sha256": "53d1042a30a047b1458da355685cd3416fd70ebb6c5458169b2c1b2fad2b1809",
+  "output_sha256": "cbfd1f0eb711e63f384fd7d1bf128b8d6a646e2b6dbb4263033cfacb90d2e1ea",
+  "executions_of_heldout": 1
+}

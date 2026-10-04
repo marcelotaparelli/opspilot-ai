@@ -135,11 +135,14 @@ class PostgresRepository:
 
     @staticmethod
     def any_term_query(question: str) -> str:
-        """Match chunks containing any question word (OR); ts_rank_cd orders them.
+        """Match chunks containing any question word (OR); ts_rank orders them.
 
         websearch_to_tsquery/plainto_tsquery AND every word and `simple` has no
         stopword list, so "How do I restart the service?" previously matched nothing.
         Tokens contain only word characters: quoting cannot inject tsquery operators.
+        ts_rank, not ts_rank_cd: under OR every occurrence is a ts_rank_cd "cover", which
+        degenerates to occurrence counting and favours long stopword-dense chunks; ts_rank
+        saturates per-term frequency (docs/evaluation/retrieval-v2.md).
         """
         return " | ".join(f"'{term}'" for term in dict.fromkeys(re.findall(r"\w+", question)))
 
@@ -151,7 +154,7 @@ class PostgresRepository:
             result = await connection.execute(
                 text(
                     "SELECT c.*, d.title, d.source, "
-                    "ts_rank_cd(c.search_vector, q.query) AS score "
+                    "ts_rank(c.search_vector, q.query) AS score "
                     "FROM chunks c JOIN documents d "
                     "ON d.id=c.document_id AND d.tenant_id=c.tenant_id "
                     "CROSS JOIN to_tsquery('simple', :query) AS q(query) "

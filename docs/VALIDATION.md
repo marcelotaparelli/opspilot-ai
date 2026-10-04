@@ -81,6 +81,8 @@ real but do not survive a VM reboot.
 - Lexical: `to_tsquery('simple', 'w1' | 'w2' …)` over the question's word tokens, ranked by
   `ts_rank_cd` descending, UUID tie-break (see bug 1). `simple` has no stemming and no
   stopword list, and `ts_rank_cd` has no IDF, so stopword overlap produces low-ranked matches.
+  *(Changed after this record: ranking is now `ts_rank`, chosen on the retrieval-v2 dev split;
+  see [retrieval-v2.md](evaluation/retrieval-v2.md) §7.1.)*
 - Hybrid: each branch fetches `min(4K, 80)` candidates in its own tenant transaction; RRF
   `sum(1/(60 + rank))`, duplicates within a ranking counted once, UUID tie-break, truncated to K.
   60 is the constant from the RRF paper (Cormack, Clarke & Buettcher, SIGIR 2009), not tuned.

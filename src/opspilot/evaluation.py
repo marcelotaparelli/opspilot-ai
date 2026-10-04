@@ -84,11 +84,11 @@ def metrics(retrieved: list[UUID], relevant: list[UUID], k: int) -> tuple[float,
 
 
 async def prepare_corpus(
-    service: RagService, repository: PostgresRepository, dataset: Dataset, seed: bool
+    service: RagService, repository: PostgresRepository, corpus: list[CorpusDocument], seed: bool
 ) -> None:
     from opspilot.chunking import normalize_content
 
-    for document in dataset.corpus:
+    for document in corpus:
         async with repository.transaction(document.tenant_id) as connection:
             result = await connection.execute(
                 text(
@@ -129,7 +129,7 @@ async def evaluate(dataset_path: Path, k: int, seed: bool) -> dict[str, object]:
     try:
         await repository.ready()
         service = RagService(repository, provider, provider)
-        await prepare_corpus(service, repository, dataset, seed)
+        await prepare_corpus(service, repository, dataset.corpus, seed)
         modes: tuple[RetrievalMode, ...] = ("lexical", "vector", "hybrid")
         output: dict[str, object] = {}
         for mode in modes:

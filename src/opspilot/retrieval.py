@@ -7,11 +7,19 @@ from opspilot.domain import Embedder, Hit, IsolationError, Repository, validate_
 from opspilot.observability import span
 
 RetrievalMode = Literal["lexical", "vector", "hybrid"]
+# 60 is the value proposed with RRF (Cormack, Clarke & Buettcher, SIGIR 2009); a literature
+# default, not tuned here. Recorded in benchmark freeze manifests together with the depth.
+RRF_CONSTANT = 60
+MAX_CANDIDATES = 80
 
 
-def rrf(rankings: list[list[Hit]], k: int, constant: int = 60) -> list[Hit]:
-    # score = sum(1 / (constant + rank)). 60 is the value proposed with RRF (Cormack,
-    # Clarke & Buettcher, SIGIR 2009); it is a literature default, not tuned here.
+def candidate_count(k: int) -> int:
+    """Candidates fetched per branch before fusion: an untuned bounded heuristic."""
+    return min(k * 4, MAX_CANDIDATES)
+
+
+def rrf(rankings: list[list[Hit]], k: int, constant: int = RRF_CONSTANT) -> list[Hit]:
+    # score = sum(1 / (constant + one-based rank)); duplicates within a ranking count once.
     scores: dict[UUID, float] = {}
     chunks = {hit.chunk.id: hit.chunk for ranking in rankings for hit in ranking}
     for ranking in rankings:
@@ -33,7 +41,7 @@ class Retriever:
         self, tenant: UUID, question: str, k: int, mode: RetrievalMode = "hybrid"
     ) -> list[Hit]:
         with span("retrieval"):
-            candidates = min(k * 4, 80)
+            candidates = candidate_count(k)
             rankings: list[list[Hit]] = []
             if mode in ("vector", "hybrid"):
                 with span("embedding"):
