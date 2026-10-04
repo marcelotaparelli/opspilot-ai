@@ -263,5 +263,7 @@ FastAPI-native automatic tracing/metrics/logging and auto-configuration are disa
 composition root. Manual instrumentation and its allowlists remain the export boundary.
 `ai.response.model` is span-only; served-version IDs are not new metric labels. HTTP request
 log lines include response status, so handled errors can be identified independently of the
-span wrapper's outcome. The final release tests and AWS sidecar runtime remain pending;
-see [release gates](evidence/release/README.md).
+span wrapper's outcome. Final release tests and local Collector/Jaeger runtime checks passed,
+including collector failure and recovery. AWS sidecar runtime remains unexecuted;
+see [local runtime evidence](evidence/release/observability-runtime.json) and
+[current release status](CURRENT-STATE.md).

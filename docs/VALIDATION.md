@@ -6,11 +6,15 @@ OPENAI LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
 
 GITLAB LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
 
-PUSH REALIZADO: NO
+Release v0.1.0 is published on GitHub, tagged at
+`04fb9aada0c11f16838544316c1fd71e6537d911`. The owner confirmed GitHub Actions completed
+successfully on a hosted runner: jobs `checks` and `terraform` PASS. See [current state](CURRENT-STATE.md).
 
 [Final Phase 4 validation](evidence/release/final-validation.md) and
 [execution records](evidence/release/execution-records.json) bind current source, commands,
 timestamps, retained logs, exact image metadata, scanners and full clean-room reproduction.
+Those records preserve the pre-publication local/static-CI scope. Hosted CI PASS and publication
+were subsequently confirmed by the owner; this documentation task does not rerun validation.
 
 | Record | Scope |
 | --- | --- |
@@ -45,5 +49,6 @@ no-cache Docker and new-volume HTTP. [Executed clean-room](evidence/release/clea
 passed these stages individually; verify.sh was not invoked as a single command.
 
 Live evidence is separate from engineering PASS. Real OpenAI schema/model/usage behavior,
-GitLab permissions/search/cleanup, hosted Actions and AWS runtime remain NOT EXECUTED.
+GitLab permissions/search/cleanup and AWS runtime remain NOT EXECUTED. Hosted Actions passed
+for v0.1.0; Terraform validation in CI does not establish a production deployment.
 No live credentials were requested. No new mutation score or real semantic-quality claim.

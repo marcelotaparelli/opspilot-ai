@@ -278,8 +278,10 @@ CloudWatch; that deployment path has not been executed.
 
 Append-only audit events record actor/action hashes, denials, claims, attempts and safe
 outcomes. Long descriptions are recorded as lengths. Telemetry is diagnostic; persisted
-state and authorization remain the authority. Historical Phase 3 exporter-failure tests are
-not substitutes for the pending final tests/runtime checks.
+state and authorization remain the authority. Final release tests and local telemetry runtime
+checks passed, including collector failure and recovery; historical Phase 3 results retain
+their original scope. See [current status](../CURRENT-STATE.md) and
+[local runtime evidence](../evidence/release/observability-runtime.json).
 
 ## 11. Evaluation and mutation results
 

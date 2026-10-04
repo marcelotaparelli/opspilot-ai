@@ -1,8 +1,10 @@
 # AWS deployment blueprint
 
-This document describes `infra/terraform`, not an executed AWS deployment. Phase 4 Terraform,
-container and clean-room revalidation remain blocked in the continuation environment. No cloud
-resources were created. Infrastructure application is outside this validation task.
+This document describes a validated `infra/terraform` blueprint, not an executed AWS deployment.
+Terraform validation and offline plans, local restricted container runtime and clean-room passed
+for v0.1.0. The release is published; GitHub-hosted Actions jobs `checks` and `terraform` passed.
+No cloud resources were created or infrastructure applied in production.
+See [current status](../CURRENT-STATE.md) and [local Terraform evidence](../evidence/release/terraform-validation.md).
 
 ## Topology
 
@@ -85,7 +87,8 @@ on all seven tenant tables and role restrictions.
 
 Run the one-off migration task before deploying API revisions, wait for STOPPED and require
 exit 0. Do not migrate per replica. The advisory lock serializes migrators; v1 data is preserved
-by the v2 upgrade. Final migration tests and restore/rollback drills are pending. Image rollback
+by the v2 upgrade. Final local migration tests passed, including transactional DDL rollback
+and retry; production restore/rollback drills remain unexecuted. Image rollback
 does not undo schema changes. The current slow-query logging parameter can expose bound
 content in database logs; audit logging/redaction before ingesting sensitive data.
 

@@ -103,4 +103,6 @@ release commit. The CLI logger lifecycle bug was fixed and repeated closed-strea
 covered. Engineering PASS includes 241 unit / 72 integration, migration rollback/retry,
 regressions, runtime/HTTP, scans and offline Terraform. Unfixed image findings and deliberate
 IaC risks remain visible. Live OpenAI/GitLab and AWS execution remain unverified; no provider
-credentials were requested, held-out evaluation rerun, infrastructure applied or push made.
+credentials were requested, held-out evaluation rerun or infrastructure applied. Release v0.1.0
+is published on GitHub; hosted GitHub Actions jobs `checks` and `terraform` passed. This
+post-release documentation task makes no further push and does not change the published tag.

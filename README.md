@@ -18,11 +18,12 @@ GitLab outcomes are reconciled before resending; telemetry failures stay outside
 measure the exercised cases, not real model quality. See [retrieval evaluation](docs/evaluation/retrieval-v2.md)
 and [agent evidence](docs/evidence/phase3/agent-eval-v1.json).
 
-**Release status:** Phase 4 engineering gates and full clean-room **PASS**: 241 unit and
-72 real-DB integration tests, migrations/regressions, observability, restricted Docker runtime,
-empty-volume Compose/HTTP, scans and offline Terraform. The repeated-CLI logging defect is fixed.
-The image retains 44 unfixed HIGH findings; zero fixable HIGH/CRITICAL findings.
-[Release checklist and evidence](docs/evidence/release/README.md). No push was performed.
+**Release status:** [v0.1.0 is published on GitHub](https://github.com/marcelotaparelli/opspilot-ai/releases/tag/v0.1.0).
+Engineering release **PASS**, clean-room **PASS**, and GitHub Actions hosted runner **PASS**
+(jobs `checks` and `terraform`). Final local validation passed 241 unit and 72 integration tests.
+The image retains **44 HIGH unfixed / 0 fixable HIGH/CRITICAL** findings.
+Terraform is a validated blueprint, not applied in production.
+[Current status](docs/CURRENT-STATE.md) · [Local validation evidence](docs/evidence/release/README.md).
 
 OPENAI LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
 
@@ -61,10 +62,10 @@ curl --fail http://localhost:8000/v1/query \
   -d '{"question":"How do I restart the service?","top_k":5}'
 ```
 
-Compose ports bind to loopback. The image specifies UID/GID 10001. Compose declares read-only
-root, writable `/tmp`, dropped capabilities and no new privileges. **The final image and runtime
-restrictions still require execution evidence**; Compose parsing and Terraform declarations are
-insufficient. Interactive docs and `/openapi.json` are disabled by default. Development can
+Compose ports bind to loopback. The final local runtime confirmed UID/GID 10001, read-only
+root, writable `/tmp`, dropped capabilities and no new privileges, including in the clean-room.
+See [runtime execution evidence](docs/evidence/release/container-metadata.json). Interactive docs
+and `/openapi.json` are disabled by default. Development can
 opt in with `EXPOSE_API_DOCS=true`; `APP_ENV=production` rejects docs exposure, HTTP GitLab
 and recognized example credentials. Those checks do not prove credential entropy or TLS identity.
 
@@ -174,8 +175,8 @@ retrieval-v2 **dev**, agent/security regressions, image build, full-history secr
 dependency auditing, image vulnerability scanning, SBOM generation and Terraform validation.
 Actions are commit-pinned; scanner archives are checksum-verified. The image gate blocks
 fixable HIGH/CRITICAL findings and retains the full report, including unfixed findings. CI
-excludes live providers, held-out execution and infrastructure application. Hosted CI has not
-run for this working tree.
+excludes live providers, held-out execution and infrastructure application. GitHub Actions
+passed completely on a GitHub-hosted runner for v0.1.0: jobs `checks` and `terraform` PASS.
 
 The opt-in live scripts require credentials **and** their respective
 `OPSPILOT_ALLOW_REAL_OPENAI_SMOKE=true` / `OPSPILOT_ALLOW_REAL_GITLAB_SMOKE=true` flags.
@@ -187,15 +188,16 @@ Rehearsals remain separate from live evidence. No credentials are requested for 
 
 [AWS deployment and qualitative cost drivers](docs/deployment/aws.md): public ALB → ECS/Fargate
 → private RDS/pgvector, plus ECR, Secrets Manager and optional telemetry. No AWS deployment
-was performed. Offline plans/scans must be rerun before release. Four deliberate IaC findings
-are classified in the [risk register](docs/evidence/release/iac-findings.md).
+was performed. Offline plans and scans passed for v0.1.0; the blueprint has not been applied
+in production. Four deliberate IaC findings are classified in the [risk register](docs/evidence/release/iac-findings.md).
 
 ## Known limitations and records
 
 Static tokens lack SSO, identity lifecycle and per-user quotas. There are no within-tenant
 ACLs, automatic recovery workers, semantic rerankers or real-model quality measurements. The
 AWS default has one API task, single-AZ RDS, broad HTTPS egress and optional single-NAT routing;
-it has not been deployed or restore-tested. Final runtime and release scans remain pending.
+it has not been deployed or restore-tested. Local Docker runtime and release scans passed;
+this does not establish AWS runtime or restore evidence.
 
 - [Current state](docs/CURRENT-STATE.md) and [validation provenance](docs/VALIDATION.md)
 - [Dependencies](docs/DEPENDENCIES.md), [ADRs](docs/adr/)

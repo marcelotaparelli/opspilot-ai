@@ -69,7 +69,9 @@ mutation checks after fixing a broken baseline. Phase 4 passed 241 unit and 72 i
 tests, migrations/regressions, observability, restricted Docker runtime, new-volume HTTP,
 scans, offline Terraform and full cold clean-room. Repeated CLI logging now survives closed
 capture streams. The image has zero fixable HIGH/CRITICAL findings, while 44 unfixed HIGH
-findings remain recorded. The release is engineering PASS; no push was performed.
+findings remain recorded. Engineering release and clean-room PASS; v0.1.0 is published on
+GitHub, and hosted GitHub Actions jobs `checks` and `terraform` PASS. Terraform remains a
+validated blueprint, not applied in production.
 
 ## Limitations
 
