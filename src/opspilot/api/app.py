@@ -12,6 +12,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from opspilot import observability
 from opspilot.agent.gitlab import GitLabTracker
 from opspilot.agent.graph import AgentService
 from opspilot.agent.planners import HeuristicPlanner, OpenAIPlanner
@@ -76,6 +77,7 @@ def create_app(
             app.state.agent = agent
             yield
             return
+        telemetry_owned = observability.setup(config.otel_exporter_otlp_endpoint)
         repository = PostgresRepository(config)
         provider = OpenAIProvider(config) if config.provider == "openai" else FakeProvider()
         planner = OpenAIPlanner(config) if config.provider == "openai" else HeuristicPlanner()
@@ -106,6 +108,8 @@ def create_app(
                     await tracker.close()
             finally:
                 await repository.close()
+                if telemetry_owned:
+                    observability.shutdown()
 
     app = FastAPI(title="opspilot-ai", version="0.1.0", lifespan=lifespan, debug=False)
     # Test injection does not require an ASGI lifespan manager dependency.

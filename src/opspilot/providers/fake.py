@@ -10,6 +10,7 @@ from opspilot.domain import (
     Chunk,
     GeneratedAnswer,
 )
+from opspilot.observability import llm_call
 
 
 class FakeProvider:
@@ -18,6 +19,11 @@ class FakeProvider:
         return EMBEDDING_SPACE_FAKE
 
     async def embed(self, texts: list[str]) -> list[list[float]]:
+        # The fake has no tokenizer: usage is unknown (not zero) and cost is unknown.
+        with llm_call("fake", "fake-sha256-bow", "embedding"):
+            return self._embed(texts)
+
+    def _embed(self, texts: list[str]) -> list[list[float]]:
         result: list[list[float]] = []
         for text in texts:
             vector = [0.0] * DIMENSIONS
@@ -32,4 +38,5 @@ class FakeProvider:
 
     async def answer(self, question: str, chunks: tuple[Chunk, ...]) -> GeneratedAnswer:
         # Extractive evidence cannot execute instructions or change tenant scope.
-        return GeneratedAnswer(chunks[0].text, (chunks[0].id,))
+        with llm_call("fake", "fake-extractive", "answer"):
+            return GeneratedAnswer(chunks[0].text, (chunks[0].id,))

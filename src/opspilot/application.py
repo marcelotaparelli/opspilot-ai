@@ -14,7 +14,7 @@ from opspilot.domain import (
     Repository,
     validate_vectors,
 )
-from opspilot.observability import span
+from opspilot.observability import annotate, span
 from opspilot.retrieval import Retriever
 
 
@@ -28,28 +28,47 @@ class RagService:
     async def ingest(
         self, tenant: UUID, content: str, metadata: Metadata, document_id: UUID | None = None
     ) -> tuple[Document, list[UUID]]:
-        document = Document(document_id or uuid4(), tenant, normalize_content(content), metadata)
-        chunks = split_document(document)
-        vectors: list[list[float]] = []
-        with span("embedding"):
+        with span("rag.ingest") as current:
+            document = Document(
+                document_id or uuid4(), tenant, normalize_content(content), metadata
+            )
+            chunks = split_document(document)
+            annotate(current, ai__ingest__chunks=len(chunks))
+            vectors: list[list[float]] = []
             # Bounded requests: at most 16 windows / 19,200 characters per call.
             for offset in range(0, len(chunks), 16):
                 batch = chunks[offset : offset + 16]
                 embedded = await self.embedder.embed([chunk.text for chunk in batch])
                 validate_vectors(embedded, len(batch))
                 vectors.extend(embedded)
-        # One database transaction, after all external calls succeed.
-        await self.repository.save(document, chunks, vectors, self.embedder.space)
-        return document, [chunk.id for chunk in chunks]
+            # One database transaction, after all external calls succeed.
+            await self.repository.save(document, chunks, vectors, self.embedder.space)
+            return document, [chunk.id for chunk in chunks]
 
     async def query(self, tenant: UUID, question: str, k: int) -> QueryResult:
+        with span("rag.query", ai__retrieval__top_k=k) as current:
+            result = await self._query(tenant, question, k)
+            annotate(
+                current,
+                ai__retrieval__chunks_returned=len(result.retrieved),
+                ai__citations__count=len(result.citations),
+                ai__answer__abstained=result.answer == ABSTENTION,
+            )
+            return result
+
+    async def _query(self, tenant: UUID, question: str, k: int) -> QueryResult:
         hits = await self.retriever.search(tenant, question, k)
         if not hits:
             return QueryResult(ABSTENTION, (), ())
-        # Maximum 24,000 context characters, enforced by chunk and k bounds.
-        context = tuple(hit.chunk for hit in hits)
-        with span("llm"):
-            generated = await self.answerer.answer(question, context)
+        with span("context_build") as current:
+            # Maximum 24,000 context characters, enforced by chunk and k bounds.
+            context = tuple(hit.chunk for hit in hits)
+            annotate(
+                current,
+                ai__context__chunks=len(context),
+                ai__context__characters=sum(len(chunk.text) for chunk in context),
+            )
+        generated = await self.answerer.answer(question, context)
         allowed = {chunk.id: chunk for chunk in context}
         if (
             not generated.answer.strip()

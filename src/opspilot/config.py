@@ -21,6 +21,7 @@ from sqlalchemy.exc import ArgumentError
 
 from opspilot.agent.policy import AgentPolicy, Principal
 from opspilot.domain import DIMENSIONS
+from opspilot.pricing import PricingTable
 
 
 class Settings(BaseModel):
@@ -48,6 +49,10 @@ class Settings(BaseModel):
     execution_lease_seconds: float = Field(default=60, ge=0.1, le=600)
     reconcile_grace_seconds: float = Field(default=30, ge=0, le=3600)
     max_execution_attempts: int = Field(default=3, ge=1, le=5)
+    # OTLP/HTTP collector base URL (e.g. http://otel-collector:4318); unset = no export.
+    otel_exporter_otlp_endpoint: str | None = None
+    # Configured prices only; an unpriced model has unknown cost, never an invented one.
+    model_pricing: PricingTable = Field(default_factory=PricingTable)
 
     @field_validator("database_url")
     @classmethod
@@ -96,6 +101,23 @@ class Settings(BaseModel):
         if (self.gitlab_base_url is None) != (self.gitlab_token is None):
             raise ValueError("GitLab requires both base URL and token")
         return self
+
+    @field_validator("otel_exporter_otlp_endpoint")
+    @classmethod
+    def otlp_url(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        parts = urlsplit(value)
+        if (
+            parts.scheme not in ("http", "https")
+            or not parts.hostname
+            or parts.username
+            or parts.password
+            or parts.query
+            or parts.path not in ("", "/")
+        ):
+            raise ValueError("OTLP endpoint must be http(s)://host[:port] without credentials")
+        return value.rstrip("/")
 
     @field_validator("gitlab_base_url")
     @classmethod
@@ -146,5 +168,8 @@ class Settings(BaseModel):
                 "gitlab_timeout_seconds": os.environ.get("GITLAB_TIMEOUT_SECONDS", "10"),
                 "execution_lease_seconds": os.environ.get("EXECUTION_LEASE_SECONDS", "60"),
                 "reconcile_grace_seconds": os.environ.get("RECONCILE_GRACE_SECONDS", "30"),
+                "otel_exporter_otlp_endpoint": os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT")
+                or None,
+                "model_pricing": {"prices": json.loads(os.environ.get("MODEL_PRICING") or "[]")},
             }
         )

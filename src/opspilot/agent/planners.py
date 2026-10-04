@@ -4,6 +4,7 @@ import asyncio
 import json
 import re
 from collections.abc import Sequence
+from datetime import UTC, datetime
 
 from openai import AsyncOpenAI, OpenAIError
 from pydantic import BaseModel, ConfigDict
@@ -12,6 +13,8 @@ from opspilot.agent.models import FinalAnswer, PrepareGitLabIssue, SearchKnowled
 from opspilot.agent.ports import PlannerView
 from opspilot.config import Settings
 from opspilot.domain import ProviderError
+from opspilot.observability import llm_call
+from opspilot.providers.openai import classify_error, refused, response_usage
 
 ISSUE_REQUEST = re.compile(r"\b(issue|ticket)\b", re.IGNORECASE)
 
@@ -25,6 +28,10 @@ class HeuristicPlanner:
     """
 
     async def decide(self, view: PlannerView) -> object:
+        with llm_call("fake", "heuristic-planner", "plan"):
+            return self._decide(view)
+
+    def _decide(self, view: PlannerView) -> object:
         tools = [str(item.get("tool")) for item in view.observations]
         searches = [item for item in view.observations if item.get("tool") == "search_knowledge"]
         if not searches:
@@ -77,14 +84,19 @@ class ScriptedPlanner:
         self.views: list[PlannerView] = []
 
     async def decide(self, view: PlannerView) -> object:
-        self.views.append(view)
-        if self.delay:
-            await asyncio.sleep(self.delay)
-        index = self.calls if not self.repeat_last else min(self.calls, len(self.script) - 1)
-        self.calls += 1
-        if index >= len(self.script):
-            return {"tool": "final_answer", "answer": "Script exhausted.", "cited_chunk_ids": []}
-        return self.script[index]
+        with llm_call("fake", "scripted-planner", "plan"):
+            self.views.append(view)
+            if self.delay:
+                await asyncio.sleep(self.delay)
+            index = self.calls if not self.repeat_last else min(self.calls, len(self.script) - 1)
+            self.calls += 1
+            if index >= len(self.script):
+                return {
+                    "tool": "final_answer",
+                    "answer": "Script exhausted.",
+                    "cited_chunk_ids": [],
+                }
+            return self.script[index]
 
 
 INSTRUCTIONS = (
@@ -122,21 +134,28 @@ class OpenAIPlanner:
             "untrusted_observations": view.observations,
             "steps_remaining": view.steps_remaining,
         }
-        try:
-            async with asyncio.timeout(self.settings.agent_llm_timeout_seconds):
-                response = await self.client.responses.parse(
-                    model=self.settings.answer_model,
-                    instructions=INSTRUCTIONS,
-                    input=json.dumps(payload),
-                    text_format=Envelope,
-                    max_output_tokens=2500,
-                    store=False,
-                )
-        except (OpenAIError, TimeoutError, ValueError, TypeError):
-            raise ProviderError from None
-        if response.output_parsed is None:
-            raise ProviderError
-        return response.output_parsed.decision.model_dump(mode="json")
+        model = self.settings.answer_model
+        with llm_call("openai", model, "plan") as call:
+            try:
+                async with asyncio.timeout(self.settings.agent_llm_timeout_seconds):
+                    response = await self.client.responses.parse(
+                        model=model,
+                        instructions=INSTRUCTIONS,
+                        input=json.dumps(payload),
+                        text_format=Envelope,
+                        max_output_tokens=2500,
+                        store=False,
+                    )
+            except (OpenAIError, TimeoutError, ValueError, TypeError) as error:
+                call.fail(classify_error(error))
+                raise ProviderError from None
+            usage = response_usage(response)
+            pricing = self.settings.model_pricing
+            call.report_usage(usage, pricing.cost("openai", model, usage, datetime.now(UTC)))
+            if response.output_parsed is None:
+                call.fail("refusal" if refused(response) else "invalid_output")
+                raise ProviderError
+            return response.output_parsed.decision.model_dump(mode="json")
 
     async def close(self) -> None:
         await self.client.close()

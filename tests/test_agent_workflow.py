@@ -179,7 +179,11 @@ async def test_unauthorized_project_is_never_proposed(agent_env: Env) -> None:
         bundle = await svc.start(agent_env.alice, ISSUE_REQUEST)
         events = await svc.store.events(agent_env.a, bundle.run.id)
     assert bundle.run.status == "answered" and bundle.proposal is None
-    denials = [event["data"] for event in events if event["type"] == "policy.denied"]
+    denials = [
+        {key: value for key, value in event["data"].items() if key != "trace_id"}
+        for event in events
+        if event["type"] == "policy.denied"
+    ]
     assert denials == [
         {"code": "project_not_allowed", "project": "secret-admin"},
         {"code": "project_not_allowed", "project": "b-ops"},

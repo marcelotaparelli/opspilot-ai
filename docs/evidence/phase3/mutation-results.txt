@@ -1,0 +1,19 @@
+# Phase 3 mutation/fault checks, 2026-10-04. One defect per line, full suite (unit + integration on
+# real PostgreSQL), file restored afterwards, bytecode purged. First failing test shown.
+# A first attempt was discarded: the baseline suite then had one failing test (audit event data
+# gained trace_id), which made every mutant look 'caught'. Fixed, baseline re-verified green
+# (201 unit + 64 integration), then all mutants re-run below.
+Q01 [redaction] exceptions recorded on spans: CAUGHT (FAILED tests/test_observability.py::test_exception_messages_never_reach_spans)
+Q02 [redaction] attribute allowlist bypassed: CAUGHT (FAILED tests/test_observability.py::test_span_attributes_are_allowlisted_typed_and_sanitised)
+Q03 [fail-open] exporter on the request path (synchronous): CAUGHT (FAILED tests/test_telemetry_failure.py::test_dead_collector_never_breaks_product_and_export_recovers)
+Q04 [fail-open] metric errors propagate: CAUGHT (FAILED tests/test_observability.py::test_broken_telemetry_never_breaks_requests)
+Q05 [cardinality] run_id label at a call site: CAUGHT (FAILED tests/test_observability_integration.py::test_metric_labels_stay_bounded_after_real_flows)
+Q06 [cardinality] label key guard removed: CAUGHT (FAILED tests/test_observability.py::test_metric_labels_reject_high_cardinality_keys_and_values)
+Q07 [tokens] missing usage reported as zero: CAUGHT (FAILED tests/test_observability.py::test_provider_usage_is_normalised_and_priced[False])
+Q08 [tokens] unknown totals summarised as zero: CAUGHT (FAILED tests/test_observability.py::test_unknown_usage_is_never_counted_as_zero)
+Q09 [correlation] run_id dropped from spans: CAUGHT (FAILED tests/test_observability_integration.py::test_agent_run_is_reconstructable_from_traces_audit_and_logs)
+Q10 [correlation] trace_id dropped from audit events: CAUGHT (FAILED tests/test_observability_integration.py::test_agent_run_is_reconstructable_from_traces_audit_and_logs)
+Q11 [policy] denial not counted: CAUGHT (FAILED tests/test_observability_integration.py::test_policy_and_model_failures_are_counted)
+Q12 [gate] RAG regression gate never fails: CAUGHT (FAILED tests/test_regression_gates.py::test_rag_gate_detects_material_regressions[<lambda>-lexical mrr@5 dropped])
+Q13 [gate] agent invariants not enforced: CAUGHT (FAILED tests/test_regression_gates.py::test_agent_gate_treats_safety_metrics_as_invariants)
+Q14 [gate] CI no longer runs the RAG gate: CAUGHT (FAILED tests/test_regression_gates.py::test_ci_runs_every_gate - AssertionErr...)

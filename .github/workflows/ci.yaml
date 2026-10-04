@@ -37,8 +37,20 @@ jobs:
         run: ./scripts/verify.sh
       - name: Measure retrieval against real PostgreSQL
         run: uv run --locked python -m opspilot.evaluation --seed --output eval-results-ci.json
-      - name: Agent control evaluation (scripted model behaviour, fake GitLab)
-        run: PYTHONPATH=. uv run --locked python -m scripts.agent_eval --output agent-eval-ci.json
+      - name: RAG regression gate (retrieval-v2 DEV split; held-out is never re-run)
+        run: |
+          uv run --locked python -m opspilot.benchmark run --split dev --seed --output rag-dev-ci.json
+          PYTHONPATH=. uv run --locked python -m scripts.regression_gate rag rag-dev-ci.json
+      - name: Agent regression gate (safety invariants + task success)
+        run: |
+          PYTHONPATH=. uv run --locked python -m scripts.agent_eval --output agent-eval-ci.json
+          PYTHONPATH=. uv run --locked python -m scripts.regression_gate agent agent-eval-ci.json
+      - name: Security regression suite
+        env:
+          ADMIN_DATABASE_URL: postgresql+asyncpg://postgres:ci-admin-ephemeral@localhost:5432/opspilot
+        run: |
+          PYTHONPATH=. uv run --locked python -m scripts.security_suite --output security-ci.json
+          PYTHONPATH=. uv run --locked python -m scripts.regression_gate security security-ci.json
       - name: Start built API and smoke test real HTTP
         env:
           DATABASE_URL: postgresql+asyncpg://opspilot_app:ci-app-ephemeral@db:5432/opspilot
@@ -56,7 +68,9 @@ jobs:
           name: measured-retrieval
           path: |
             eval-results-ci.json
+            rag-dev-ci.json
             agent-eval-ci.json
+            security-ci.json
             smoke-results-ci.json
             agent-smoke-ci.json
       - name: Stop PostgreSQL

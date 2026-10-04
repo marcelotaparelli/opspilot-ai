@@ -11,6 +11,9 @@ persists its transition before returning, so PostgreSQL always holds the latest 
 """
 
 import asyncio
+import time
+from collections.abc import AsyncIterator, Callable
+from contextlib import asynccontextmanager
 from typing import Literal, cast
 from uuid import UUID, uuid4
 
@@ -23,6 +26,7 @@ from opspilot.agent.models import (
     DECISION,
     AgentState,
     FinalAnswer,
+    IssueAction,
     PrepareGitLabIssue,
     SearchKnowledge,
     marker_footer,
@@ -47,8 +51,8 @@ from opspilot.agent.ports import (
 from opspilot.agent.store import Event, PostgresAgentStore, RunBundle
 from opspilot.config import Settings
 from opspilot.domain import AppError, ProviderError
+from opspilot.observability import annotate, count, observe, span, usage_scope
 from opspilot.observability import run_id as run_context
-from opspilot.observability import span
 from opspilot.retrieval import Retriever
 
 MAX_INVALID_OUTPUTS = 2
@@ -74,7 +78,6 @@ class AgentService:
 
     # ---------------------------------------------------------------- API use cases
     async def start(self, principal: Principal, request: str) -> RunBundle:
-        authorize_start(principal)
         state = AgentState(
             run_id=str(uuid4()),
             tenant_id=str(principal.tenant),
@@ -90,16 +93,15 @@ class AgentService:
             cited_chunk_ids=[],
             error=None,
         )
-        token = run_context.set(state["run_id"])
-        try:
-            with span("agent.run"):
-                await self.store.create_run(
-                    state, [("run.created", principal.subject, {"request_chars": len(request)})]
-                )
-                await self.drive(state)
-        finally:
-            run_context.reset(token)
-        return await self.bundle(principal.tenant, UUID(state["run_id"]))
+        run = UUID(state["run_id"])
+        async with self.invocation("start", principal.tenant, run, None):
+            # Inside agent.run so a denied start is traced with the would-be run ID.
+            _authorize("start", authorize_start, principal)
+            await self.store.create_run(
+                state, [("run.created", principal.subject, {"request_chars": len(request)})]
+            )
+            await self.drive(state)
+        return await self.bundle(principal.tenant, run)
 
     async def get(self, principal: Principal, run_id: UUID) -> RunBundle:
         return await self.bundle(principal.tenant, run_id)
@@ -108,23 +110,41 @@ class AgentService:
         self, principal: Principal, run_id: UUID, action_hash: str, approve: bool
     ) -> RunBundle:
         bundle = await self.bundle(principal.tenant, run_id)
-        authorize_decision(principal, bundle.run.tenant_id, bundle.run.requested_by)
         decision: Literal["approved", "rejected"] = "approved" if approve else "rejected"
-        token = run_context.set(str(run_id))
-        try:
-            with span("agent.approval"):
-                await self.store.decide(
-                    principal.tenant,
-                    run_id,
-                    principal.subject,
-                    decision,
-                    action_hash,
-                    [(f"approval.{decision}", principal.subject, {"action_hash": action_hash})],
-                )
+        entry = "approve" if approve else "reject"
+        async with self.invocation(entry, principal.tenant, run_id, bundle.run.status):
+            _authorize(
+                "decide",
+                authorize_decision,
+                principal,
+                bundle.run.tenant_id,
+                bundle.run.requested_by,
+            )
+            with span("approval", ai__approval__decision=decision) as current:
+                try:
+                    await self.store.decide(
+                        principal.tenant,
+                        run_id,
+                        principal.subject,
+                        decision,
+                        action_hash,
+                        [(f"approval.{decision}", principal.subject, {"action_hash": action_hash})],
+                    )
+                except AgentError as refused:
+                    if refused.code == "action_hash_mismatch":
+                        count("approval_hash_mismatch_total")
+                    raise
+                decided = await self.bundle(principal.tenant, run_id)
+                if decided.proposal and decided.approval:
+                    wait = (
+                        decided.approval.decided_at - decided.proposal.created_at
+                    ).total_seconds()
+                    # Human wait spans processes: database timestamps, not a monotonic clock.
+                    annotate(current, ai__approval__wait_seconds=wait)
+                    observe("approval_duration_seconds", wait, result=decision)
+                count(f"approval_{decision}_total")
             if approve:
                 await self.resume_execution(principal.tenant, run_id)
-        finally:
-            run_context.reset(token)
         return await self.bundle(principal.tenant, run_id)
 
     async def resume(self, principal: Principal, run_id: UUID) -> RunBundle:
@@ -132,15 +152,45 @@ class AgentService:
         if not principal.roles & {"agent", "approver"}:
             raise Denied("role_required")
         bundle = await self.bundle(principal.tenant, run_id)
-        token = run_context.set(str(run_id))
-        try:
+        async with self.invocation("resume", principal.tenant, run_id, bundle.run.status):
             if bundle.run.status == "planning":
                 await self.drive(bundle.run.state)
             elif bundle.run.status in ("approved", "executing", "ambiguous"):
                 await self.resume_execution(principal.tenant, run_id)
-        finally:
-            run_context.reset(token)
         return await self.bundle(principal.tenant, run_id)
+
+    @asynccontextmanager
+    async def invocation(
+        self, entry: str, tenant: UUID, run_id: UUID, before: str | None
+    ) -> AsyncIterator[None]:
+        """agent.run span + run metrics; outcome metrics only on a status transition."""
+        token = run_context.set(str(run_id))
+        started = time.monotonic()
+        try:
+            with span("agent.run", ai__agent__entry=entry) as current:
+                try:
+                    yield
+                except Exception as error:
+                    count("agent_failure_total", reason=type(error).__name__)
+                    raise
+                count("agent_runs_total", entry=entry)
+                after = await self.store.load(tenant, run_id)
+                if after is not None:
+                    status = after.run.status
+                    annotate(current, ai__agent__status=status, ai__agent__steps=after.run.steps)
+                    if status != before:
+                        if status in ("answered", "succeeded"):
+                            count("agent_success_total", status=status)
+                        elif status == "failed":
+                            count(
+                                "agent_failure_total",
+                                reason=after.run.state.get("error") or "unknown",
+                            )
+                        if status != "planning":
+                            observe("agent_steps", after.run.steps, status=status)
+        finally:
+            observe("agent_duration_seconds", time.monotonic() - started, entry=entry)
+            run_context.reset(token)
 
     async def bundle(self, tenant: UUID, run_id: UUID) -> RunBundle:
         bundle = await self.store.load(tenant, run_id)
@@ -190,10 +240,11 @@ class AgentService:
                 "system",
                 {"approved_hash": approval.action_hash, "current_hash": current},
             )
+            count("approval_hash_mismatch_total")
             await self.store.fail_run(tenant, run_id, "approval_invalid", [event])
             return
         try:
-            authorize_execution(self.settings.agent_policy, proposal.action)
+            _authorize("execute", authorize_execution, self.settings.agent_policy, proposal.action)
         except Denied as denied:
             await self.store.fail_run(
                 tenant, run_id, denied.code, [("execution.denied", "system", {"code": denied.code})]
@@ -211,17 +262,37 @@ class AgentService:
         mode = await self.store.claim(tenant, run_id, owner, self.settings.execution_lease_seconds)
         if mode is None:
             return  # terminal already, or another live owner holds the lease
-        action, key = proposal.action, execution.idempotency_key
-        with span("agent.tool"):
-            if mode == "reconcile":
+        started = time.monotonic()
+        with span(
+            "tool.execute", ai__tool__name="create_gitlab_issue", ai__execution__mode=mode
+        ) as tool_span:
+            result = await self._run_claimed(
+                tenant, run_id, owner, mode, proposal.action, execution.idempotency_key
+            )
+            annotate(tool_span, ai__execution__outcome=result)
+        count("tool_calls_total", tool="create_gitlab_issue")
+        observe("tool_duration_seconds", time.monotonic() - started, tool="create_gitlab_issue")
+        if result != "succeeded":
+            count("tool_failures_total", tool="create_gitlab_issue", error_type=result)
+
+    async def _run_claimed(
+        self, tenant: UUID, run_id: UUID, owner: UUID, mode: str, action: IssueAction, key: str
+    ) -> str:
+        """Returns the execution status written (or 'lost' if ownership was lost)."""
+        assert self.tracker is not None
+        if mode == "reconcile":
+            count("reconciliation_attempt_total")
+            with span("reconciliation") as reconciliation:
                 try:
                     found = await self.tracker.find_by_marker(action.project_id, key)
                 except TrackerUnavailable:
-                    await self.finish(
+                    annotate(reconciliation, ai__reconciliation__result="unavailable")
+                    return await self.finish(
                         tenant, run_id, owner, CreateOutcome("unknown", "reconcile_unavailable")
                     )
-                    return
                 if found:
+                    annotate(reconciliation, ai__reconciliation__result="found")
+                    count("reconciliation_success_total")
                     events: list[Event] = [
                         ("execution.reconciled", "system", {"found": len(found)})
                     ]
@@ -232,33 +303,33 @@ class AgentService:
                     await self.store.finish(
                         tenant, run_id, owner, "succeeded", "succeeded", None, found[0], events
                     )
-                    return
+                    return "succeeded"
                 latest = (await self.bundle(tenant, run_id)).execution
                 since = latest.seconds_since_attempt if latest else None
                 if since is not None and since < self.settings.reconcile_grace_seconds:
                     # Too early to conclude "not created": the original request may land late.
-                    await self.finish(
+                    annotate(reconciliation, ai__reconciliation__result="within_grace")
+                    return await self.finish(
                         tenant, run_id, owner, CreateOutcome("unknown", "awaiting_reconcile_grace")
                     )
-                    return
-            latest = (await self.bundle(tenant, run_id)).execution
-            if latest is not None and latest.attempts >= self.settings.max_execution_attempts:
-                await self.finish(
-                    tenant, run_id, owner, CreateOutcome("rejected", "attempts_exhausted")
-                )
-                return
-            if not await self.store.begin_attempt(tenant, run_id, owner):
-                return
-            outcome = await self.tracker.create_issue(
-                action.project_id,
-                action.title,
-                action.description + marker_footer(key),
-                action.labels,
-                action.assignee_ids,
+                annotate(reconciliation, ai__reconciliation__result="not_found")
+        latest = (await self.bundle(tenant, run_id)).execution
+        if latest is not None and latest.attempts >= self.settings.max_execution_attempts:
+            return await self.finish(
+                tenant, run_id, owner, CreateOutcome("rejected", "attempts_exhausted")
             )
-            await self.finish(tenant, run_id, owner, outcome)
+        if not await self.store.begin_attempt(tenant, run_id, owner):
+            return "lost"
+        outcome = await self.tracker.create_issue(
+            action.project_id,
+            action.title,
+            action.description + marker_footer(key),
+            action.labels,
+            action.assignee_ids,
+        )
+        return await self.finish(tenant, run_id, owner, outcome)
 
-    async def finish(self, tenant: UUID, run_id: UUID, owner: UUID, outcome: CreateOutcome) -> None:
+    async def finish(self, tenant: UUID, run_id: UUID, owner: UUID, outcome: CreateOutcome) -> str:
         data: dict[str, object] = {"outcome": outcome.kind, "code": outcome.code}
         if outcome.kind == "created" and outcome.issue is not None:
             data |= {"issue_iid": outcome.issue.iid, "issue_url": outcome.issue.web_url}
@@ -272,12 +343,13 @@ class AgentService:
                 outcome.issue,
                 [("execution.succeeded", "system", data)],
             )
-            return
+            return "succeeded"
         bundle = await self.bundle(tenant, run_id)
         attempts = bundle.execution.attempts if bundle.execution else 0
         exhausted = attempts >= self.settings.max_execution_attempts
         if outcome.kind == "unknown":
             # Never treat "unknown" as "failed": reconcile by marker before any resend.
+            count("ambiguous_execution_total", reason=outcome.code)
             await self.store.finish(
                 tenant,
                 run_id,
@@ -288,7 +360,7 @@ class AgentService:
                 None,
                 [("execution.ambiguous", "system", data)],
             )
-            return
+            return "ambiguous"
         if (outcome.kind == "not_sent" or outcome.retryable) and not exhausted:
             await self.store.finish(
                 tenant,
@@ -300,7 +372,7 @@ class AgentService:
                 None,
                 [("execution.retryable", "system", data)],
             )
-            return
+            return "pending"
         await self.store.finish(
             tenant,
             run_id,
@@ -311,6 +383,20 @@ class AgentService:
             None,
             [("execution.failed", "system", data)],
         )
+        return "failed_terminal"
+
+
+def _authorize[T](check: str, policy: Callable[..., T], *args: object) -> T:
+    """Every authorization decision is a span and, when denied, a bounded-label metric."""
+    with span("authorization", ai__operation=check) as current:
+        try:
+            result = policy(*args)
+        except Denied as denied:
+            annotate(current, ai__policy__result="deny", ai__policy__reason=denied.code)
+            count("policy_denied_total", reason=denied.code)
+            raise
+        annotate(current, ai__policy__result="allow")
+        return result
 
 
 def _project_views(service: AgentService, tenant: UUID) -> list[dict[str, object]]:
@@ -334,18 +420,25 @@ def build_graph(
             return {"status": "failed", "error": "superseded"}
         return updates
 
-    async def invalid(state: AgentState, reason: str, tool: object) -> dict[str, object]:
-        count = state["invalid_outputs"] + 1
+    async def invalid(
+        state: AgentState, reason: str, tool: object, spent: dict[str, object] | None = None
+    ) -> dict[str, object]:
+        invalid_count = state["invalid_outputs"] + 1
         observation = {"tool": tool if isinstance(tool, str) else None, "error": reason}
+        if reason == "tool_not_permitted":
+            count("unauthorized_tool_total")
+        else:
+            count("invalid_model_output_total", reason=reason)
         updates: dict[str, object] = {
-            "invalid_outputs": count,
+            "invalid_outputs": invalid_count,
             "steps": state["steps"] + 1,
             "observations": [*state["observations"], observation][-OBSERVATION_WINDOW:],
             "decision": None,
         }
         kind = "tool.denied" if reason == "tool_not_permitted" else "decision.invalid"
-        events: list[Event] = [(kind, "model", {"reason": reason, "tool": str(tool)[:64]})]
-        if count > MAX_INVALID_OUTPUTS:
+        data: dict[str, object] = {"reason": reason, "tool": str(tool)[:64]} | (spent or {})
+        events: list[Event] = [(kind, "model", data)]
+        if invalid_count > MAX_INVALID_OUTPUTS:
             updates |= {"status": "failed", "error": "invalid_model_output"}
             events.append(("run.failed", "system", {"code": "invalid_model_output"}))
         return await commit(state, updates, events)
@@ -357,6 +450,18 @@ def build_graph(
                 {"status": "failed", "error": "step_limit"},
                 [("run.failed", "system", {"code": "step_limit"})],
             )
+        with span("agent.plan", ai__agent__step=state["steps"] + 1) as current:
+            updates = await planned(state)
+            decided = updates.get("decision")
+            if isinstance(decided, dict):
+                annotate(
+                    current, ai__tool__name=str(decided.get("tool")), ai__decision__result="valid"
+                )
+            else:
+                annotate(current, ai__decision__result=str(updates.get("error") or "invalid"))
+            return updates
+
+    async def planned(state: AgentState) -> dict[str, object]:
         tenant = UUID(state["tenant_id"])
         view = PlannerView(
             request=state["request"],
@@ -364,28 +469,32 @@ def build_graph(
             observations=state["observations"][-OBSERVATION_WINDOW:],
             steps_remaining=settings.agent_max_steps - state["steps"],
         )
-        try:
-            with span("agent.llm"):
+        with usage_scope() as usage:
+            try:
                 async with asyncio.timeout(settings.agent_llm_timeout_seconds):
                     raw = await service.planner.decide(view)
-        except (TimeoutError, ProviderError):
+            except (TimeoutError, ProviderError):
+                raw = None
+        # Tokens and cost are persisted with the decision, priced at call time.
+        spent = usage.summary()
+        if raw is None:
             return await commit(
                 state,
                 {"status": "failed", "error": "llm_unavailable"},
-                [("run.failed", "system", {"code": "llm_unavailable"})],
+                [("run.failed", "system", {"code": "llm_unavailable"} | spent)],
             )
         tool = raw.get("tool") if isinstance(raw, dict) else None
         if not isinstance(tool, str):
-            return await invalid(state, "malformed_decision", tool)
+            return await invalid(state, "malformed_decision", tool, spent)
         try:
-            authorize_tool(tool)
+            _authorize("tool", authorize_tool, tool)
         except Denied:
-            return await invalid(state, "tool_not_permitted", tool)
+            return await invalid(state, "tool_not_permitted", tool, spent)
         try:
             decision = DECISION.validate_python(raw)
         except ValidationError:
-            return await invalid(state, "invalid_arguments", tool)
-        summary: dict[str, object] = {"tool": decision.tool}
+            return await invalid(state, "invalid_arguments", tool, spent)
+        summary: dict[str, object] = {"tool": decision.tool} | spent
         if isinstance(decision, SearchKnowledge):
             summary["query"] = decision.query
         elif isinstance(decision, PrepareGitLabIssue):
@@ -405,15 +514,19 @@ def build_graph(
     async def search_knowledge(state: AgentState) -> dict[str, object]:
         decision = SearchKnowledge.model_validate(state["decision"])
         tenant = UUID(state["tenant_id"])
+        started = time.monotonic()
+        count("tool_calls_total", tool="search_knowledge")
         try:
-            with span("agent.tool"):
+            with span("knowledge_search", ai__tool__name="search_knowledge"):
                 hits = await service.retriever.search(tenant, decision.query, 5)
-        except AppError:
+        except AppError as error:
+            count("tool_failures_total", tool="search_knowledge", error_type=error.code)
             return await commit(
                 state,
                 {"status": "failed", "error": "retrieval_unavailable"},
                 [("run.failed", "system", {"code": "retrieval_unavailable"})],
             )
+        observe("tool_duration_seconds", time.monotonic() - started, tool="search_knowledge")
         refs = [
             {
                 "chunk_id": str(hit.chunk.id),
@@ -448,9 +561,12 @@ def build_graph(
         request = PrepareGitLabIssue.model_validate(state["decision"])
         principal = Principal(tenant=UUID(state["tenant_id"]), subject=state["subject"])
         steps = state["steps"] + 1
+        count("tool_calls_total", tool="prepare_gitlab_issue")
         try:
             # Pure: resolves aliases from configuration and checks policy; no side effect.
-            action = authorize_issue(settings.agent_policy, principal, request)
+            action = _authorize(
+                "prepare", authorize_issue, settings.agent_policy, principal, request
+            )
         except Denied as denied:
             observation = {"tool": "prepare_gitlab_issue", "error": denied.code}
             return await commit(
@@ -482,10 +598,12 @@ def build_graph(
         )
         if not stored:
             return {"status": "failed", "error": "superseded"}
+        count("approval_requested_total")
         return {"steps": steps, "decision": None, "status": "awaiting_approval"}
 
     async def final_answer(state: AgentState) -> dict[str, object]:
         decision = FinalAnswer.model_validate(state["decision"])
+        count("tool_calls_total", tool="final_answer")
         known = {item["chunk_id"] for item in state["context"]}
         cited = [str(item) for item in decision.cited_chunk_ids]
         if any(item not in known for item in cited):

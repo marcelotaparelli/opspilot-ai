@@ -8,4 +8,5 @@ uv run --locked mypy
 uv run --locked pytest -m 'not integration'
 uv run --locked pytest -m integration
 docker compose --env-file "${COMPOSE_ENV_FILE:-.env.example}" config --quiet
+docker compose --env-file "${COMPOSE_ENV_FILE:-.env.example}" --profile observability config --quiet
 docker build --tag opspilot-ai:phase1 .

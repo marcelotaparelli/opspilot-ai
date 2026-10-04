@@ -127,7 +127,7 @@ async def test_adversarial_api_scope_and_safe_logs(
     )
     for secret in secrets:
         assert secret not in caplog.text
-    assert "operation=retrieval" in caplog.text and "request_id=" in caplog.text
+    assert '"operation":"retrieval"' in caplog.text and '"request_id":' in caplog.text
 
 
 async def test_provider_failure_is_controlled(settings: Settings) -> None:

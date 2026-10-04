@@ -147,7 +147,7 @@ async def test_token_never_logged(caplog: pytest.LogCaptureFixture) -> None:
         await create(tracker(lambda request: httpx.Response(401)))
         await create(tracker(lambda request: httpx.Response(201, json=CREATED)))
     assert TOKEN not in caplog.text
-    assert "operation=gitlab.request" in caplog.text
+    assert '"operation":"gitlab.request"' in caplog.text
 
 
 def planner(handler: Any) -> OpenAIPlanner:

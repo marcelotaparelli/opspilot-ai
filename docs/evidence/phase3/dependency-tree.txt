@@ -1,0 +1,127 @@
+opspilot-ai v0.1.0
+├── asyncpg v0.30.0
+├── fastapi v0.115.12
+│   ├── pydantic v2.11.4
+│   │   ├── annotated-types v0.8.0
+│   │   ├── pydantic-core v2.33.2
+│   │   │   └── typing-extensions v4.16.0
+│   │   ├── typing-extensions v4.16.0
+│   │   └── typing-inspection v0.4.4
+│   │       └── typing-extensions v4.16.0
+│   ├── starlette v0.46.2
+│   │   └── anyio v4.15.1
+│   │       ├── idna v3.20
+│   │       └── typing-extensions v4.16.0
+│   └── typing-extensions v4.16.0
+├── httpx v0.28.1
+│   ├── anyio v4.15.1 (*)
+│   ├── certifi v2026.7.22
+│   ├── httpcore v1.0.9
+│   │   ├── certifi v2026.7.22
+│   │   └── h11 v0.16.0
+│   └── idna v3.20
+├── langgraph v1.2.12
+│   ├── langchain-core v1.6.6
+│   │   ├── httpx v0.28.1 (*)
+│   │   ├── jsonpatch v1.33
+│   │   │   └── jsonpointer v3.1.1
+│   │   ├── langchain-protocol v0.0.19
+│   │   │   └── typing-extensions v4.16.0
+│   │   ├── langsmith v0.14.4
+│   │   │   ├── anyio v4.15.1 (*)
+│   │   │   ├── distro v1.9.0
+│   │   │   ├── httpx2 v2.13.1
+│   │   │   │   ├── anyio v4.15.1 (*)
+│   │   │   │   ├── httpcore2 v2.13.1
+│   │   │   │   │   ├── h11 v0.16.0
+│   │   │   │   │   └── truststore v0.10.4
+│   │   │   │   ├── idna v3.20
+│   │   │   │   ├── truststore v0.10.4
+│   │   │   │   └── typing-extensions v4.16.0
+│   │   │   ├── orjson v3.12.0
+│   │   │   ├── packaging v26.3
+│   │   │   ├── pydantic v2.11.4 (*)
+│   │   │   ├── requests v2.34.2
+│   │   │   │   ├── certifi v2026.7.22
+│   │   │   │   ├── charset-normalizer v3.5.2
+│   │   │   │   ├── idna v3.20
+│   │   │   │   └── urllib3 v2.8.0
+│   │   │   ├── requests-toolbelt v1.0.0
+│   │   │   │   └── requests v2.34.2 (*)
+│   │   │   ├── sniffio v1.3.1
+│   │   │   ├── typing-extensions v4.16.0
+│   │   │   ├── uuid-utils v0.17.1
+│   │   │   ├── websockets v16.1.1
+│   │   │   ├── xxhash v4.0.1
+│   │   │   └── zstandard v0.25.0
+│   │   ├── packaging v26.3
+│   │   ├── pydantic v2.11.4 (*)
+│   │   ├── pyyaml v6.0.3
+│   │   ├── tenacity v9.1.4
+│   │   ├── typing-extensions v4.16.0
+│   │   └── uuid-utils v0.17.1
+│   ├── langgraph-checkpoint v4.2.0
+│   │   ├── langchain-core v1.6.6 (*)
+│   │   └── ormsgpack v1.12.2
+│   ├── langgraph-prebuilt v1.1.0
+│   │   ├── langchain-core v1.6.6 (*)
+│   │   └── langgraph-checkpoint v4.2.0 (*)
+│   ├── langgraph-sdk v0.4.5
+│   │   ├── httpx v0.28.1 (*)
+│   │   ├── langchain-core v1.6.6 (*)
+│   │   ├── langchain-protocol v0.0.19 (*)
+│   │   ├── orjson v3.12.0
+│   │   └── websockets v16.1.1
+│   ├── pydantic v2.11.4 (*)
+│   └── xxhash v4.0.1
+├── openai v1.78.1
+│   ├── anyio v4.15.1 (*)
+│   ├── distro v1.9.0
+│   ├── httpx v0.28.1 (*)
+│   ├── jiter v0.17.0
+│   ├── pydantic v2.11.4 (*)
+│   ├── sniffio v1.3.1
+│   ├── tqdm v4.70.1
+│   └── typing-extensions v4.16.0
+├── opentelemetry-api v1.45.0
+│   └── typing-extensions v4.16.0
+├── opentelemetry-exporter-otlp-proto-http v1.45.0
+│   ├── googleapis-common-protos v1.75.5
+│   │   └── protobuf v7.36.2
+│   ├── opentelemetry-api v1.45.0 (*)
+│   ├── opentelemetry-exporter-http-transport[urllib3] v0.66b0
+│   │   ├── opentelemetry-api v1.45.0 (*)
+│   │   └── urllib3 v2.8.0 (extra: urllib3)
+│   ├── opentelemetry-exporter-otlp-common v0.66b0
+│   │   └── opentelemetry-sdk v1.45.0
+│   │       ├── opentelemetry-api v1.45.0 (*)
+│   │       ├── opentelemetry-semantic-conventions v0.66b0
+│   │       │   ├── opentelemetry-api v1.45.0 (*)
+│   │       │   └── typing-extensions v4.16.0
+│   │       └── typing-extensions v4.16.0
+│   ├── opentelemetry-exporter-otlp-proto-common v1.45.0
+│   │   └── opentelemetry-proto v1.45.0
+│   │       └── protobuf v7.36.2
+│   ├── opentelemetry-proto v1.45.0 (*)
+│   ├── opentelemetry-sdk v1.45.0 (*)
+│   └── typing-extensions v4.16.0
+├── opentelemetry-sdk v1.45.0 (*)
+├── pydantic v2.11.4 (*)
+├── sqlalchemy[asyncio] v2.0.41
+│   ├── greenlet v3.5.6
+│   ├── typing-extensions v4.16.0
+│   └── greenlet v3.5.6 (extra: asyncio)
+├── uvicorn v0.34.2
+│   ├── click v8.5.0
+│   └── h11 v0.16.0
+├── mypy v1.15.0 (group: dev)
+│   ├── mypy-extensions v1.1.0
+│   └── typing-extensions v4.16.0
+├── pytest v8.3.5 (group: dev)
+│   ├── iniconfig v2.3.0
+│   ├── packaging v26.3
+│   └── pluggy v1.6.0
+├── pytest-asyncio v0.26.0 (group: dev)
+│   └── pytest v8.3.5 (*)
+└── ruff v0.11.9 (group: dev)
+(*) Package tree already displayed

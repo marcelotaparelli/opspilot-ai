@@ -1,0 +1,41 @@
+# Local observability profile only. OTLP/HTTP in; traces to Jaeger; metrics exposed in
+# Prometheus text format on :8889 (curl-able, no Prometheus server needed).
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 200
+  # Defense in depth: the application already allowlists attributes; drop anything that
+  # still looks like a credential or raw content if a future change slips one through.
+  attributes/redact:
+    actions:
+      - pattern: "(?i).*(authorization|token|secret|password|api[_.-]?key|prompt|cookie).*"
+        action: delete
+  batch: {}
+
+exporters:
+  otlp/jaeger:
+    endpoint: jaeger:4317
+    tls:
+      insecure: true
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    add_metric_suffixes: false
+  debug:
+    verbosity: basic
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, attributes/redact, batch]
+      exporters: [otlp/jaeger]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, attributes/redact, batch]
+      exporters: [prometheus]

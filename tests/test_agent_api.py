@@ -99,5 +99,5 @@ async def test_agent_http_flow_and_error_contract(
             assert fetched["status"] == "succeeded" and len(agent_env.issues()) == 1
     for secret in (ALICE, BOB, GITLAB_TOKEN, "Authorization", "restart payments-api"):
         assert secret not in caplog.text
-    assert "operation=agent.run" in caplog.text and f"run_id={run_id}" in caplog.text
-    assert "operation=gitlab.request" in caplog.text
+    assert '"operation":"agent.run"' in caplog.text and f'"run_id":"{run_id}"' in caplog.text
+    assert '"operation":"gitlab.request"' in caplog.text

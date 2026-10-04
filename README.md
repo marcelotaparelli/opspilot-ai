@@ -94,6 +94,25 @@ is no exactly-once claim. Design, trust boundaries, failure modes and limits:
 `GITLAB_BASE_URL`/`GITLAB_TOKEN` enable execution (https only; empty means approved actions
 fail closed).
 
+### Observability (Phase 3)
+
+OpenTelemetry traces and metrics at business/AI boundaries (HTTP, RAG stages, LLM calls with
+tokens and configured cost, agent planning/tools/policy/approval/execution, GitLab), JSON logs on
+stdout, and `request_id`/`run_id`/`trace_id` correlation (`x-trace-id` response header). Telemetry
+is fail-open: it never fails or slows a request, while security stays fail-closed. Attributes and
+labels are allowlisted, so no content, secrets or high-cardinality IDs leave the process. The
+collector and Jaeger are an optional Compose profile:
+
+```bash
+OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318 \
+  docker compose --env-file .env.example --profile observability up --build -d --wait
+# Jaeger UI: http://127.0.0.1:16686   Metrics: curl http://127.0.0.1:8889/metrics
+```
+
+CI gates: the RAG dev-split regression gate, agent safety invariants and the adversarial security
+suite. Signals, redaction, cost accounting, failure behaviour and the measured latency baseline:
+[docs/observability.md](docs/observability.md).
+
 ## 3. How to run
 
 Validated versions: Python 3.12.10, uv 0.7.3, Docker Engine 29.8.2 and Compose 5.6.0.
@@ -196,10 +215,11 @@ Unit tests use a separate in-memory port implementation, never an SQLite substit
 PostgreSQL behavior. SDK adapter tests use the actual official SDK with an HTTP transport
 mock and no network/provider credentials.
 
-Measured on 2026-10-04 (Phase 2): `scripts/verify.sh` exit 0. Ruff checked 50 Python files;
-strict mypy checked source, tests and scripts. Pytest collected 228 tests: the unit command
-selected and passed 172 (56 deselected); the integration command selected and passed 56
-(172 deselected) against real PostgreSQL. Zero failures, zero skips. Agent tests and evidence:
+Measured on 2026-10-04 (Phase 3): `scripts/verify.sh` exit 0. Ruff checked 59 Python files;
+strict mypy checked source, tests and scripts. Pytest collected 265 tests: the unit command
+selected and passed 201 (64 deselected); the integration command selected and passed 64
+(201 deselected) against real PostgreSQL. Zero failures, zero skips. Observability evidence:
+[docs/observability.md](docs/observability.md). Agent tests and evidence:
 [agent-workflow.md §8, §11](docs/architecture/agent-workflow.md). Phase 1 detail follows. The database tests
 compare vector order/scores/top-k with an independent cosine computation, run a
 natural-language lexical query, remove the application tenant predicates and show RLS

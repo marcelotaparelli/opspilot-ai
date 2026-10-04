@@ -1,0 +1,25 @@
+{
+  "scenario": "rag",
+  "path": "/v1/query",
+  "requests": 400,
+  "warmup": 40,
+  "concurrency": 8,
+  "wall_seconds": 2.39,
+  "throughput_rps": 167.4,
+  "latency_ms": {
+    "p50": 37.7,
+    "p95": 104.8,
+    "p99": 183.2,
+    "max": 189.1,
+    "mean": 47.6
+  },
+  "errors": 0,
+  "error_rate": 0.0,
+  "environment": {
+    "platform": "Linux-6.12.98-x86_64-with-glibc2.36",
+    "cpus": 4,
+    "cpu_model": "AMD EPYC",
+    "memory_kib": "8157388",
+    "python": "3.12.10"
+  }
+}

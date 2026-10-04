@@ -13,6 +13,8 @@ review; they are not part of that runtime/development lock. This is not a vulner
 | Dependency | Need / why stdlib is insufficient | Relevant transitives / maintenance impact |
 | --- | --- | --- |
 | LangGraph 1.2.12 (Phase 2) | Owner-mandated agent framework; used only for typed `StateGraph`, conditional routing, recursion limit and topology export ([ADR 004](adr/004-langgraph-control-flow-postgres-durability.md)). Checkpointer, `interrupt()`, prebuilt agents and LangChain tools are deliberately unused | Largest addition: the lock grew from 33 to 58 entries (+25). Via `langchain-core`: `langsmith` (requests, urllib3, charset-normalizer, requests-toolbelt, httpx2/httpcore2/httpx2-jsfetch, truststore, websockets, zstandard, orjson, uuid-utils), jsonpatch/jsonpointer, langchain-protocol, pyyaml, tenacity; `langgraph-checkpoint` (ormsgpack); `langgraph-sdk`; xxhash. LangSmith tracing is off unless `LANGSMITH_*`/`LANGCHAIN_TRACING*` variables are set; this project sets none. Upgrade LangGraph and langchain-core together and re-run the agent suite |
+| OpenTelemetry API + SDK 1.45.0 (Phase 3) | Vendor-neutral standard for traces and metrics; manual spans and a single metric registry. Stdlib logging cannot produce distributed traces or OTLP metrics | `opentelemetry-semantic-conventions`; `typing-extensions` (present). API and SDK versions are pinned together and must be upgraded in lockstep |
+| OTLP/HTTP exporter 1.45.0 (Phase 3) | Exports both signals to any OTLP backend through the Collector ([ADR 005](adr/005-otlp-http-collector-jaeger.md)); the HTTP variant avoids `grpcio` | `opentelemetry-proto`, `opentelemetry-exporter-otlp-proto-common`, `opentelemetry-exporter-otlp-common`, `opentelemetry-exporter-http-transport`, `protobuf` (native wheel; follow its security advisories), `googleapis-common-protos`; uses `requests`/`urllib3`, already in the lock through LangSmith. Lock grew from 58 to 68 entries (+10) |
 | HTTPX (runtime direct since Phase 2) | The GitLab adapter calls it directly (timeouts, no redirects, mock transport in tests). It was already in the lock through openai/langgraph; declaring it avoids relying on a transitive. Same pin 0.28.1, no new packages | anyio, httpcore, certifi, idna, h11 (already present) |
 | FastAPI | ASGI HTTP routing, dependency injection and generated Pydantic contracts; stdlib has no comparable async API framework | Starlette, Pydantic, typing-extensions; follow framework/Starlette security updates together |
 | Pydantic v2 | Bounded contracts, environment validation and SDK JSON schemas; dataclasses alone do not validate arbitrary HTTP JSON | pydantic-core native wheels, annotated-types, typing-inspection, typing-extensions; native parser updates and compatibility require locked upgrades |
@@ -39,6 +41,13 @@ Docker images and GitHub Actions also introduce supply-chain trust. Versions are
 explicitly but not yet pinned to digests/commit SHAs. No dependency vulnerability audit
 or current support guarantee was measured. CI credentials are ephemeral examples, and
 no real provider credentials are used in tests. No auto-upgrade bot is installed.
+
+Phase 3 alternatives considered: the OTLP/gRPC exporter (grpcio native wheel), auto-instrumentation
+packages (more dependencies, and they record URLs, statements and headers we would have to scrub),
+`prometheus_client` in the API (a second metrics stack), and a full Prometheus/Grafana/Tempo/Loki
+stack (too heavy for the VM; see ADR 005). Container images added only in the optional profile:
+`otel/opentelemetry-collector-contrib:0.161.0` (about 522 MB) and `jaegertracing/jaeger:2.21.0`
+(about 174 MB), pinned by tag, not by digest.
 
 Phase 2 alternatives considered: a hand-written loop (similar size, but no declared topology or
 framework backstop; see ADR 004), the LangGraph Postgres checkpointer (adds psycopg plus a second

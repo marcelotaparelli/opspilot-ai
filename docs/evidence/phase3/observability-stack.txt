@@ -1,0 +1,16 @@
+profile up exit=0
+api Up 10 seconds (healthy);db Up 17 seconds (healthy);fake-gitlab Up 17 seconds (healthy);jaeger Up 17 seconds;migrate Exited (0) 10 seconds ago;otel-collector Up 17 seconds;
+rag smoke ok
+agent smoke ok
+jaeger: 80 spans; 17 distinct names; attribute keys outside allowlist: []
+collector exposition lines for app metrics: 392
+forbidden label keys in collector metrics: none-other
+--- collector stopped
+rag smoke ok during outage
+agent smoke ok during outage
+unauthenticated during outage: 401
+jaeger during outage: 80 spans; 17 distinct names; attribute keys outside allowlist: []
+telemetry.export error lines: 4
+api: Up 26 seconds (healthy)
+rag smoke ok after recovery
+jaeger after recovery: 95 spans; 17 distinct names; attribute keys outside allowlist: []

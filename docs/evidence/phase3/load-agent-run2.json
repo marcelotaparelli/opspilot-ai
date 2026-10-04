@@ -1,0 +1,41 @@
+{
+  "scenario": "agent",
+  "path": "/v1/agent/runs",
+  "requests": 300,
+  "warmup": 30,
+  "concurrency": 8,
+  "wall_seconds": 7.064,
+  "throughput_rps": 42.5,
+  "latency_ms": {
+    "p50": 178.1,
+    "p95": 254.6,
+    "p99": 308.3,
+    "max": 340.0,
+    "mean": 187.6
+  },
+  "errors": 0,
+  "error_rate": 0.0,
+  "environment": {
+    "platform": "Linux-6.12.98-x86_64-with-glibc2.36",
+    "cpus": 4,
+    "cpu_model": "AMD EPYC",
+    "memory_kib": "8157388",
+    "python": "3.12.10"
+  },
+  "resources": {
+    "opspilot-ai-api-1": {
+      "samples": 3,
+      "cpu_percent_max": 103.36,
+      "cpu_percent_mean": 101.1,
+      "memory_first": "105.7MiB",
+      "memory_last": "106.2MiB"
+    },
+    "opspilot-ai-db-1": {
+      "samples": 3,
+      "cpu_percent_max": 34.72,
+      "cpu_percent_mean": 32.1,
+      "memory_first": "105.9MiB",
+      "memory_last": "106.3MiB"
+    }
+  }
+}

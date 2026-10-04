@@ -1,0 +1,30 @@
+{
+  "benchmark": "retrieval-v2",
+  "split": "dev",
+  "k": 5,
+  "embedding_space": "fake:sha256-bow-v1:256",
+  "source": "docs/evaluation/evidence/retrieval-v2-dev-final.json",
+  "tolerance": 0.042,
+  "rationale": "DEV split only (held-out is consumed and never re-run). With the fake embedder and the fixed UUID layout the run is deterministic, so any change is a real behaviour change. A drop counts as material when it exceeds one query's worth on 24 queries (1/24 = 0.0417), e.g. one query losing its only relevant document from the top 5 or its first-rank hit. Smaller drops are reported, not gated. Improvements never fail; refresh this baseline deliberately in the same commit as the change.",
+  "metrics": {
+    "lexical": {
+      "recall@5": 0.6736111111111112,
+      "mrr@5": 0.6958333333333333,
+      "ndcg@5": 0.6175445595914347
+    },
+    "vector": {
+      "recall@5": 0.5416666666666666,
+      "mrr@5": 0.3923611111111111,
+      "ndcg@5": 0.41881458425466117
+    },
+    "hybrid": {
+      "recall@5": 0.6284722222222222,
+      "mrr@5": 0.5291666666666667,
+      "ndcg@5": 0.5261714125172031
+    }
+  },
+  "invariants": {
+    "rrf_recomputation_mismatches": 0,
+    "lexical_branch_empty_max": 1
+  }
+}

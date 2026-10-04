@@ -1,0 +1,4 @@
+start api_memory=104.9MiB
+rag x2000 p95 92.4 err 0 api_memory=105.4MiB
+agent x1000 p95 249.4 err 0 api_memory=105.7MiB
+rag x2000 p95 93.2 err 0 api_memory=105.3MiB

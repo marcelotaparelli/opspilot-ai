@@ -23,6 +23,7 @@ from opspilot.agent.models import (
     idempotency_key,
 )
 from opspilot.agent.ports import AgentError, Issue
+from opspilot.observability import trace_ids
 from opspilot.persistence.postgres import PostgresRepository
 
 Event = tuple[str, str, dict[str, object]]
@@ -84,7 +85,10 @@ class RunBundle:
 async def _events(
     connection: AsyncConnection, tenant: UUID, run_id: UUID, events: list[Event]
 ) -> None:
-    for kind, actor, data in events:
+    # Links each audit event to the distributed trace that produced it.
+    trace_id = trace_ids()[0]
+    for kind, actor, payload in events:
+        data = payload | {"trace_id": trace_id} if trace_id != "-" else payload
         await connection.execute(
             text(
                 "INSERT INTO agent_events (run_id, tenant_id, type, actor, data) "

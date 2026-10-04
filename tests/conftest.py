@@ -15,6 +15,20 @@ from tests.helpers import TENANT_A, TENANT_B, TOKEN_A, TOKEN_B
 
 if TYPE_CHECKING:
     from tests.agent_support import Env
+    from tests.telemetry_support import Telemetry
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _telemetry_sdk() -> "Telemetry":
+    from tests.telemetry_support import install
+
+    return install()
+
+
+@pytest.fixture
+def telemetry(_telemetry_sdk: "Telemetry") -> "Telemetry":
+    _telemetry_sdk.clear()
+    return _telemetry_sdk
 
 
 @pytest.fixture

@@ -121,3 +121,16 @@ class Repository(Protocol):
     async def ready(self) -> None: ...
 
     async def close(self) -> None: ...
+
+
+@dataclass(frozen=True)
+class Usage:
+    """Normalised provider token usage. None means unknown, never zero."""
+
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    total_tokens: int | None = None
+
+    @property
+    def known(self) -> bool:
+        return self.input_tokens is not None and self.output_tokens is not None

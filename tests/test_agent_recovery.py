@@ -19,9 +19,13 @@ ROOT = Path(__file__).resolve().parents[1]
 
 CHILD = textwrap.dedent(
     """
-    import asyncio, sys
+    import asyncio, logging, sys
     from uuid import UUID
     from tests.agent_support import Env, service
+
+    # stdout carries the protocol (the run ID); JSON logs go to stderr in the child.
+    for handler in logging.getLogger("opspilot").handlers:
+        handler.setStream(sys.stderr)  # type: ignore[attr-defined]
 
     async def main() -> None:
         a, b, url, phase = UUID(sys.argv[1]), UUID(sys.argv[2]), sys.argv[3], sys.argv[4]

@@ -9,10 +9,19 @@ have processed the request; nothing is retried here.
 import asyncio
 
 import httpx
+from opentelemetry.propagate import inject
 from pydantic import BaseModel, ValidationError
 
 from opspilot.agent.ports import CreateOutcome, Issue, TrackerUnavailable
-from opspilot.observability import span
+from opspilot.observability import annotate, span
+
+
+def trace_headers() -> dict[str, str]:
+    """W3C traceparent for the outgoing call (no baggage, no user data)."""
+    carrier: dict[str, str] = {}
+    inject(carrier)
+    return {key: value for key, value in carrier.items() if key in ("traceparent", "tracestate")}
+
 
 # Raised before any request byte can have been sent: provably no side effect.
 NOT_SENT = (httpx.ConnectError, httpx.ConnectTimeout, httpx.PoolTimeout)
@@ -65,9 +74,14 @@ class GitLabTracker:
             "assignee_ids": list(assignee_ids),
         }
         try:
-            with span("gitlab.request"):
+            with span(
+                "gitlab.request", ai__gitlab__operation="create", http__request__method="POST"
+            ) as current:
                 async with asyncio.timeout(self.timeout * 2):
-                    response = await self.client.post(f"/projects/{project_id}/issues", json=body)
+                    response = await self.client.post(
+                        f"/projects/{project_id}/issues", json=body, headers=trace_headers()
+                    )
+                annotate(current, http__response__status_code=response.status_code)
         except NOT_SENT:
             return CreateOutcome("not_sent", "gitlab_connect_failed", retryable=True)
         except (httpx.HTTPError, TimeoutError):
@@ -93,12 +107,16 @@ class GitLabTracker:
 
     async def find_by_marker(self, project_id: int, marker: str) -> list[Issue]:
         try:
-            with span("gitlab.request"):
+            with span(
+                "gitlab.request", ai__gitlab__operation="lookup", http__request__method="GET"
+            ) as current:
                 async with asyncio.timeout(self.timeout * 2):
                     response = await self.client.get(
                         f"/projects/{project_id}/issues",
                         params={"search": marker, "in": "description", "per_page": 20},
+                        headers=trace_headers(),
                     )
+                annotate(current, http__response__status_code=response.status_code)
         except (httpx.HTTPError, TimeoutError):
             raise TrackerUnavailable from None
         if response.status_code != 200:
