@@ -32,7 +32,12 @@ v0.1.0: real 256-dimensional embedding, strict answer/planner schemas, database-
 citation membership, usage/served models, trace IDs and bounded timeout. Pricing was not
 configured; no measured cost or real-model quality claim. [Details](docs/evidence/release/live-provider-status.md).
 
-GITLAB LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
+GITLAB LIVE EVIDENCE: PASS — POST-RELEASE SANDBOX INTEGRATION ONLY
+
+[GitLab live smoke](docs/evidence/release/live-gitlab-smoke.json) passed on 2026-10-05 in a real
+sandbox: no GitLab request before approval, issue creation/GET, second approval 409, resume
+without another create (1 matching issue / 1 create POST), and confirmed closure. This is
+integration evidence for this run; no exactly-once or production deployment claim.
 
 ## Quickstart
 
@@ -131,8 +136,8 @@ checks the stored hash and current policy again.
 
 Lost GitLab responses and 5xx can conceal completed writes. Execution becomes ambiguous and
 searches for its exact marker before resending. Recovery requires `/resume`; there is no worker.
-A lease cannot fence an in-flight external request. Search visibility is unmeasured against
-real GitLab. [Workflow, failure modes and limits](docs/architecture/agent-workflow.md).
+A lease cannot fence an in-flight external request. The sandbox smoke found 1 issue by its
+marker; delayed search visibility and lost-response recovery remain unmeasured against real GitLab. [Workflow, failure modes and limits](docs/architecture/agent-workflow.md).
 
 Use `compose.smoke.yaml` alongside `compose.yaml` for disposable fake GitLab testing. This
 override enables HTTP and needs development configuration. `scripts/smoke.py` and
@@ -189,7 +194,10 @@ The opt-in live scripts require credentials **and** their respective
 Missing configuration exits 2 before external work. OpenAI reserves at most nine requests,
 with optional small database-backed RAG. GitLab requires HTTPS, a sandbox project and migrated
 DB; it tests approval/create/confirm/conflict/resume/close and attempts cleanup after partial
-failure. Use a project access token, Reporter role, `api` scope, short expiry and sandbox only.
+failure. Use a short-expiry token restricted to the sandbox. The owner reports that the
+passing run used a fine-grained token with Work Item Create/Read/Update permissions; token
+configuration is not recorded by the JSON. A project access token with Reporter role / `api`
+scope remains the documented alternative.
 Rehearsals remain separate from live evidence. No credentials are requested for this validation.
 
 [AWS deployment and qualitative cost drivers](docs/deployment/aws.md): public ALB → ECS/Fargate

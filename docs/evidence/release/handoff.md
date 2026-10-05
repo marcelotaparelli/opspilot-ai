@@ -1,4 +1,4 @@
-> HISTORICAL ATTEMPT. Current ENGINEERING RELEASE: PASS; both live providers NOT EXECUTED; PUSH REALIZADO: NO. See [final validation](final-validation.md).
+> HISTORICAL ATTEMPT. The provider statuses below describe this attempt. See [final validation](final-validation.md) for the engineering gate and [current post-release provider status](live-provider-status.md) for subsequent live evidence.
 
 # Phase 4 — handoff da continuação
 

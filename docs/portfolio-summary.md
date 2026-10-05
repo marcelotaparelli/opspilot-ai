@@ -79,9 +79,15 @@ Strict answer/planner schemas, database-backed RAG (1 evidence item / 1 citation
 membership, usage, served models, trace IDs and bounded timeout passed. No secret was found
 in captured logs/spans. Pricing was not configured; no measured cost is claimed.
 
+Post-release [GitLab live integration evidence](evidence/release/live-gitlab-smoke.json)
+passed on 2026-10-05 in a real sandbox: zero GitLab requests before approval, successful
+creation/GET, both markers present, second approval 409 and resume succeeded with 1 matching
+issue / 1 create POST. Closure was confirmed with final state closed. This does not establish
+exactly-once or production GitLab deployment.
+
 ## Limitations
 
-GITLAB LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED. OpenAI live evidence covers
+GITLAB LIVE EVIDENCE: PASS — POST-RELEASE SANDBOX INTEGRATION ONLY. OpenAI live evidence covers
 the exercised integration and schema acceptance only; semantic retrieval quality, factual
 entailment and AWS performance remain unmeasured. Static tokens lack SSO/lifecycle, recovery
 needs client invocation, exact vector search has linear work, and the default cloud topology

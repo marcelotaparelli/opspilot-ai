@@ -4,7 +4,7 @@ ENGINEERING RELEASE: PASS
 
 OPENAI LIVE EVIDENCE: PASS — POST-RELEASE INTEGRATION ONLY
 
-GITLAB LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
+GITLAB LIVE EVIDENCE: PASS — POST-RELEASE SANDBOX INTEGRATION ONLY
 
 Release v0.1.0 is published on GitHub, tagged at
 `04fb9aada0c11f16838544316c1fd71e6537d911`. The owner confirmed GitHub Actions completed
@@ -24,6 +24,7 @@ were subsequently confirmed by the owner; this documentation task does not rerun
 | [Phase 3](evidence/phase3/) | Historical 201 unit / 64 integration, 16 agent / 10 security, 14/14 mutations, telemetry/load |
 | [Phase 4](evidence/release/README.md) | Historical release gate FINAL PASS: 241 unit / 72 integration, 5 migrations, regressions, scans, runtime, plans and cold clean-room |
 | [Post-release OpenAI live smoke](evidence/release/live-openai-smoke.json) | PASS at 2026-10-04T23:45:24+00:00: real embedding, strict answer/planner schemas, database-backed RAG, citation membership, usage, served models, traces and bounded timeout; integration only |
+| [Post-release GitLab live smoke](evidence/release/live-gitlab-smoke.json) | PASS at 2026-10-05T00:16:39+00:00: real sandbox approval/create/GET, markers, second approval 409, resume with 1 issue / 1 create POST, confirmed closed; integration only |
 
 Final suites each collected 313 tests: non-integration selected/passed 241, deselected 72;
 integration selected/passed 72, deselected 241; no failures/skips. Telemetry and offline
@@ -54,6 +55,12 @@ records `passed: true`, `text-embedding-3-small` / `gpt-4.1-mini`, 256-dimension
 strict answer/planner schema acceptance, 1 retrieved evidence item and 1 citation, usage, served
 models and trace IDs. Timeout classification/bounds passed; `secret_in_logs_or_spans: false`.
 `pricing_configured: false` and all cost values are null; no measured cost is claimed.
-GitLab permissions/search/cleanup and AWS runtime remain NOT EXECUTED. Hosted Actions passed
+The post-release GitLab JSON records `passed: true`: proposal 201 / awaiting_approval with
+zero GitLab requests before approval; approval 200 / succeeded; create 201 / GET 200; both
+markers present; second approval 409; resume 200 / succeeded with 1 matching issue / 1 create
+POST; close 200 / confirmation 200 / final state closed. The owner reports a fine-grained
+sandbox token with Work Item Create/Read/Update; token configuration is not in the JSON.
+This does not establish exactly-once, real lost-response recovery or production GitLab/AWS
+deployment. AWS runtime remains NOT EXECUTED. Hosted Actions passed
 for v0.1.0; Terraform validation in CI does not establish a production deployment.
 No new mutation score or real semantic-quality claim; this update did not rerun live providers.

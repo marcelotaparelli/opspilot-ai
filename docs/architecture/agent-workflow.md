@@ -312,9 +312,9 @@ arbitrary project, double side effect, step bound). **17 / 17 were caught.**
 ## 12. Limitations
 
 - **External-service evidence limits:**
-  - No real GitLab instance was used. The fake server implements only the endpoints the adapter
-    calls, and its search is a substring match.
-  - The optional real GitLab smoke is documented in the README and was not run.
+  - Historical agent evaluation used fake GitLab, whose search is a substring match.
+  - The post-release real sandbox GitLab smoke passed approval/create/confirm/conflict/resume/close.
+    This does not measure lost-response recovery, delayed search visibility or exactly-once.
   - Historical agent evaluation used mocked/scripted planners. The post-release OpenAI smoke
     accepted the real planner structured schema; it does not evaluate agent/model quality.
 - **Static identity:** principals come from configured tokens, with no SSO, rotation workflow or
@@ -335,10 +335,10 @@ arbitrary project, double side effect, step bound). **17 / 17 were caught.**
   is unchanged), so the retrieval-v2 freeze manifest correctly refuses a held-out re-run at this
   commit. The published held-out result belongs to commit `7ba3378`.
 
-## 13. Optional real GitLab smoke (not executed)
+## 13. Optional real GitLab smoke
 
-Use `scripts/live_gitlab_smoke.py` only with a disposable sandbox project, a project access
-token with Reporter role / `api` scope / short expiry, HTTPS base URL, numeric project ID,
+Use `scripts/live_gitlab_smoke.py` only with a disposable sandbox project and a short-expiry
+token restricted to that project, HTTPS base URL, numeric project ID,
 a migrated runtime-role `DATABASE_URL`, and `OPSPILOT_ALLOW_REAL_GITLAB_SMOKE=true`.
 Missing configuration exits 2 without network work. Never run this script in CI.
 
@@ -353,7 +353,15 @@ unknown HTTP status. No token, URL, path or request/document content is written 
 The fake-server rehearsal tests this logic, not real GitLab's role permissions, search
 visibility or version-specific behavior. Latest status:
 
-GITLAB LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
+GITLAB LIVE EVIDENCE: PASS — POST-RELEASE SANDBOX INTEGRATION ONLY
+
+The [retained JSON](../evidence/release/live-gitlab-smoke.json) records proposal 201 /
+awaiting_approval and zero GitLab requests before approval; approval 200 / succeeded; create
+201 / GET 200; both smoke/action markers; second approval 409; resume 200 / succeeded with
+1 matching issue / 1 create POST; close 200 / confirmation 200 / final state closed.
+The owner reports a fine-grained sandbox token with Work Item Create/Read/Update; its
+configuration is not in the JSON. Reporter / `api` project access tokens remain a documented
+alternative. This is integration evidence for this run, not an exactly-once or production claim.
 
 OPENAI LIVE EVIDENCE: PASS — POST-RELEASE INTEGRATION ONLY
 

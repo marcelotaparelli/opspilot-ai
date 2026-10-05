@@ -1,0 +1,57 @@
+{
+  "smoke": "live-gitlab",
+  "timestamp": "2026-10-05T00:16:39+00:00",
+  "marker": "opspilot-smoke:372ebbe5-795d-4a1a-b02f-1db405666478",
+  "project_id": 87229685,
+  "issue": {
+    "issue_id": 205417909,
+    "issue_iid": 2,
+    "project_id": 87229685,
+    "state_after_create": "opened",
+    "marker_in_description": true,
+    "idempotency_marker_in_description": true,
+    "final_state": "closed"
+  },
+  "checks": [
+    {
+      "step": "proposal",
+      "http": 201,
+      "run_status": "awaiting_approval",
+      "gitlab_requests_before_approval": 0
+    },
+    {
+      "step": "approve_and_execute",
+      "http": 200,
+      "run_status": "succeeded",
+      "gitlab_create_http": 201
+    },
+    {
+      "step": "confirm_via_get",
+      "http": 200
+    },
+    {
+      "step": "idempotency_rerun",
+      "second_approval_http": 409,
+      "resume_http": 200,
+      "run_status_after_resume": "succeeded",
+      "issues_with_marker": 1,
+      "create_requests_sent": 1
+    },
+    {
+      "step": "close_issue",
+      "http": 200,
+      "confirm_http": 200
+    }
+  ],
+  "adapter_requests": [
+    {
+      "method": "POST",
+      "http": 201
+    },
+    {
+      "method": "GET",
+      "http": 200
+    }
+  ],
+  "passed": true
+}

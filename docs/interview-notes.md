@@ -92,14 +92,16 @@ schemas, including minLength/maxLength. The post-release
 embeddings, answer/planner schema acceptance and database-backed RAG. Usage, served models,
 trace IDs, citation membership and bounded timeout passed; no secret was found in captured
 logs/spans. Pricing was not configured, so cost remains unknown. This does not measure model
-quality. GitLab requires a least-privilege sandbox token and closes smoke issues; its live
-evidence remains NOT EXECUTED — CREDENTIALS NOT PROVIDED.
+quality. The [post-release GitLab smoke](evidence/release/live-gitlab-smoke.json) also passed
+in a real sandbox: zero GitLab requests before approval, create/GET, both markers, second
+approval 409, resume succeeded with 1 matching issue / 1 create POST, and confirmed closed.
+The owner reports a project-restricted fine-grained token with Work Item Create/Read/Update;
+this token configuration is not a JSON observation. No exactly-once or production claim follows.
 
 The continuation also found that some smoke facts were recorded without influencing PASS.
 Evidence predicates now require usage/model/cost when configured, trace IDs, valid evidence
 and a classified bounded timeout. Negative tests passed when these observations were deliberately removed.
-Passing rehearsals remain separate from the post-release OpenAI live proof and unexecuted
-GitLab live smoke.
+Passing rehearsals remain separate from the post-release OpenAI and GitLab live evidence.
 
 ## Release discipline
 
@@ -108,7 +110,7 @@ release commit. The CLI logger lifecycle bug was fixed and repeated closed-strea
 covered. Engineering PASS includes 241 unit / 72 integration, migration rollback/retry,
 regressions, runtime/HTTP, scans and offline Terraform. Unfixed image findings and deliberate
 IaC risks remain visible. The original gate did not execute live providers or AWS, rerun
-held-out evaluation or apply infrastructure. OpenAI integration subsequently passed post-release;
-GitLab and AWS execution remain unverified. Release v0.1.0
+held-out evaluation or apply infrastructure. OpenAI and sandbox GitLab integration subsequently
+passed post-release; AWS execution remains unverified. Release v0.1.0
 is published on GitHub; hosted GitHub Actions jobs `checks` and `terraform` passed. This
 post-release documentation task makes no further push and does not change the published tag.

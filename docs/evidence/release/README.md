@@ -4,7 +4,8 @@ This page preserves the pre-publication Phase 4/v0.1.0 gate snapshot. Its provid
 statuses below describe that historical gate. Separately, the
 [post-release OpenAI live smoke](live-openai-smoke.json) passed at
 2026-10-04T23:45:24+00:00; see [current provider status](live-provider-status.md).
-It was not part of the original gate. GitLab live evidence remains NOT EXECUTED.
+The [post-release GitLab live smoke](live-gitlab-smoke.json) also passed at
+2026-10-05T00:16:39+00:00 in a real sandbox. Neither live run was part of the original gate.
 The published v0.1.0 tag and release are unchanged.
 
 ENGINEERING RELEASE: PASS

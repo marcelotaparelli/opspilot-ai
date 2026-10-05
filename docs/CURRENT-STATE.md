@@ -4,7 +4,7 @@ ENGINEERING RELEASE: PASS
 
 OPENAI LIVE EVIDENCE: PASS — POST-RELEASE INTEGRATION ONLY
 
-GITLAB LIVE EVIDENCE: NOT EXECUTED — CREDENTIALS NOT PROVIDED
+GITLAB LIVE EVIDENCE: PASS — POST-RELEASE SANDBOX INTEGRATION ONLY
 
 RELEASE v0.1.0: PUBLISHED ON GITHUB
 
@@ -38,8 +38,14 @@ The [post-release OpenAI smoke](evidence/release/live-openai-smoke.json), record
 `text-embedding-3-small` (256 dimensions) and `gpt-4.1-mini`, accepted both strict schemas,
 and retrieved 1 evidence item with 1 citation. Usage, served models, trace IDs and a classified
 bounded timeout passed; `secret_in_logs_or_spans` is false. Pricing was not configured, so
-no measured cost is claimed. [Provider details and GitLab prerequisites](evidence/release/live-provider-status.md).
-GitLab remains unverified live; held-out retrieval-v2 was not rerun for this release.
+no measured cost is claimed. [Provider details](evidence/release/live-provider-status.md).
+The [post-release GitLab smoke](evidence/release/live-gitlab-smoke.json), recorded at
+2026-10-05T00:16:39+00:00, passed in a real sandbox: proposal 201 / awaiting_approval,
+zero GitLab requests before approval, approval 200 / succeeded, create 201 and GET 200.
+Both smoke/action markers were present. Second approval returned 409; resume returned
+200 / succeeded, with 1 matching issue and 1 create POST. Close and confirmation returned
+200, and final state was closed. Token scope is owner-reported in the provider details.
+Held-out retrieval-v2 was not rerun for this release.
 No real-model quality,
 AWS runtime/TLS/SQL-log privacy/performance or exactly-once guarantee is implied. Static
 identity, manual recovery, narrow defaults and known blueprint risks remain documented.
